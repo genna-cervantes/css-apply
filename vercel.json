@@ -1,4 +1,4 @@
 {
-  "installCommand": "npm config set target_platform linux && npm config set target_arch x64 && npm install --force",
+  "installCommand": "npm install --force --no-optional",
   "buildCommand": "npm run build"
 }
