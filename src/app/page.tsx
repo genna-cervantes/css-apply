@@ -234,7 +234,7 @@ export default function Home() {
               is where curious minds, creative thinkers, and future tech leaders
               come together.{" "}
               <span className="font-bold">
-                We're here to help you grow, collaborate, and make an impact
+                We are here to help you grow, collaborate, and make an impact
               </span>{" "}
               — inside and outside the classroom.
               <br />
