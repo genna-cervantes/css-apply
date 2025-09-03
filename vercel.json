@@ -1,4 +1,4 @@
 {
-  "installCommand": "npm install --force --no-optional",
+  "installCommand": "rm -f package-lock.json && npm install --force",
   "buildCommand": "npm run build"
 }
