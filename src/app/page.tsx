@@ -224,7 +224,7 @@ export default function Home() {
         <div className="space-y-5 lg:space-y-0 lg:flex lg:justify-around">
           <div className="font-raleway lg:w-1/2 flex flex-col justify-center">
             <p className="text-md md:text-xl">WHAT HAPPENS</p>
-            <p className="text-2xl md:text-3xl lg:text-6xl font-bold ">
+            <p className="text-3xl md:text-4xl lg:text-6xl font-bold ">
               when <span className="text-[#3F74B8]">passion</span> <br /> meets{" "}
               <span className="text-[#134687]">technology?</span>
             </p>
@@ -280,7 +280,7 @@ export default function Home() {
       </section>
 
       {/* Mobile View */}
-      <section className="md:hidden">
+      <section className="sm:hidden">
         <div className="-space-y-16">
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-center justify-center"
@@ -342,7 +342,7 @@ export default function Home() {
               backgroundImage: "url('/assets/pictures/s4_mobile_pic4.png')",
             }}
           >
-            <div className="p-3 mb-2 text-left text-white flex mt-24">
+            <div className="p-3 ml-4 mb-2 text-left text-white flex mt-24">
               <p className="font-inter font-extralight text-7xl">03</p>
 
               <div className="font-inter ml-3">
