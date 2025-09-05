@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from 'next-auth/react';
@@ -405,7 +406,7 @@ export default function Home() {
               backgroundImage: "url('/assets/pictures/s4_desktop_pic2.png')",
             }}
           >
-            <div className="font-inter text-left text-white w-[80%] mb-10 ml-5">
+            <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
               <p className="text-9xl font-extralight">01</p>
               <p className="font-semibold text-lg mt-2">NEW PATHS AWAIT YOU</p>
               <p className="font-extralight text-md mt-2">
@@ -420,7 +421,7 @@ export default function Home() {
               backgroundImage: "url('/assets/pictures/s4_desktop_pic3.png')",
             }}
           >
-            <div className="font-inter text-left text-white w-[80%] mb-10 ml-5 ">
+            <div className="font-inter text-left text-white w-[80%] mb-14 ml-5 ">
               <p className="text-9xl font-extralight">02</p>
               <p className="font-semibold text-lg mt-2">UNITED WE RISE</p>
               <p className="font-extralight text-md mt-2">
@@ -435,13 +436,124 @@ export default function Home() {
               backgroundImage: "url('/assets/pictures/s4_desktop_pic4.png')",
             }}
           >
-            <div className="font-inter text-left text-white w-[80%] mb-10 ml-5">
+            <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
               <p className="text-9xl font-extralight">03</p>
               <p className="font-semibold text-lg mt-2">LEARN FROM EXPERTS</p>
               <p className="font-extralight text-md mt-2">
                 Exclusive talks and mentorships to guide your CS journey.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="h-1/2 w-full flex flex-col justify-center items-center">
+          <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-5 gap-2 w-[85%]">
+            <p className="text-3xl">Why join us?</p>
+            <p className="italic text-md">Discover Why You Belong Here</p>
+          </div>
+
+          <div className="flex flex-col justify-center items-center text-white mt-4 gap-2">
+            <div className="bg-[#1457AC] w-[85%] px-7 py-4 rounded-xl">
+              Be part of exciting projects and events that shape the CSS
+              community.
+            </div>
+
+            <div className="bg-[#1457AC] w-[85%] px-7 py-4 rounded-xl">
+              Be part of exciting projects and events that shape the CSS
+              community.
+            </div>
+
+            <div className="bg-[#1457AC] w-[85%] px-7 py-4 rounded-xl">
+              Be part of exciting projects and events that shape the CSS
+              community.
+            </div>
+          </div>
+
+          <div className="h-0.5 w-[90%] bg-[#AEAEAE] mt-12"></div>
+        </div>
+
+        <div className="h-1/2 w-full flex flex-col justify-center items-center mb-5">
+          <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-5 gap-2 w-[85%] mt-5">
+            <p className="text-3xl">Our Committees</p>
+            <p className="italic text-md">Discover where you fit in</p>
+          </div>
+
+          <div className="flex w-full flex-col justify-center items-center text-white text-md mt-4 gap-2">
+            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
+              <Icon icon="ri:book-fill" /> Academics
+            </div>
+
+            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
+              <Icon icon="ri:community-fill" /> Community Development
+            </div>
+
+            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
+              <Icon icon="mdi:partnership" /> External Affairs
+            </div>
+
+            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
+              <Icon icon="mdi:art" />
+              Creatives and Technicals
+            </div>
+
+            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
+              <Icon icon="material-symbols:money-bag-rounded" />
+              Finance
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gradient-to-r from-[#2F7EE3] to-[#0E2A4D] p-5 w-screen">
+        <div className="flex flex-col justify-center items-center space-y-6 mt-5">
+          <div className="text-[#1C4D8C] text-sm bg-white p-3 rounded-3xl text-center font-bold">
+            Not Sure Which Committee You Belong To?
+          </div>
+          <div className="text-md font-bold text-white text-center w-[80%]">
+            Find Your Perfect Committe in Just a Few Clicks!
+          </div>
+          <div className="text-center text-white">
+            Take our quick and fun test to discover which committee matches your
+            skills, passions, and goals.
+          </div>
+          <button className=" text-[#1C4D8C] bg-white text-sm rounded-2xl px-3 mt-5">
+            <div className="flex items-center justify-center gap-2">
+              <p>Take the Test</p>
+              <Icon icon="flowbite:arrow-right-outline" className="text-3xl" />
+            </div>
+          </button>
+          <Image
+            src="/assets/logos/csar.png"
+            alt=""
+            width={250}
+            height={250}
+            className="mt-3 mb-4"
+          />
+        </div>
+      </section>
+
+      <section className="bg-[#00459C] p-5">
+        <div className="flex flex-col justify-center items-center">
+          <div className="text-2xl text-shadow-md text-white">
+            Build the future. Start with us.
+          </div>
+          <div className="text-center text-sm text-extralight text-shadow-sm text-white mt-2">
+            Join the Computer Science Society and turn your passion into impact
+          </div>
+          <div className="flex flex-col gap-4 mt-7">
+            <button className="bg-white px-7 py-2 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+              Apply as Member
+            </button>
+
+            <button className="bg-white px-7 py-2 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+              Apply as Staff
+            </button>
+
+            <button className="bg-white px-7 py-2 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+              Apply as Executive Assistant
+            </button>
           </div>
         </div>
       </section>
