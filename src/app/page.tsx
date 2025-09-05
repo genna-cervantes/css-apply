@@ -384,9 +384,7 @@ export default function Home() {
           >
             <div className="font-inter text-left text-white w-[80%] mb-10 ml-5">
               <p className="text-9xl font-extralight">01</p>
-              <p className="font-semibold text-lg mt-2">
-                UNLOCKED OPPORTUNITIES
-              </p>
+              <p className="font-semibold text-lg mt-2">NEW PATHS AWAIT YOU</p>
               <p className="font-extralight text-md mt-2">
                 Events and workshops to power up your skills and connections.
               </p>
@@ -401,9 +399,7 @@ export default function Home() {
           >
             <div className="font-inter text-left text-white w-[80%] mb-10 ml-5 ">
               <p className="text-9xl font-extralight">02</p>
-              <p className="font-semibold text-lg mt-2">
-                STRONGER THROUGH UNITY
-              </p>
+              <p className="font-semibold text-lg mt-2">UNITED WE RISE</p>
               <p className="font-extralight text-md mt-2">
                 A community where collaboration turn into friendships that last.
               </p>
@@ -418,9 +414,7 @@ export default function Home() {
           >
             <div className="font-inter text-left text-white w-[80%] mb-10 ml-5">
               <p className="text-9xl font-extralight">03</p>
-              <p className="font-semibold text-lg mt-2">
-                LEARN FROM THE EXPERTS
-              </p>
+              <p className="font-semibold text-lg mt-2">LEARN FROM EXPERTS</p>
               <p className="font-extralight text-md mt-2">
                 Exclusive talks and mentorships to guide your CS journey.
               </p>
