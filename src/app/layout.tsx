@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Raleway, Poppins } from "next/font/google";
 import "./globals.css";
+import SessionWrapper from "@/components/SessionWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,11 +33,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${raleway.variable} ${poppins.variable}`}
-    >
-      <body>{children}</body>
-    </html>
+    <SessionWrapper>
+      <html
+        lang="en"
+        className={`${inter.variable} ${raleway.variable} ${poppins.variable}`}
+      >
+        <body>{children}</body>
+      </html>
+    </SessionWrapper>
+
   );
 }

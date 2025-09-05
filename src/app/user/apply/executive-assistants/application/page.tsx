@@ -3,11 +3,58 @@
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function ExecutiveAssistantApplication() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const ebId = searchParams.get("eb");
+  const { data: session } = useSession() // Backend session check
+
+  // Replace the current handleSubmit function with this:
+  // const handleSubmit = async () => {
+  //   if (!isChecked) {
+  //     alert('Please agree to the terms and conditions')
+  //     return
+  //   }
+
+  //   if (!formData.studentNumber || !formData.firstName || !formData.lastName || 
+  //       !formData.section || !formData.secondChoice || !formData.cv) {
+  //     alert('Please fill in all required fields')
+  //     return
+  //   }
+
+  //   try {
+  //     // Use your existing API endpoint
+  //     const response = await fetch('/api/applications/ea/complete', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         studentNumber: formData.studentNumber,
+  //         section: formData.section,
+  //         firstName: formData.firstName,
+  //         lastName: formData.lastName,
+  //         firstOptionEb: ebId, // This comes from the URL parameter
+  //         secondOptionEb: formData.secondChoice,
+  //         cvLink: formData.cv, // This should be a URL/link, not file content
+  //         portfolioLink: '', // Add if needed
+  //       }),
+  //     })
+
+  //     if (response.ok) {
+  //       router.push('/user/apply/executive-assistants/schedule')
+  //     } else {
+  //       const errorData = await response.json()
+  //       alert(errorData.error || 'Application failed. Please try again.')
+  //     }
+  //   } catch (error) {
+  //     console.error('Error submitting application:', error)
+  //     alert('Application failed. Please try again.')
+  //   }
+  // }
+
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
