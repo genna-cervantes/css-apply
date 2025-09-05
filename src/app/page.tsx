@@ -39,7 +39,7 @@ export default function Home() {
   };
 
   return (
-    <div className="">
+    <div className="h-full w-full">
       <section className="min-h-screen w-full bg-gradient-to-b from-[#000000] via-[rgb(1,124,238)] via-69% to-[#0054FF] relative overflow-hidden">
         <header className="flex justify-center sm:justify-start p-9 md:p-6 relative z-30">
           <Image
@@ -280,15 +280,15 @@ export default function Home() {
       </section>
 
       {/* Mobile View */}
-      <section className="sm:hidden">
-        <div className="-space-y-16">
+      <section className="lg:hidden">
+        <div className="">
           <div
-            className="relative w-full h-60 bg-cover bg-center flex items-center justify-center"
+            className="relative w-full h-60 bg-cover bg-center flex items-center"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic1.png')",
             }}
           >
-            <div className="p-5 ml-4 mb-7 text-left text-white border-l-4 border-white">
+            <div className="p-5 ml-4 sm:ml-10 sm:w-[60%] md:w-[40%] md:ml-10 text-left text-white border-l-4 border-white">
               <p className="font-inter text-md italic">
                 CSS 2025 is going to be bigger, bolder, and innovative than ever
               </p>
@@ -300,12 +300,12 @@ export default function Home() {
           </div>
 
           <div
-            className="relative w-full h-60 bg-cover bg-center flex items-center"
+            className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic2.png')",
             }}
           >
-            <div className="p-3 ml-4 mb-7 text-left text-white flex mt-24">
+            <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-1/2 sm:ml-4 md:ml-6">
               <p className="font-inter font-extralight text-7xl">01</p>
 
               <div className="font-inter ml-3">
@@ -319,12 +319,12 @@ export default function Home() {
           </div>
 
           <div
-            className="relative w-full h-60 bg-cover bg-center flex items-center"
+            className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic3.png')",
             }}
           >
-            <div className="p-3 ml-4 mb-7 text-left text-white flex mt-24">
+            <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
               <p className="font-inter font-extralight text-7xl">02</p>
 
               <div className="font-inter ml-3">
@@ -337,12 +337,12 @@ export default function Home() {
           </div>
 
           <div
-            className="relative w-full h-56 bg-cover bg-center flex items-center"
+            className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic4.png')",
             }}
           >
-            <div className="p-3 ml-4 mb-2 text-left text-white flex mt-24">
+            <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
               <p className="font-inter font-extralight text-7xl">03</p>
 
               <div className="font-inter ml-3">
@@ -351,6 +351,79 @@ export default function Home() {
                   Exclusive talks and mentorships to guide your CS journey.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Desktop View */}
+      <section className="hidden lg:block bg-black">
+        <div className="sm:flex sm:flex-row h-[700px] w-screen">
+          <div
+            className="w-[28%] h-full bg-cover bg-center flex items-center pl-10"
+            style={{
+              backgroundImage: "url('/assets/pictures/s4_desktop_pic1.png')",
+            }}
+          >
+            <div className="flex flex-col justify-end text-left text-white border-l-4 border-white h-[80%] w-[70%] pl-3 ">
+              <p className="font-inter text-md italic">
+                CSS 2025 is going to be bigger, bolder, and innovative than ever
+              </p>
+
+              <p className="font-raleway font-semibold text-3xl mt-2">
+                What to Expect This Year
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
+            style={{
+              backgroundImage: "url('/assets/pictures/s4_desktop_pic2.png')",
+            }}
+          >
+            <div className="font-inter text-left text-white w-[80%] mb-10 ml-5">
+              <p className="text-9xl font-extralight">01</p>
+              <p className="font-semibold text-lg mt-2">
+                UNLOCKED OPPORTUNITIES
+              </p>
+              <p className="font-extralight text-md mt-2">
+                Events and workshops to power up your skills and connections.
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
+            style={{
+              backgroundImage: "url('/assets/pictures/s4_desktop_pic3.png')",
+            }}
+          >
+            <div className="font-inter text-left text-white w-[80%] mb-10 ml-5 ">
+              <p className="text-9xl font-extralight">02</p>
+              <p className="font-semibold text-lg mt-2">
+                STRONGER THROUGH UNITY
+              </p>
+              <p className="font-extralight text-md mt-2">
+                A community where collaboration turn into friendships that last.
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
+            style={{
+              backgroundImage: "url('/assets/pictures/s4_desktop_pic4.png')",
+            }}
+          >
+            <div className="font-inter text-left text-white w-[80%] mb-10 ml-5">
+              <p className="text-9xl font-extralight">03</p>
+              <p className="font-semibold text-lg mt-2">
+                LEARN FROM THE EXPERTS
+              </p>
+              <p className="font-extralight text-md mt-2">
+                Exclusive talks and mentorships to guide your CS journey.
+              </p>
             </div>
           </div>
         </div>
