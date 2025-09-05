@@ -3,9 +3,11 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from 'next-auth/react';
 
 export default function Home() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [showFirstLine, setShowFirstLine] = useState(false);
   const [showSecondLine, setShowSecondLine] = useState(false);
   const [showThirdLine, setShowThirdLine] = useState(false);
@@ -40,8 +42,17 @@ export default function Home() {
     }
   };
 
-  const handleEnterClick = () => {
-    router.push("/user");
+  // Google Auth
+  const handleEnterClick = async () => {
+    if (session) {
+      router.push("/user");
+    } else {
+      try {
+        await signIn('google', { callbackUrl: '/user' });
+      } catch (error) {
+        console.error("Sign-in error:", error);
+      }
+    }
   };
 
   return (

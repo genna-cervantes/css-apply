@@ -1,6 +1,27 @@
+"use client";
+
 import Image from "next/image";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function UserDashboard() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ 
+        callbackUrl: '/', // Redirect to home page after logout
+        redirect: true 
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Get user name from session, fallback to default
+  const userName = session?.user?.name || "User";
+
   return (
     <section className="min-h-screen bg-[#F3F3FD]">
       <header className="flex p-5 items-center justify-between shadow-md shadow-black/40 bg-white">
@@ -11,7 +32,9 @@ export default function UserDashboard() {
           height={190}
           className="drop-shadow-md"
         />
-        <button className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm transition-all duration-150 active:scale-95">
+        <button 
+          onClick={handleLogout}
+          className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]">
           Log Out
         </button>
       </header>
@@ -20,7 +43,7 @@ export default function UserDashboard() {
         <div className="flex flex-col justify-center items-center gap-16">
           <div className="flex flex-col gap-5">
             <div className="rounded-[45px] text-white text-4xl font-poppins font-medium px-0 py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)]">
-              Welcome, Mar De Guzman 👋
+              Welcome, {userName} 👋
             </div>
             <div className="text-black text-md font-Inter font-light">
               Manage your applications and explore opportunities with the
