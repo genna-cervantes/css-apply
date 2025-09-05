@@ -8,50 +8,83 @@ export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
         
-        if (!session) {
+        if (!session || !session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const body = await request.json()
-        const { paymentProof } = body
+        const { studentNumber, firstName, lastName, section, fullName } = await request.json()
 
-        // Get user from database
-        const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-        })
-
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        if (!studentNumber || !firstName || !lastName || !section) {
+            return NextResponse.json(
+                { error: 'All fields are required' },
+                { status: 400 }
+            )
         }
 
-        // Check if user already applied
+        if (!/^\d{10}$/.test(studentNumber)) {
+            return NextResponse.json(
+                { error: 'Student number must be 10 digits' },
+                { status: 400 }
+            )
+        }
+
+        const existingUserWithSN = await prisma.user.findUnique({
+            where: { studentNumber },
+        });
+
+        if (existingUserWithSN && existingUserWithSN.email !== session.user.email) {
+            return NextResponse.json(
+                { error: 'This student number is already registered by another user' },
+                { status: 400 }
+            );
+        }
+
         const existingApplication = await prisma.memberApplication.findUnique({
-            where: { studentNumber: user.studentNumber },
+            where: { studentNumber },
         })
 
         if (existingApplication) {
-            return NextResponse.json({ error: 'Already applied' }, { status: 400 })
+            return NextResponse.json(
+                { error: 'You already have a pending member application' },
+                { status: 400 }
+            )
         }
 
-        // Create Member application
-        const application = await prisma.memberApplication.create({
+        const updatedUser = await prisma.user.update({
+            where: { email: session.user.email },
             data: {
-                studentNumber: user.studentNumber,
-                paymentProof,
+                studentNumber,
+                name: fullName,
+                section,
             },
         })
 
-        // Send confirmation email
-        await sendEmail(
-            session.user.email!,
-            'Membership Application Received',
-            `<p>Thank you for applying for CSS Membership. Welcome to the Computer Science Society!</p>`
-        )
+        const application = await prisma.memberApplication.create({
+            data: {
+                studentNumber,
+                paymentProof: "", // Empty initially, will be updated after payment
+                hasAccepted: false,
+            },
+        })
 
-        return NextResponse.json(application, { status: 201 })
+        
+        return NextResponse.json({ 
+            success: true, 
+            user: updatedUser,
+            application,
+            message: 'Application submitted successfully. Please proceed to payment.' 
+        })
 
     } catch (error) {
-        console.error('Member Application error:', error)
+        console.error('Member application error:', error)
+        // Handle unique constraint violation
+        if (error instanceof Error && error.message.includes('Unique constraint')) {
+            return NextResponse.json(
+                { error: 'This student number already has an application' },
+                { status: 400 }
+            )
+        }
+
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -68,20 +101,29 @@ export async function GET() {
         }
 
         // Get user from database
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
+            include: { memberApplication: true }
         })
 
         if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        // Get Member application
-        const application = await prisma.memberApplication.findUnique({
-            where: { studentNumber: user.studentNumber },
+        return NextResponse.json({ 
+            hasApplication: !!user.memberApplication,
+            application: user.memberApplication,
+            user: {
+                studentNumber: user.studentNumber,
+                name: user.name,
+                section: user.section
+            }
         })
-
-        return NextResponse.json(application)
+        
     } catch (error) {
         console.error('Get Member Application error:', error)
         return NextResponse.json(

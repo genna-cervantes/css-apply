@@ -17,8 +17,8 @@ model User {
   id              String   @id @default(cuid())
   email           String   @unique
   name            String
-  studentNumber   String   @unique @db.VarChar(10)
-  section         String
+  studentNumber   String?   @unique @db.VarChar(10)
+  section         String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

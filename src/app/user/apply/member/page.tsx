@@ -1,12 +1,116 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
 export default function MemberApplication() {
   const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
+  const { data: session } = useSession();
+
+  // Form state - all fields will be filled by user
+  const [formData, setFormData] = useState({
+    studentNumber: "",
+    firstName: "",
+    lastName: "",
+    section: ""
+  });
+
+  useEffect(() => {
+    // Pre-fill with any existing user data if available
+    if (session?.user) {
+      setFormData(prev => ({
+        ...prev,
+        studentNumber: session.user.studentNumber || "",
+        firstName: session.user.name?.split(' ')[0] || "",
+        lastName: session.user.name?.split(' ').slice(1).join(' ') || "",
+        section: session.user.section || ""
+      }));
+    }
+  }, [session]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'studentNumber') {
+        const numericValue = value.replace(/[^0-9]/g, '').slice(0, 10); // Limit to 10 for studentNumber
+        setFormData(prev => ({ ...prev, [name]: numericValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    if (!isChecked) {
+      setError("Please agree to the data privacy terms");
+      setLoading(false);
+      return;
+    }
+
+    // Validate all fields
+    if (!formData.studentNumber || formData.studentNumber.length !== 10) {
+      setError("Please enter a valid 10-digit student number");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.firstName || !formData.lastName) {
+      setError("Please enter your first and last name");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.section) {
+      setError("Please enter your section");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/applications/member', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentNumber: formData.studentNumber,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          section: formData.section,
+          fullName: `${formData.firstName} ${formData.lastName}`.trim()
+        }),
+      });
+
+      if (response.ok) {
+        router.push('/user/member/application/payment');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Application submission failed');
+      }
+    } catch (error) {
+      setError('An error occurred while submitting your application');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ 
+        callbackUrl: '/', // Redirect to home page after logout
+        redirect: true 
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <section className="min-h-screen bg-[rgb(243,243,253)]">
@@ -19,13 +123,15 @@ export default function MemberApplication() {
           className="drop-shadow-md"
         />
         <div className="flex items-center gap-4">
-          <button className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm">
+          <button 
+          onClick={handleLogout}
+          className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm">
             Log Out
           </button>
         </div>
       </header>
       <div className="flex flex-col justify-center items-center px-50 py-20">
-        <div className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28">
+        <form onSubmit={handleSubmit} className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28">
           <div className="text-4xl font-raleway font-semibold mb-4">
             <span className="text-black">Apply as </span>
             <span className="text-[#134687]">Member</span>
@@ -45,6 +151,12 @@ export default function MemberApplication() {
                 <div className="text-black text-sm font-Inter w-[400px]">
                   <input
                     type="text"
+                    name="studentNumber"
+                    value={formData.studentNumber}
+                    onChange={handleInputChange}
+                    required
+                    pattern="[0-9]{10}"
+                    maxLength={10}
                     className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. 2019131907"
                   />
@@ -57,6 +169,10 @@ export default function MemberApplication() {
                 <div className="text-black text-sm font-Inter w-[400px]">
                   <input
                     type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
                     className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. Juan"
                   />
@@ -69,6 +185,10 @@ export default function MemberApplication() {
                 <div className="text-black text-sm font-Inter w-[400px]">
                   <input
                     type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
                     className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. Dela Cruz"
                   />
@@ -81,6 +201,10 @@ export default function MemberApplication() {
                 <div className="text-black text-sm font-Inter w-[200px]">
                   <input
                     type="text"
+                    name="section"
+                    value={formData.section}
+                    onChange={handleInputChange}
+                    required
                     className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. 1CSA"
                   />
@@ -93,6 +217,7 @@ export default function MemberApplication() {
                     id="circle-checkbox"
                     checked={isChecked}
                     onChange={(e) => setIsChecked(e.target.checked)}
+                    required
                     className="w-6 h-6 appearance-none rounded-full border-2 border-gray-400 transition-all duration-200 focus:outline-none
               hover:border-[#134687]
               checked:bg-blue-500
@@ -143,11 +268,15 @@ export default function MemberApplication() {
             >
               Back
             </button>
-            <a className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-12 py-3 rounded-lg border-2 border-[#134687] bg-white">
-              Pay Now
-            </a>
+            <button
+              type="submit"
+              disabled={loading || !formData.studentNumber || formData.studentNumber.length !== 10 || !formData.firstName || !formData.lastName || !formData.section}
+              className="whitespace-nowrap font-inter text-sm font-semibold text-white px-12 py-3 rounded-lg bg-[#134687] hover:bg-[#0d3569] disabled:opacity-50"
+            >
+              {loading ? 'Submitting...' : 'Pay Now'}
+            </button>
           </div>
-        </div>
+        </form>
       </div>
       <footer className="w-full mt-16 py-8 pl-20 pr-20 bg-[#044FAF] text-white flex flex-row gap-100 items-start border-b-10 border-[#287FEB]">
         <div className="flex flex-col">
