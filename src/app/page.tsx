@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [showFirstLine, setShowFirstLine] = useState(false);
   const [showSecondLine, setShowSecondLine] = useState(false);
   const [showThirdLine, setShowThirdLine] = useState(false);
@@ -36,6 +38,10 @@ export default function Home() {
     if (nextSection) {
       nextSection.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  const handleEnterClick = () => {
+    router.push("/user");
   };
 
   return (
@@ -129,7 +135,10 @@ export default function Home() {
 
           {showButton && (
             <div>
-              <button className="bg-[#0077FF] font-family-inter text-white py-2 px-16 font-medium text-xl shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] absolute top-[45%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 animate-fade-in">
+              <button
+                onClick={handleEnterClick}
+                className="bg-[#0077FF] font-family-inter text-white py-2 px-16 font-medium text-xl shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] absolute top-[45%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 animate-fade-in hover:bg-[#0056CC] transition-colors duration-200 cursor-pointer"
+              >
                 ENTER
               </button>
             </div>
@@ -176,7 +185,10 @@ export default function Home() {
             {/* Mobile button */}
             {showButton && (
               <div className="absolute top-[65%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40">
-                <button className="bg-[#0077FF] font-family-inter text-white py-2 px-8 md:py-3 md:px-12 font-medium text-sm md:text-lg shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] animate-fade-in rounded-sm">
+                <button
+                  onClick={handleEnterClick}
+                  className="bg-[#0077FF] font-family-inter text-white py-2 px-8 md:py-3 md:px-12 font-medium text-sm md:text-lg shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] animate-fade-in rounded-sm hover:bg-[#0056CC] transition-colors duration-200 cursor-pointer"
+                >
                   ENTER
                 </button>
               </div>
