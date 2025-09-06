@@ -235,7 +235,7 @@ export default function StaffApplication() {
                             <button
                               onClick={() =>
                                 router.push(
-                                  `/apply/committee-staff/application?committee=${selectedRole}`
+                                  `/user/apply/committee-staff/${selectedRole}/application`
                                 )
                               }
                               className="bg-[#044FAF] text-white px-10 py-3 rounded-md font-inter font-normal text-xs hover:bg-[#04387B] transition-colors"
