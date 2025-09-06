@@ -581,15 +581,15 @@ export default function Home() {
             Join the Computer Science Society and turn your passion into impact.
           </div>
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
-            <button className="bg-white lg:w-72 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-80 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Member
             </button>
 
-            <button className="bg-white lg:w-72 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-80 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Staff
             </button>
 
-            <button className="bg-white lg:w-72 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-80 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Executive Assistant
             </button>
           </div>
