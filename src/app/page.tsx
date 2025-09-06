@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, useSession } from "next-auth/react";
 
 export default function Home() {
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function Home() {
       router.push("/user");
     } else {
       try {
-        await signIn('google', { callbackUrl: '/user' });
+        await signIn("google", { callbackUrl: "/user" });
       } catch (error) {
         console.error("Sign-in error:", error);
       }
@@ -447,111 +447,149 @@ export default function Home() {
         </div>
       </section>
 
-      <section>
-        <div className="h-1/2 w-full flex flex-col justify-center items-center">
-          <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-5 gap-2 w-[85%]">
-            <p className="text-3xl">Why join us?</p>
-            <p className="italic text-md">Discover Why You Belong Here</p>
+      <section className="py-8 md:py-12">
+        <div className="min-h-screen md:min-h-[60vh] w-full flex flex-col lg:flex-row justify-center items-stretch gap-8 lg:gap-0">
+          {/* Why Join Us Section */}
+          <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8">
+            <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-4 md:p-6 gap-2 w-full max-w-md">
+              <p className="text-2xl md:text-3xl font-semibold text-center font-raleway">
+                Why join us?
+              </p>
+              <p className="italic text-sm md:text-base text-center font-inter">
+                Discover Why You Belong Here
+              </p>
+            </div>
+
+            <div className="flex flex-col justify-center items-center text-white mt-6 gap-3 w-full max-w-md font-inter">
+              <div className="bg-[#1457AC] w-full px-6 md:px-7 py-4 rounded-xl text-sm md:text-base leading-relaxed">
+                Be part of exciting projects and events that shape the CSS
+                community.
+              </div>
+
+              <div className="bg-[#1457AC] w-full px-6 md:px-7 py-4 rounded-xl text-sm md:text-base leading-relaxed">
+                Connect with like-minded individuals and build lasting
+                professional relationships.
+              </div>
+
+              <div className="bg-[#1457AC] w-full px-6 md:px-7 py-4 rounded-xl text-sm md:text-base leading-relaxed">
+                Develop leadership skills and gain valuable experience in your
+                field.
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-col justify-center items-center text-white mt-4 gap-2">
-            <div className="bg-[#1457AC] w-[85%] px-7 py-4 rounded-xl">
-              Be part of exciting projects and events that shape the CSS
-              community.
-            </div>
-
-            <div className="bg-[#1457AC] w-[85%] px-7 py-4 rounded-xl">
-              Be part of exciting projects and events that shape the CSS
-              community.
-            </div>
-
-            <div className="bg-[#1457AC] w-[85%] px-7 py-4 rounded-xl">
-              Be part of exciting projects and events that shape the CSS
-              community.
-            </div>
+          {/* Divider */}
+          <div className="flex justify-center items-center">
+            <div className="h-px w-[80%] lg:h-[60%] lg:w-px bg-[#AEAEAE]"></div>
           </div>
 
-          <div className="h-0.5 w-[90%] bg-[#AEAEAE] mt-12"></div>
+          {/* Our Committees Section */}
+          <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8">
+            <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-4 md:p-6 gap-2 w-full max-w-md">
+              <p className="text-2xl md:text-3xl font-semibold text-center font-raleway">
+                Our Committees
+              </p>
+              <p className="italic text-sm md:text-base text-center font-inter">
+                Discover where you fit in
+              </p>
+            </div>
+
+            <div className="flex w-full max-w-md flex-col justify-center items-center text-white mt-6 gap-3 font-inter">
+              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
+                <Icon icon="ri:book-fill" className="text-lg" /> Academics
+              </div>
+
+              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
+                <Icon icon="ri:community-fill" className="text-lg" /> Community
+                Development
+              </div>
+
+              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
+                <Icon icon="mdi:partnership" className="text-lg" /> External
+                Affairs
+              </div>
+
+              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
+                <Icon icon="mdi:art" className="text-lg" />
+                Creatives and Technicals
+              </div>
+
+              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
+                <Icon
+                  icon="material-symbols:money-bag-rounded"
+                  className="text-lg"
+                />
+                Finance
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="h-1/2 w-full flex flex-col justify-center items-center mb-5">
-          <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-5 gap-2 w-[85%] mt-5">
-            <p className="text-3xl">Our Committees</p>
-            <p className="italic text-md">Discover where you fit in</p>
-          </div>
-
-          <div className="flex w-full flex-col justify-center items-center text-white text-md mt-4 gap-2">
-            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
-              <Icon icon="ri:book-fill" /> Academics
+      <section className="bg-gradient-to-r from-[#2F7EE3] to-[#0E2A4D] py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
+        <div className="flex justify-center items-center mx-auto">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+            <div className="flex-shrink-0 order-2 lg:order-1">
+              <Image
+                src="/assets/logos/csar.png"
+                alt="CSAR Logo"
+                width={250}
+                height={250}
+                className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 object-contain"
+              />
             </div>
 
-            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
-              <Icon icon="ri:community-fill" /> Community Development
-            </div>
+            {/* Content - Right side on lg screens, bottom on smaller screens */}
+            <div className="flex flex-col items-center lg:items-start space-y-4 text-center lg:text-left order-1 lg:order-2 flex-1 font-raleway">
+              {/* Header badge */}
+              <div className="text-[#1C4D8C] text-sm sm:text-base lg:text-2xl bg-white py-2 px-4 sm:py-3 sm:px-6 rounded-3xl font-bold">
+                Not Sure Which Committee You Belong To?
+              </div>
 
-            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
-              <Icon icon="mdi:partnership" /> External Affairs
-            </div>
+              {/* Main heading */}
+              <div className="text-xl font-bold text-white max-w-2xl lg:ml-5">
+                Find Your Perfect Committee in Just a Few Clicks!
+              </div>
 
-            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
-              <Icon icon="mdi:art" />
-              Creatives and Technicals
-            </div>
+              {/* Description */}
+              <div className="text-white text-sm sm:text-base lg:text-lg max-w-xl leading-relaxed lg:ml-5">
+                Take our quick and fun test to discover which committee matches
+                your skills, passions, and goals.
+              </div>
 
-            <div className="bg-[#1457AC] w-[85%] rounded-lg flex justify-center items-center py-2 gap-2">
-              <Icon icon="material-symbols:money-bag-rounded" />
-              Finance
+              {/* CTA Button */}
+              <button className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 hover:bg-gray-100 transition-colors duration-200 font-semibold lg:ml-5">
+                <div className="flex items-center justify-center gap-2">
+                  <p className="font-inter">Take the Test</p>
+                  <Icon
+                    icon="flowbite:arrow-right-outline"
+                    className="text-xl sm:text-2xl"
+                  />
+                </div>
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-gradient-to-r from-[#2F7EE3] to-[#0E2A4D] p-5 w-screen">
-        <div className="flex flex-col justify-center items-center space-y-6 mt-5">
-          <div className="text-[#1C4D8C] text-sm bg-white p-3 rounded-3xl text-center font-bold">
-            Not Sure Which Committee You Belong To?
-          </div>
-          <div className="text-md font-bold text-white text-center w-[80%]">
-            Find Your Perfect Committe in Just a Few Clicks!
-          </div>
-          <div className="text-center text-white">
-            Take our quick and fun test to discover which committee matches your
-            skills, passions, and goals.
-          </div>
-          <button className=" text-[#1C4D8C] bg-white text-sm rounded-2xl px-3 mt-5">
-            <div className="flex items-center justify-center gap-2">
-              <p>Take the Test</p>
-              <Icon icon="flowbite:arrow-right-outline" className="text-3xl" />
-            </div>
-          </button>
-          <Image
-            src="/assets/logos/csar.png"
-            alt=""
-            width={250}
-            height={250}
-            className="mt-3 mb-4"
-          />
-        </div>
-      </section>
-
-      <section className="bg-[#00459C] p-5">
-        <div className="flex flex-col justify-center items-center">
-          <div className="text-2xl text-shadow-md text-white">
+      <section className="bg-[#00459C] lg:bg-white p-5">
+        <div className="flex flex-col justify-center items-center lg:bg-[#00459C] lg:p-32 lg:rounded-3xl">
+          <div className="text-2xl lg:text-5xl text-shadow-md text-white font-raleway">
             Build the future. Start with us.
           </div>
-          <div className="text-center text-sm text-extralight text-shadow-sm text-white mt-2">
-            Join the Computer Science Society and turn your passion into impact
+          <div className="text-center text-sm lg:text-lg text-extralight text-shadow-sm text-white mt-2 font-inter">
+            Join the Computer Science Society and turn your passion into impact.
           </div>
-          <div className="flex flex-col gap-4 mt-7">
-            <button className="bg-white px-7 py-2 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
+            <button className="bg-white lg:w-72 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Member
             </button>
 
-            <button className="bg-white px-7 py-2 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-72 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Staff
             </button>
 
-            <button className="bg-white px-7 py-2 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-72 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Executive Assistant
             </button>
           </div>
