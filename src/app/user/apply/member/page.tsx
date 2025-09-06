@@ -17,29 +17,29 @@ export default function MemberApplication() {
     studentNumber: "",
     firstName: "",
     lastName: "",
-    section: ""
+    section: "",
   });
 
   useEffect(() => {
     // Pre-fill with any existing user data if available
     if (session?.user) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         studentNumber: session.user.studentNumber || "",
-        firstName: session.user.name?.split(' ')[0] || "",
-        lastName: session.user.name?.split(' ').slice(1).join(' ') || "",
-        section: session.user.section || ""
+        firstName: session.user.name?.split(" ")[0] || "",
+        lastName: session.user.name?.split(" ").slice(1).join(" ") || "",
+        section: session.user.section || "",
       }));
     }
   }, [session]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === 'studentNumber') {
-        const numericValue = value.replace(/[^0-9]/g, '').slice(0, 10); // Limit to 10 for studentNumber
-        setFormData(prev => ({ ...prev, [name]: numericValue }));
+    if (name === "studentNumber") {
+      const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10); // Limit to 10 for studentNumber
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -74,28 +74,28 @@ export default function MemberApplication() {
     }
 
     try {
-      const response = await fetch('/api/applications/member', {
-        method: 'POST',
+      const response = await fetch("/api/applications/member", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           studentNumber: formData.studentNumber,
           firstName: formData.firstName,
           lastName: formData.lastName,
           section: formData.section,
-          fullName: `${formData.firstName} ${formData.lastName}`.trim()
+          fullName: `${formData.firstName} ${formData.lastName}`.trim(),
         }),
       });
 
       if (response.ok) {
-        router.push('/user/member/application/payment');
+        router.push("/user/member/application/payment");
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Application submission failed');
+        setError(errorData.error || "Application submission failed");
       }
     } catch (error) {
-      setError('An error occurred while submitting your application');
+      setError("An error occurred while submitting your application");
     } finally {
       setLoading(false);
     }
@@ -103,9 +103,9 @@ export default function MemberApplication() {
 
   const handleLogout = async () => {
     try {
-      await signOut({ 
-        callbackUrl: '/', // Redirect to home page after logout
-        redirect: true 
+      await signOut({
+        callbackUrl: "/", // Redirect to home page after logout
+        redirect: true,
       });
     } catch (error) {
       console.error("Logout error:", error);
@@ -123,15 +123,19 @@ export default function MemberApplication() {
           className="drop-shadow-md"
         />
         <div className="flex items-center gap-4">
-          <button 
-          onClick={handleLogout}
-          className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm">
+          <button
+            onClick={handleLogout}
+            className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm"
+          >
             Log Out
           </button>
         </div>
       </header>
       <div className="flex flex-col justify-center items-center px-50 py-20">
-        <form onSubmit={handleSubmit} className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28">
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28"
+        >
           <div className="text-4xl font-raleway font-semibold mb-4">
             <span className="text-black">Apply as </span>
             <span className="text-[#134687]">Member</span>
@@ -157,7 +161,7 @@ export default function MemberApplication() {
                     required
                     pattern="[0-9]{10}"
                     maxLength={10}
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. 2019131907"
                   />
                 </div>
@@ -173,7 +177,7 @@ export default function MemberApplication() {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. Juan"
                   />
                 </div>
@@ -189,7 +193,7 @@ export default function MemberApplication() {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     required
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. Dela Cruz"
                   />
                 </div>
@@ -205,7 +209,7 @@ export default function MemberApplication() {
                     value={formData.section}
                     onChange={handleInputChange}
                     required
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full rounded-md border border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. 1CSA"
                   />
                 </div>
@@ -264,16 +268,23 @@ export default function MemberApplication() {
             <button
               type="button"
               onClick={() => router.push("/user")}
-              className="bg-gray-300 text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-gray-400 transition-colors"
+              className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-colors"
             >
               Back
             </button>
             <button
               type="submit"
-              disabled={loading || !formData.studentNumber || formData.studentNumber.length !== 10 || !formData.firstName || !formData.lastName || !formData.section}
+              disabled={
+                loading ||
+                !formData.studentNumber ||
+                formData.studentNumber.length !== 10 ||
+                !formData.firstName ||
+                !formData.lastName ||
+                !formData.section
+              }
               className="whitespace-nowrap font-inter text-sm font-semibold text-white px-12 py-3 rounded-lg bg-[#134687] hover:bg-[#0d3569] disabled:opacity-50"
             >
-              {loading ? 'Submitting...' : 'Pay Now'}
+              {loading ? "Submitting..." : "Pay Now"}
             </button>
           </div>
         </form>
