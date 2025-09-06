@@ -1,15 +1,12 @@
 "use client";
-import FullCalendar from "@fullcalendar/react";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import { DateSelectArg, EventClickArg } from "@fullcalendar/core";
 import { useMemo, useState, useEffect } from "react";
-
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
+
 export default function SchedulePage() {
   const router = useRouter();
-  const { committee: committeeId } = useParams<{ committee: string }>();
+  const { "eb-role": ebRole } = useParams<{ "eb-role": string }>();
+  const ebId = ebRole;
 
   // State for scheduling
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -300,12 +297,13 @@ export default function SchedulePage() {
           startTime.setHours(hour, minute, 0, 0);
 
           const endTime = new Date(startTime);
-          endTime.setMinutes(startTime.getMinutes() + 30);
+          endTime.setMinutes(endTime.getMinutes() + 30);
 
+          const slotId = `${dateStr}-${timeStr}`;
           const isBooked = daySchedule.bookedSlots.includes(timeStr);
 
           slots.push({
-            id: `${dateStr}-${timeStr}`,
+            id: slotId,
             start: startTime.toISOString(),
             end: endTime.toISOString(),
             date: dateStr,
@@ -315,43 +313,27 @@ export default function SchedulePage() {
         });
       });
 
-      setAvailableSlots(slots);
-
-      // Group slots by date
-      const grouped = slots.reduce(
-        (acc, slot) => {
-          if (!acc[slot.date]) {
-            acc[slot.date] = [];
-          }
-          acc[slot.date].push(slot);
-          return acc;
-        },
-        {} as Record<
-          string,
-          Array<{
-            id: string;
-            start: string;
-            end: string;
-            date: string;
-            time: string;
-            isBooked: boolean;
-          }>
-        >
-      );
-
-      setGroupedSlots(grouped);
-      setIsLoading(false);
+      return slots;
     };
 
-    generateAdminSlots();
+    const slots = generateAdminSlots();
+    setAvailableSlots(slots);
+
+    // Group slots by date
+    const grouped = slots.reduce((acc, slot) => {
+      if (!acc[slot.date]) {
+        acc[slot.date] = [];
+      }
+      acc[slot.date].push(slot);
+      return acc;
+    }, {} as Record<string, typeof slots>);
+
+    setGroupedSlots(grouped);
+    setIsLoading(false);
   }, []);
 
   const handleSlotSelect = (slotId: string) => {
-    if (selectedSlot === slotId) {
-      setSelectedSlot(null);
-    } else {
-      setSelectedSlot(slotId);
-    }
+    setSelectedSlot(slotId);
   };
 
   const handleSubmitClick = () => {
@@ -362,40 +344,19 @@ export default function SchedulePage() {
 
   const handleConfirmSchedule = async () => {
     if (selectedSlot) {
-      const selectedSlotData = availableSlots.find(
-        (slot) => slot.id === selectedSlot
-      );
-
-      if (!selectedSlotData) {
-        alert("Selected slot not found");
-        return;
-      }
-
       setIsSubmitting(true);
-
       try {
-        // Get form data from localStorage or pass it as props
-        const formData = JSON.parse(
-          localStorage.getItem("committeeApplicationData") || "{}"
-        );
-
-        const applicationData = {
-          firstOptionCommittee: committeeId,
-          secondOptionCommittee: formData.secondChoice || "",
-          portfolioLink: formData.portfolioLink || "",
-          cv: formData.cv || "",
-          interviewSlotDay: selectedSlotData.date,
-          interviewSlotTimeStart: selectedSlotData.time,
-          interviewSlotTimeEnd: selectedSlotData.end,
-        };
-
         // TODO: Re-enable API call when backend is ready
-        // const response = await fetch("/api/applications/committee-staff", {
+        // const response = await fetch("/api/schedule-interview", {
         //   method: "POST",
         //   headers: {
         //     "Content-Type": "application/json",
         //   },
-        //   body: JSON.stringify(applicationData),
+        //   body: JSON.stringify({
+        //     slotId: selectedSlot,
+        //     ebId: ebId,
+        //     applicationType: "executive-assistant",
+        //   }),
         // });
 
         // Mock successful response for frontend development
@@ -434,7 +395,7 @@ export default function SchedulePage() {
             );
           }
 
-          router.push(`/user/apply/committee-staff/${committeeId}/success`);
+          router.push(`/user/apply/executive-assistant/${ebId}/success`);
         } else {
           const error = await response.json();
           alert(`Error: ${error.error}`);
@@ -452,86 +413,136 @@ export default function SchedulePage() {
     setShowModal(false);
   };
 
-  const committeeRoles = [
+  const executiveBoardRoles = [
     {
-      id: "academics",
-      title: "Academics",
+      id: "president",
+      title: "President",
       description:
-        "This committee is dedicated to enhancing the academic environment within the CSS organization. It provides reviewers and organizes tutorials to support CSS students. Additionally, the committee organizes academic-related events, such as quiz bees and programming contests, fostering a vibrant intellectual community.",
+        "Serves as the leader and representative of the Computer Science Society. They guide the organization's vision, oversee all operations, and ensure that every project and initiative aligns with the org's goals. The President also represents CSS in college and university-wide councils, making sure the voices of members are heard at every level.",
+      ebName: "Genna Cervantes",
     },
     {
-      id: "community",
-      title: "Community Development",
+      id: "internal-vice-president",
+      title: "Internal Vice President",
       description:
-        "This committee works towards improving and sustaining the well-being of the local community. They devise and implement community-based projects and events that foster social interaction, civic engagement, and community empowerment. It may focus on areas such as housing, employment, health services, or environmental initiatives.",
+        "Manages the internal structure and daily operations of CSS. They coordinate with committees, monitor staff performance, and provide support to ensure smooth execution of events and projects. Acting as the President's right hand, the Internal VP ensures that the organization runs efficiently from the inside.",
+      ebName: "Mar Vincent De Guzman",
     },
     {
-      id: "creatives",
-      title: "Creatives & Technical",
+      id: "external-vice-president",
+      title: "External Vice President",
       description:
-        "This committee oversees the design and production of all creative outputs of the organization, including digital graphics, promotional materials, and event decoration. The technical side of the committee ensures that all technical needs for events and operations, like sound and lighting systems, are catered for.",
+        "Handles the org's outreach and partnerships. They build and maintain relationships with external organizations, other student groups, and industry partners. Their role strengthens CSS's network beyond the society itself, creating opportunities for collaboration, exposure, and growth.",
+      ebName: "Christian Bhernan Buenagua",
     },
     {
-      id: "documentation",
-      title: "Documentation",
+      id: "secretary",
+      title: "Secretary",
       description:
-        "This committee is responsible for photojournalism, documenting all the activities and events of the organization. Their work ensures that the organization's achievements and memorable moments are captured and preserved for posterity.",
+        "Serves as the custodian of records and communication. They document meetings, handle correspondences, and maintain the official files of the organization. With attention to detail and organization, the Secretary ensures that the society's operations are well-documented and transparent.",
+      ebName: "Joevanni Paulo Gumban",
     },
     {
-      id: "external",
-      title: "External Affairs",
+      id: "assistant-secretary",
+      title: "Assistant Secretary",
       description:
-        "This committee manages relationships and communications with entities outside the organization. This includes liaising with other organizations, government bodies, sponsors, and the media. It also handles public relations, partnership development, and conflict resolution.",
+        "Helps and supports the Secretary with paperwork, logistics, and record-keeping. They often manage attendance records, assist in preparing documents, and ensure that no detail is overlooked in the org's administrative work.",
+      ebName: "Marian Therese Pineza",
     },
     {
-      id: "finance",
-      title: "Finance",
+      id: "treasurer",
+      title: "Treasurer",
       description:
-        "This committee oversees the organization's budgeting, expenditure, and revenue generation. It also provides financial advice to the organization, ensures fiscal responsibility, and conducts regular audits for transparency and accountability.",
+        "In charge of the society's financial health. They manage funds, prepare budgets, collect dues, and make financial reports. By ensuring transparency and accountability, the Treasurer helps sustain CSS activities while maximizing resources for its members.",
+      ebName: "Braven Rei Goodwin",
     },
     {
-      id: "logistics",
-      title: "Logistics",
+      id: "auditor",
+      title: "Auditor",
       description:
-        "This committee manages and maintains all properties owned by the organization. It keeps a thorough record of all expenses related to CSS activities and properties, ensuring transparency and accountability in the organization's financial operations.",
+        "Acts as the org's financial watchdog. They review reports, check transactions, and ensure that all financial activities are ethical and accurate. Their role keeps the organization's operations transparent and trustworthy.",
+      ebName: "Kendrick Beau Calvo",
     },
     {
-      id: "publicity",
-      title: "Publicity",
+      id: "public-relations-officer",
+      title: "Public Relations Officer (PRO)",
       description:
-        "This committee manages all promotional activities for the organization. It is responsible for creating and implementing marketing strategies, managing social media platforms, and publicizing events and activities to target audiences.",
+        "Takes charge of publicity, branding, and communications. They create captions, manage social media presence, and oversee promotional campaigns to keep CSS visible and engaging. With creativity and consistency, the PRO ensures that every announcement and publication reflects the identity of the society.",
+      ebName: "Nigel Roland Anunciacion",
     },
     {
-      id: "sports",
-      title: "Sports & Talent",
+      id: "representative-4th-year",
+      title: "4th Year Level Representative",
       description:
-        "This committee organizes and oversees all sports-related and talent activities within the organization. It may coordinate sporting events, talent shows, or workshops and ensure the organization's members have opportunities to develop and showcase their talents.",
+        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student's voice is heard. Through active engagement, they represent their year level's interests while strengthening unity across all batches.",
+      ebName: "Alexandra Antonette Palanog",
     },
     {
-      id: "technology",
-      title: "Technology Development",
+      id: "representative-3rd-year",
+      title: "3rd Year Level Representative",
       description:
-        "This committee is responsible for spearheading all technology-related projects and events within the organization. Key tasks include creating and maintaining the CSS website, implementing new technologies to streamline organizational operations, and organizing tech-focused workshops or seminars to enhance the digital skills of the members.",
+        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student's voice is heard. Through active engagement, they represent their year level's interests while strengthening unity across all batches.",
+      ebName: "Nikolas Josef Dalisay",
+    },
+    {
+      id: "representative-2nd-year",
+      title: "2nd Year Level Representative",
+      description:
+        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student's voice is heard. Through active engagement, they represent their year level's interests while strengthening unity across all batches.",
+      ebName: "Chrisry Clerry Hermoso",
+    },
+    {
+      id: "representative-1st-year",
+      title: "1st Year Level Representative",
+      description:
+        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student's voice is heard. Through active engagement, they represent their year level's interests while strengthening unity across all batches.",
+      ebName: "John Carlo Benter",
+    },
+    {
+      id: "chief-of-staff",
+      title: "Chief of Staff",
+      description:
+        "Leads the pool of staff and executive assistants, making sure manpower is allocated properly during events and projects. They coordinate with the EB to deliver logistical support and ensure that every mission is carried out smoothly.",
+      ebName: "Carylle Keona Ilano",
+    },
+    {
+      id: "director-digital-productions",
+      title: "Director for Digital Productions",
+      description:
+        "Oversees the creative and multimedia output of CSS. From posters to videos, they ensure that the society's visuals are engaging, professional, and aligned with its branding.",
+      ebName: "Charmaine Chesca Villalobos",
+    },
+    {
+      id: "director-community-development",
+      title: "Director for Community Development",
+      description:
+        "Leads the org's outreach and social responsibility initiatives. They plan and execute projects that extend beyond academics, nurturing compassion, empathy, and service within the CSS community.",
+      ebName: "Zeandarra Gaile Giva",
+    },
+    {
+      id: "thomasian-wellness-advocate",
+      title: "Thomasian Wellness Advocate (TWA)",
+      description:
+        "Champions the holistic well-being of members and students. They promote mental health, wellness programs, and activities that help balance academic life with personal growth. By fostering a supportive environment, the TWA ensures that the CSS community thrives not just academically, but also in well-being.",
+      ebName: "Andrea Pauline Tan",
     },
   ];
 
-  const selectedCommittee = committeeRoles.find(
-    (role) => role.id === committeeId
-  );
+  const selectedEB = executiveBoardRoles.find((role) => role.id === ebId);
 
-  if (!selectedCommittee) {
+  if (!selectedEB) {
     return (
       <section className="min-h-screen bg-[rgb(243,243,253)]">
         <div className="flex flex-col justify-center items-center px-50 py-20">
           <div className="text-center">
             <h1 className="text-2xl font-inter font-bold text-black mb-4">
-              Committee not found
+              Executive Board role not found
             </h1>
             <button
-              onClick={() => router.push("/user/apply/committee-staff")}
+              onClick={() => router.push("/user/apply/executive-assistant")}
               className="bg-[#044FAF] text-white px-6 py-3 rounded-md font-inter font-normal text-sm hover:bg-[#04387B] transition-all duration-150 active:scale-95"
             >
-              Back to Committee Selection
+              Back to Role Selection
             </button>
           </div>
         </div>
@@ -559,14 +570,14 @@ export default function SchedulePage() {
       <div className="flex flex-col justify-center items-center px-50 py-20">
         <div className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28  w-full">
           <div className="text-4xl font-raleway font-semibold mb-4">
-            <span className="text-black">Apply for </span>
-            <span className="text-[#134687]">
-              {selectedCommittee.title} Committee
+            <span className="text-black">
+              Apply as Executive Assistant for{" "}
             </span>
+            <span className="text-[#134687]">{selectedEB.title}</span>
           </div>
 
           <div className="text-black text-md font-Inter font-light text-justify mb-8">
-            {selectedCommittee.description}
+            {selectedEB.description}
           </div>
 
           <hr className="my-8 border-t-1 border-[#717171]" />
@@ -574,7 +585,7 @@ export default function SchedulePage() {
           <div className="w-full flex flex-col items-center justify-center mb-8">
             <div className="flex items-center">
               <div
-                onClick={() => router.push("/user/apply/committee-staff")}
+                onClick={() => router.push("/user/apply/executive-assistant")}
                 className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
               >
                 <span className="text-[#696767] text-xs font-bold font-inter">
@@ -585,7 +596,7 @@ export default function SchedulePage() {
               <div
                 onClick={() =>
                   router.push(
-                    `/user/apply/committee-staff/${committeeId}/application`
+                    `/user/apply/executive-assistant/application?eb=${ebId}`
                   )
                 }
                 className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
@@ -803,7 +814,7 @@ export default function SchedulePage() {
               type="button"
               onClick={() =>
                 router.push(
-                  `/user/apply/committee-staff/${committeeId}/application`
+                  `/user/apply/executive-assistant/${ebId}/application`
                 )
               }
               className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"

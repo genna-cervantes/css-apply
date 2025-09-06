@@ -1,125 +1,108 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function StaffApplication() {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+export default function SuccessPage() {
   const router = useRouter();
+  const { committee: committeeId } = useParams<{ committee: string }>();
+  const [scheduledTime, setScheduledTime] = useState<string>("");
+
+  useEffect(() => {
+    // Get scheduled time from localStorage or URL params
+    const time = localStorage.getItem("scheduledTime");
+    if (time) {
+      setScheduledTime(time);
+    }
+  }, []);
 
   const committeeRoles = [
     {
       id: "academics",
-      title: "Academics Committee",
+      title: "Academics",
       description:
         "This committee is dedicated to enhancing the academic environment within the CSS organization. It provides reviewers and organizes tutorials to support CSS students. Additionally, the committee organizes academic-related events, such as quiz bees and programming contests, fostering a vibrant intellectual community.",
-      requirements: [
-        "Strong academic performance",
-        "Teaching ability",
-        "Subject expertise",
-      ],
     },
     {
       id: "community",
-      title: "Community Development Committee",
+      title: "Community Development",
       description:
         "This committee works towards improving and sustaining the well-being of the local community. They devise and implement community-based projects and events that foster social interaction, civic engagement, and community empowerment. It may focus on areas such as housing, employment, health services, or environmental initiatives.",
-      requirements: [
-        "Community engagement experience",
-        "Project management skills",
-        "Social awareness",
-      ],
     },
     {
       id: "creatives",
-      title: "Creatives & Technical Committee",
+      title: "Creatives & Technical",
       description:
         "This committee oversees the design and production of all creative outputs of the organization, including digital graphics, promotional materials, and event decoration. The technical side of the committee ensures that all technical needs for events and operations, like sound and lighting systems, are catered for.",
-      requirements: [
-        "Design skills",
-        "Technical knowledge",
-        "Creative thinking",
-      ],
     },
     {
       id: "documentation",
-      title: "Documentation Committee",
+      title: "Documentation",
       description:
         "This committee is responsible for photojournalism, documenting all the activities and events of the organization. Their work ensures that the organization's achievements and memorable moments are captured and preserved for posterity.",
-      requirements: [
-        "Photography skills",
-        "Writing ability",
-        "Attention to detail",
-      ],
     },
     {
       id: "external",
-      title: "External Affairs Committee",
+      title: "External Affairs",
       description:
         "This committee manages relationships and communications with entities outside the organization. This includes liaising with other organizations, government bodies, sponsors, and the media. It also handles public relations, partnership development, and conflict resolution.",
-      requirements: [
-        "Communication skills",
-        "Networking ability",
-        "Diplomatic skills",
-      ],
     },
     {
       id: "finance",
-      title: "Finance Committee",
+      title: "Finance",
       description:
         "This committee oversees the organization's budgeting, expenditure, and revenue generation. It also provides financial advice to the organization, ensures fiscal responsibility, and conducts regular audits for transparency and accountability.",
-      requirements: [
-        "Basic accounting knowledge",
-        "Attention to detail",
-        "Responsibility",
-      ],
     },
     {
       id: "logistics",
-      title: "Logistics Committee",
+      title: "Logistics",
       description:
         "This committee manages and maintains all properties owned by the organization. It keeps a thorough record of all expenses related to CSS activities and properties, ensuring transparency and accountability in the organization's financial operations.",
-      requirements: [
-        "Organization skills",
-        "Problem-solving",
-        "Record keeping",
-      ],
     },
     {
       id: "publicity",
-      title: "Publicity Committee",
+      title: "Publicity",
       description:
         "This committee manages all promotional activities for the organization. It is responsible for creating and implementing marketing strategies, managing social media platforms, and publicizing events and activities to target audiences.",
-      requirements: [
-        "Marketing knowledge",
-        "Social media skills",
-        "Creative writing",
-      ],
     },
     {
       id: "sports",
-      title: "Sports & Talent Committee",
+      title: "Sports & Talent",
       description:
         "This committee organizes and oversees all sports-related and talent activities within the organization. It may coordinate sporting events, talent shows, or workshops and ensure the organization's members have opportunities to develop and showcase their talents.",
-      requirements: [
-        "Event coordination skills",
-        "Sports knowledge",
-        "Talent appreciation",
-      ],
     },
     {
       id: "technology",
-      title: "Technology Development Committee",
+      title: "Technology Development",
       description:
         "This committee is responsible for spearheading all technology-related projects and events within the organization. Key tasks include creating and maintaining the CSS website, implementing new technologies to streamline organizational operations, and organizing tech-focused workshops or seminars to enhance the digital skills of the members.",
-      requirements: [
-        "Technical skills",
-        "Web development knowledge",
-        "Innovation mindset",
-      ],
     },
   ];
+
+  const selectedCommittee = committeeRoles.find(
+    (role) => role.id === committeeId
+  );
+
+  if (!selectedCommittee) {
+    return (
+      <section className="min-h-screen bg-[rgb(243,243,253)]">
+        <div className="flex flex-col justify-center items-center px-50 py-20">
+          <div className="text-center">
+            <h1 className="text-2xl font-inter font-bold text-black mb-4">
+              Committee not found
+            </h1>
+            <button
+              onClick={() => router.push("/user/apply/committee-staff")}
+              className="bg-[#044FAF] text-white px-6 py-3 rounded-md font-inter font-normal text-sm hover:bg-[#04387B] transition-all duration-150 active:scale-95"
+            >
+              Back to Committee Selection
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="min-h-screen bg-[rgb(243,243,253)]">
@@ -132,152 +115,117 @@ export default function StaffApplication() {
           className="drop-shadow-md"
         />
         <div className="flex items-center gap-4">
-          <button className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm">
+          <button className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm transition-all duration-150 active:scale-95">
             Log Out
           </button>
         </div>
       </header>
-      <div className="flex flex-col justify-center items-center px-50 py-20">
-        <div className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28">
-          <div className="text-4xl font-raleway font-semibold mb-4">
-            <span className="text-black">Apply as </span>
-            <span className="text-[#134687]">Committee Staff</span>
-          </div>
-          <div className="text-black text-md font-Inter font-light text-justify">
-            As a Committee Staff of the Computer Science Society, you will play
-            a vital role in bringing our initiatives to life. From supporting
-            events and managing logistics to collaborating with fellow members
-            and leaders, your efforts ensure that every project runs smoothly
-            and every idea has the chance to shine.
-          </div>
-          <hr className="my-8 border-t-1 border-[#717171]" />
+
+      <div className="flex flex-col items-center py-20 gap-6">
+        {/* CSAR Excited Image */}
+        <div>
+          <Image
+            src="/assets/pictures/CSAR_Excited.png"
+            alt="CSAR Excited"
+            width={200}
+            height={200}
+            className="object-contain drop-shadow-lg"
+          />
+        </div>
+
+        {/* Success Message */}
+        <div className="text-center">
+          <h1 className="text-5xl font-raleway font-bold text-black mb-4 flex flex-col items-center">
+            Thank you for applying as
+            <span className="text-[#134687] mt-2">
+              Staff for the {selectedCommittee.title} Committee
+            </span>
+          </h1>
+          <p className="text-md font-inter text-gray-700">
+            Your application to the Computer Science Society has been
+            successfully submitted. <br />
+            We're excited to have you take this step toward becoming part of our
+            mission to inspire, innovate, and lead.
+          </p>
+        </div>
+        <p className="text-md font-bold font-inter text-black">
+          You are now FOR INTERVIEW
+        </p>
+
+        <div className="bg-white border-1 rounded-2xl border-[#BFBFBF] px-4 py-12 max-w-xl w-full mx-auto">
           <div className="w-full flex flex-col items-center justify-center">
-            <div className="flex items-center ">
+            <div className="flex items-center">
               <div className="flex items-center justify-center rounded-full bg-[#2F7EE3] w-10 h-10">
                 <span className="text-white text-xs font-bold font-inter">
                   1
                 </span>
               </div>
-
-              <div className="w-24 h-[3px] bg-[#D9D9D9]" />
-
+              <div className="w-28 h-[3px] bg-[#D9D9D9]" />
               <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10">
                 <span className="text-[#696767] text-xs font-bold font-inter">
                   2
                 </span>
               </div>
-
-              <div className="w-24 h-[3px] bg-[#D9D9D9]" />
-
+              <div className="w-28 h-[3px] bg-[#D9D9D9]" />
               <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10">
                 <span className="text-[#696767] text-xs font-bold font-inter">
                   3
                 </span>
               </div>
             </div>
-
-            <div className="grid grid-cols-3 w-100 mt-3 gap-x-0 place-items-center font-inter font-medium">
+            <div className="grid grid-cols-3 w-118 mt-3 gap-x-0 place-items-center font-inter font-medium">
               <span className="text-[11px] leading-none whitespace-nowrap text-center">
-                Select a Role
+                For Interview
               </span>
               <span className="text-[11px] leading-none whitespace-nowrap text-center">
-                Enter Information
+                Evaluation / Under Review
               </span>
               <span className="text-[11px] leading-none whitespace-nowrap text-center">
-                Schedule Interview
+                Application Results
               </span>
             </div>
-          </div>
-          <div className="flex justify-center gap-8 mt-8">
-            {/* Left Column - Scrollable Role List */}
-            <div className="w-1/3 max-w-md">
-              <div className="max-h-80 overflow-y-auto ">
-                {committeeRoles.map((role) => (
-                  <div
-                    key={role.id}
-                    onClick={() => setSelectedRole(role.id)}
-                    className={`p-3 border-t border-b cursor-pointer transition-all duration-200 flex items-center gap-3 ${
-                      selectedRole === role.id
-                        ? "border-[#2F7EE3] bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
-                      <span className="text-gray-500 text-xs">IMG</span>
-                    </div>
-                    <h4 className="font-inter font-semibold text-xs text-black">
-                      {role.title}
-                    </h4>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Column - Role Information */}
-            <div className="w-2/3 max-w-2xl">
-              {selectedRole ? (
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="flex">
-                    {/* Left side - Text content */}
-                    <div className="w-3/5 p-6">
-                      {(() => {
-                        const role = committeeRoles.find(
-                          (r) => r.id === selectedRole
-                        );
-                        return role ? (
-                          <>
-                            <h4 className="text-xl font-inter font-bold text-black mb-4">
-                              {role.title}
-                            </h4>
-                            <p className="text-[13px] font-normal font-inter text-black mb-6 leading-relaxed text-justify">
-                              {role.description}
-                            </p>
-                          </>
-                        ) : null;
-                      })()}
-                    </div>
-                    {/* Right side - Committee picture */}
-                    <div className="w-2/5 bg-gray-200 h-80"></div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                  <div className="flex">
-                    <div className="w-3/5 p-6 flex items-center justify-center h-80">
-                      <p className="text-gray-500 font-inter">
-                        Select a role to view details
-                      </p>
-                    </div>
-                    <div className="w-2/5 bg-gray-200 h-80"></div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          <hr className="my-8 border-t-1 border-[#717171]" />
-          <div className="flex justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => router.push("/user")}
-              className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
-            >
-              Back
-            </button>
-            {selectedRole && (
-              <button
-                onClick={() =>
-                  router.push(
-                    `/user/apply/committee-staff/${selectedRole}/application`
-                  )
-                }
-                className="bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
-              >
-                Apply
-              </button>
+            {scheduledTime && (
+              <p className="text-xs font-inter mt-6 text-gray-600">
+                Interview scheduled for:{" "}
+                <span className="font-semibold">{scheduledTime}</span>
+              </p>
             )}
           </div>
         </div>
+
+        {/* Information Box */}
+        <div className="bg-white border-1 rounded-2xl border-[#BFBFBF] px-14 py-10 max-w-4xl w-full">
+          <h3 className="text-md font-inter font-semibold text-black text-center">
+            Reminders before the Interview:
+          </h3>
+          <hr className="my-3 border-t border-black" />
+          <ul className="space-y-2 text-sm font-inter text-black">
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              You will receive a confirmation email with your interview details
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              Please arrive 10 minutes before your scheduled interview time
+            </li>
+            <li className="flex items-start">
+              <span className="mr-2">•</span>
+              Results will be announced on
+            </li>
+          </ul>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={() => router.push("/user")}
+            className="bg-[#044FAF] text-white px-8 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#04387B] transition-all duration-150 active:scale-95"
+          >
+            Return to Dashboard
+          </button>
+        </div>
       </div>
+
       <footer className="w-full mt-16 py-8 pl-20 pr-20 bg-[#044FAF] text-white flex flex-row gap-100 items-start border-b-10 border-[#287FEB]">
         <div className="flex flex-col">
           <Image
@@ -286,7 +234,7 @@ export default function StaffApplication() {
             width={60}
             height={60}
           />
-          <div className="font-inter text-4xl font-semibold ">
+          <div className="font-inter text-4xl font-semibold">
             Computer Science Society
           </div>
           <div className="font-inter text-sm font-thin italic mb-2">
@@ -297,7 +245,7 @@ export default function StaffApplication() {
             reserved.
           </div>
         </div>
-        <div className="flex flex-col mt-10 font-inter ">
+        <div className="flex flex-col mt-10 font-inter">
           <div className="text-lg font-semibold mb-2">Partner with us:</div>
           <div className="flex flex-col items-start">
             <a

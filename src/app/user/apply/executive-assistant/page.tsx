@@ -242,16 +242,6 @@ export default function AssistantApplication() {
                             <p className="text-[13px] font-normal font-inter text-black mb-6 leading-relaxed text-justify">
                               {role.description}
                             </p>
-                            <button
-                              onClick={() =>
-                                router.push(
-                                  `/apply/executive-assistant/application?eb=${selectedRole}`
-                                )
-                              }
-                              className="bg-[#044FAF] text-white px-10 py-3 rounded-md font-inter font-normal text-xs hover:bg-[#04387B] transition-colors"
-                            >
-                              Apply
-                            </button>
                           </>
                         ) : null;
                       })()}
@@ -275,14 +265,26 @@ export default function AssistantApplication() {
             </div>
           </div>
           <hr className="my-8 border-t-1 border-[#717171]" />
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4">
             <button
               type="button"
-              onClick={() => router.push("/")}
-              className="bg-gray-300 text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-gray-400 transition-all duration-150 active:scale-95"
+              onClick={() => router.push("/user")}
+              className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
             >
               Back
             </button>
+            {selectedRole && (
+              <button
+                onClick={() =>
+                  router.push(
+                    `/user/apply/executive-assistant/${selectedRole}/application`
+                  )
+                }
+                className="bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
+              >
+                Apply
+              </button>
+            )}
           </div>
         </div>
       </div>
