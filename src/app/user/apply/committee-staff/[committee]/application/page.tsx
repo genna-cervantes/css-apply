@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 export default function CommitteeApplication() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const committeeId = searchParams.get("committee");
+  const { committee: committeeId } = useParams<{ committee: string }>();
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -101,11 +100,9 @@ export default function CommitteeApplication() {
         setIsOpen(false);
       }
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -120,7 +117,7 @@ export default function CommitteeApplication() {
               Committee not found
             </h1>
             <button
-              onClick={() => router.push("/apply/committee-staff")}
+              onClick={() => router.push("/user/apply/committee-staff")}
               className="bg-[#044FAF] text-white px-6 py-3 rounded-md font-inter font-normal text-sm hover:bg-[#04387B] transition-all duration-150 active:scale-95"
             >
               Back to Committee Selection
@@ -163,11 +160,10 @@ export default function CommitteeApplication() {
 
           <hr className="my-8 border-t-1 border-[#717171]" />
 
-          {/* Stepper */}
           <div className="w-full flex flex-col items-center justify-center mb-8">
             <div className="flex items-center">
               <div
-                onClick={() => router.push("/apply/committee-staff")}
+                onClick={() => router.push("/user/apply/committee-staff")}
                 className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
               >
                 <span className="text-[#696767] text-xs font-bold font-inter">
@@ -200,8 +196,6 @@ export default function CommitteeApplication() {
             </div>
           </div>
 
-          {/* Application Form */}
-
           <div className="flex gap-40 ">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
@@ -233,10 +227,7 @@ export default function CommitteeApplication() {
                     type="text"
                     value={formData.firstName}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        firstName: e.target.value,
-                      })
+                      setFormData({ ...formData, firstName: e.target.value })
                     }
                     className="w-full rounded-md border-2 border-[#CDCECF] focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                     placeholder="e.g. Juan"
@@ -271,10 +262,7 @@ export default function CommitteeApplication() {
                       type="text"
                       value={formData.section}
                       onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          section: e.target.value,
-                        })
+                        setFormData({ ...formData, section: e.target.value })
                       }
                       className="w-full rounded-md border-2 border-[#CDCECF] focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
                       placeholder="e.g. 1CSA"
@@ -305,7 +293,6 @@ export default function CommitteeApplication() {
                           )?.title
                         : "Select a Committee"}
                     </button>
-
                     {isOpen && (
                       <div className="absolute top-full left-0 right-0 bg-white border-2 border-[#044FAF] rounded-md mt-1 shadow-lg z-10 max-h-60 overflow-y-auto">
                         {committeeRoles.map((role) => (
@@ -464,13 +451,18 @@ export default function CommitteeApplication() {
           <div className="flex gap-4 justify-center">
             <button
               type="button"
-              onClick={() => router.push("/apply/committee-staff")}
+              onClick={() => router.push("/user/apply/committee-staff")}
               className="bg-gray-300 text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-gray-400 transition-all duration-150 active:scale-95"
             >
               Back
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={() =>
+                router.push(
+                  `/user/apply/committee-staff/${committeeId}/schedule`
+                )
+              }
               className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
             >
               Next
