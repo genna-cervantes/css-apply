@@ -359,46 +359,52 @@ export default function CommitteeApplication() {
                   )}
                 </div>
               </div>
-              <div className="flex gap-2 items-center">
-                <div className="text-black text-sm font-Inter font-normal">
-                  Portfolio (in pdf):
-                </div>
-                <div className="text-black text-xs font-Inter w-[200px]">
-                  {formData.cv ? (
-                    <div className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-md">
-                      <span className="text-sm text-black truncate">
-                        {formData.cv}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, cv: "" })}
-                        className="text-black hover:text-[#044FAF] ml-2 text-lg"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ) : (
-                    <label htmlFor="cv-upload" className="cursor-pointer">
-                      <input
-                        id="cv-upload"
-                        type="file"
-                        accept=".pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setFormData({ ...formData, cv: file.name });
-                          }
-                        }}
-                        className="hidden"
-                        required
-                      />
-                      <div className="bg-[#044FAF] text-white text-sm font-semibold px-2 py-2 rounded-md hover:bg-[#04387B] transition-all duration-150 active:scale-95 text-center w-20">
-                        Upload
+              {(selectedCommittee.id === "creatives" ||
+                selectedCommittee.id === "technology") && (
+                <div className="flex gap-2 items-center">
+                  <div className="text-black text-sm font-Inter font-normal">
+                    Portfolio (in pdf):
+                  </div>
+                  <div className="text-black text-xs font-Inter w-[200px]">
+                    {formData.cv ? (
+                      <div className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-md">
+                        <span className="text-sm text-black truncate">
+                          {formData.cv}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, cv: "" })}
+                          className="text-black hover:text-[#044FAF] ml-2 text-lg"
+                        >
+                          ×
+                        </button>
                       </div>
-                    </label>
-                  )}
+                    ) : (
+                      <label
+                        htmlFor="portfolio-upload"
+                        className="cursor-pointer"
+                      >
+                        <input
+                          id="portfolio-upload"
+                          type="file"
+                          accept=".pdf"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setFormData({ ...formData, cv: file.name });
+                            }
+                          }}
+                          className="hidden"
+                          required
+                        />
+                        <div className="bg-[#044FAF] text-white text-sm font-semibold px-2 py-2 rounded-md hover:bg-[#04387B] transition-all duration-150 active:scale-95 text-center w-20">
+                          Upload
+                        </div>
+                      </label>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="flex items-start gap-3">
                 <div className="relative flex-shrink-0">
@@ -452,17 +458,22 @@ export default function CommitteeApplication() {
             <button
               type="button"
               onClick={() => router.push("/user/apply/committee-staff")}
-              className="bg-gray-300 text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-gray-400 transition-all duration-150 active:scale-95"
+              className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
             >
               Back
             </button>
             <button
               type="button"
-              onClick={() =>
+              onClick={() => {
+                // Save form data to localStorage before navigating
+                localStorage.setItem(
+                  "committeeApplicationData",
+                  JSON.stringify(formData)
+                );
                 router.push(
                   `/user/apply/committee-staff/${committeeId}/schedule`
-                )
-              }
+                );
+              }}
               className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
             >
               Next

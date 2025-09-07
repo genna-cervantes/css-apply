@@ -253,7 +253,7 @@ export default function Home() {
               when <span className="text-[#3F74B8]">passion</span> <br /> meets{" "}
               <span className="text-[#134687]">technology?</span>
             </p>
-            <div className=" text-sm md:text-xl lg:text-2xl text-justify mt-5">
+            <div className=" text-sm md:text-lg lg:text-lg text-justify mt-5">
               The{" "}
               <span className="font-bold"> Computer Science Society (CSS)</span>{" "}
               is where curious minds, creative thinkers, and future tech leaders
