@@ -1,4 +1,5 @@
 "use client";
+import Footer from "@/components/Footer";
 
 import Image from "next/image";
 import { Icon } from "@iconify/react";
@@ -540,7 +541,7 @@ export default function Home() {
             </div>
 
             {/* Content - Right side on lg screens, bottom on smaller screens */}
-            <div className="flex flex-col items-center lg:items-start space-y-4 text-center lg:text-left order-1 lg:order-2 flex-1 font-raleway">
+            <div className="flex flex-col items-center lg:items-start space-y-4 text-center lg:text-left order-1 lg:order-2 flex-1 font-raleway mt-7 lg:mt-0">
               {/* Header badge */}
               <div className="text-[#1C4D8C] text-sm sm:text-base lg:text-2xl bg-white py-2 px-4 sm:py-3 sm:px-6 rounded-3xl font-bold">
                 Not Sure Which Committee You Belong To?
@@ -572,7 +573,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#00459C] lg:bg-white p-5">
+      <section className="bg-[#00459C] lg:bg-white p-9">
         <div className="flex flex-col justify-center items-center lg:bg-[#00459C] lg:p-32 lg:rounded-3xl">
           <div className="text-2xl lg:text-5xl text-shadow-md text-white font-raleway">
             Build the future. Start with us.
@@ -581,20 +582,22 @@ export default function Home() {
             Join the Computer Science Society and turn your passion into impact.
           </div>
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
-            <button className="bg-white lg:w-80 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Member
             </button>
 
-            <button className="bg-white lg:w-80 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Staff
             </button>
 
-            <button className="bg-white lg:w-80 px-7 py-2 lg:px-9 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
+            <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Executive Assistant
             </button>
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
