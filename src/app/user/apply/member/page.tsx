@@ -21,6 +21,7 @@ export default function MemberApplication() {
     section: "",
   });
 
+  // REF: gawing naka disable
   useEffect(() => {
     // Pre-fill with any existing user data if available
     if (session?.user) {

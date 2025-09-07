@@ -1,4 +1,6 @@
-"use client";
+"use client"; 
+// REF: di kailangan na use client ung buong file
+
 import Footer from "@/components/Footer";
 
 import Image from "next/image";
@@ -10,6 +12,8 @@ import { signIn, useSession } from "next-auth/react";
 export default function Home() {
   const router = useRouter();
   const { data: session, status } = useSession();
+
+  // REF: di need ng useEffect for this, kaya toh css animations lng and tailwind
   const [showFirstLine, setShowFirstLine] = useState(false);
   const [showSecondLine, setShowSecondLine] = useState(false);
   const [showThirdLine, setShowThirdLine] = useState(false);
@@ -146,6 +150,8 @@ export default function Home() {
             </div>
           </div>
 
+          {/* REF: eto ilagay nalang sa client component */}
+          {/* REF: lagyan ng loading state */}
           {showButton && (
             <div>
               <button
@@ -230,6 +236,7 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-full h-30 md:h-50 bg-gradient-to-t from-[#000000] via-[#006CF8] via-52% to-transparent z-10 pointer-events-none opacity-60"></div>
       </section>
 
+      {/* REF: bakit tayo may inline styles? stick to one */}
       <style jsx>{`
         .animate-fade-in {
           animation: fadeIn 0.5s ease-in-out;
@@ -304,6 +311,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* REF: bakit separate tong mobile and desktop view? hindi ba kaya ng tailwind breakpoints? */}
       {/* Mobile View */}
       <section className="lg:hidden">
         <div className="">
@@ -559,6 +567,7 @@ export default function Home() {
               </div>
 
               {/* CTA Button */}
+              {/* REF: san toh nakaconnect? */}
               <button className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 hover:bg-gray-100 transition-colors duration-200 font-semibold lg:ml-5">
                 <div className="flex items-center justify-center gap-2">
                   <p className="font-inter">Take the Test</p>
@@ -582,6 +591,7 @@ export default function Home() {
             Join the Computer Science Society and turn your passion into impact.
           </div>
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
+            {/* REF: toh rin */}
             <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
               Apply as Member
             </button>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import Footer from "@/components/Footer";
 
@@ -23,6 +23,7 @@ export default function UserDashboard() {
   };
 
   // Get user name from session, fallback to default
+  // REF: if wala session ibig sabihin di authorized so dapat redirection toh
   const userName = session?.user?.name || "User";
 
   return (
@@ -104,6 +105,7 @@ export default function UserDashboard() {
                   className="flex transition-transform duration-300"
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
+                  {/* lagyan ng validation if nag apply na ba toh and idisable lahat ng buttons show instead ung application niya */}
                   {/* Slide 1 - Member */}
                   <div className="min-w-full flex justify-center">
                     <div className="relative flex flex-col w-64 h-[440px] md:w-80 md:h-[480px] rounded-[28px] border-2 border-[#005FD9] bg-white shadow-md lg:shadow-[0_8px_13px_0_rgba(0,0,0,0.25)] items-center justify-center">

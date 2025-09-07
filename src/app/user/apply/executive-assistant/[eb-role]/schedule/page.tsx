@@ -389,6 +389,7 @@ export default function SchedulePage() {
             if (hour === 0) hour = 12;
             const formattedTime = `${hour}:${minute} ${ampm}`;
 
+            // REF: for what ung localStorage
             localStorage.setItem(
               "scheduledTime",
               `${formattedDate} at ${formattedTime}`
@@ -552,6 +553,7 @@ export default function SchedulePage() {
 
   return (
     <section className="min-h-screen bg-[rgb(243,243,253)]">
+      {/* REF: gawing component */}
       <header className="flex p-5 items-center justify-between shadow-md shadow-black/40 bg-white">
         <Image
           src="/assets/logos/Logo_CSS Apply.svg"
