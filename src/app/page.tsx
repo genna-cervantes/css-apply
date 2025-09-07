@@ -47,10 +47,20 @@ export default function Home() {
   // Google Auth
   const handleEnterClick = async () => {
     if (session) {
-      router.push("/user");
+      // Redirect based on user role
+      const userRole = session.user.role;
+      console.log('User role for redirect:', userRole);
+      
+      if (userRole === 'super_admin') {
+        router.push("/admin/super-admin");
+      } else if (userRole === 'admin') {
+        router.push("/admin");
+      } else {
+        router.push("/user");
+      }
     } else {
       try {
-        await signIn("google", { callbackUrl: "/user" });
+        await signIn('google', { callbackUrl: '/user' });
       } catch (error) {
         console.error("Sign-in error:", error);
       }
