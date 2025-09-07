@@ -125,7 +125,7 @@ export default function MemberApplication() {
         />
         <button
           onClick={handleLogout}
-          className="bg-[#134687] font-inter text-[11px] sm:text-xs text-white px-4 py-1 lg:py-2 sm:px-8 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]"
+          className="bg-[#134687] font-inter text-[11px] sm:text-xs text-white px-4 py-2 md:py-3 sm:px-8 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]"
         >
           Log Out
         </button>
@@ -135,7 +135,7 @@ export default function MemberApplication() {
         <div className="flex flex-col justify-center items-center w-[80%] lg:w-full lg:px-50 lg:py-20">
           <form
             onSubmit={handleSubmit}
-            className="rounded-[24px] lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] my-12 lg:my-0 md:p-20 lg:p-24"
+            className="rounded-[24px] md:bg-white lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] my-12 lg:my-0 md:p-20 lg:p-24"
           >
             <div className="text-2xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as </span>
