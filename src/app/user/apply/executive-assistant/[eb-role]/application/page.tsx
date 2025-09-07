@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 export default function ExecutiveAssistantApplication() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const ebId = searchParams.get("eb");
-  const { data: session } = useSession() // Backend session check
+  const { "eb-role": ebRole } = useParams<{ "eb-role": string }>();
+  const ebId = ebRole;
+  const { data: session } = useSession(); // Backend session check
 
   // Replace the current handleSubmit function with this:
   // const handleSubmit = async () => {
@@ -18,7 +18,7 @@ export default function ExecutiveAssistantApplication() {
   //     return
   //   }
 
-  //   if (!formData.studentNumber || !formData.firstName || !formData.lastName || 
+  //   if (!formData.studentNumber || !formData.firstName || !formData.lastName ||
   //       !formData.section || !formData.secondChoice || !formData.cv) {
   //     alert('Please fill in all required fields')
   //     return
@@ -54,7 +54,6 @@ export default function ExecutiveAssistantApplication() {
   //     alert('Application failed. Please try again.')
   //   }
   // }
-
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -242,7 +241,7 @@ export default function ExecutiveAssistantApplication() {
               EB role not found
             </h1>
             <button
-              onClick={() => router.push("/apply/executive-assistant")}
+              onClick={() => router.push("/user/apply/executive-assistant")}
               className="bg-[#044FAF] text-white px-6 py-3 rounded-md font-inter font-normal text-sm hover:bg-[#04387B] transition-all duration-150 active:scale-95"
             >
               Back to EB Selection
@@ -290,7 +289,7 @@ export default function ExecutiveAssistantApplication() {
           <div className="w-full flex flex-col items-center justify-center mb-8">
             <div className="flex items-center">
               <div
-                onClick={() => router.push("/apply/executive-assistant")}
+                onClick={() => router.push("/user/apply/executive-assistant")}
                 className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
               >
                 <span className="text-[#696767] text-xs font-bold font-inter">
@@ -548,14 +547,16 @@ export default function ExecutiveAssistantApplication() {
           <div className="flex gap-4 justify-center">
             <button
               type="button"
-              onClick={() => router.push("/apply/executive-assistant")}
-              className="bg-gray-300 text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-gray-400 transition-all duration-150 active:scale-95"
+              onClick={() => router.push("/user/apply/executive-assistant")}
+              className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
             >
               Back
             </button>
             <button
               type="submit"
-              onClick={() => router.push("/schedule")}
+              onClick={() =>
+                router.push(`/user/apply/executive-assistant/${ebId}/schedule`)
+              }
               className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
             >
               Next
