@@ -38,7 +38,7 @@ export default function UserDashboard() {
           />
           <button
             onClick={handleLogout}
-            className="bg-[#134687] font-inter text-[11px] sm:text-xs text-white px-4 py-1 lg:py-2 sm:px-8 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]"
+            className="bg-[#134687] font-inter text-[11px] sm:text-xs text-white px-4 py-2 md:py-3 sm:px-8 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]"
           >
             Log Out
           </button>
