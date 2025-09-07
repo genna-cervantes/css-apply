@@ -65,7 +65,7 @@ function Footer() {
                 fill="white"
               />
             </svg>
-            <span className="flex items-center h-6">
+            <span className="whitespace-nowrap flex items-center h-6">
               UST Computer Science Society
             </span>
           </a>

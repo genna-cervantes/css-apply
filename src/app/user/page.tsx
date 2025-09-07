@@ -28,7 +28,7 @@ export default function UserDashboard() {
   return (
     <div>
       <section className="min-h-screen bg-[#F3F3FD] flex flex-col justify-between">
-        <header className="flex items-center justify-between bg-white shadow-md shadow-black/40 p-3 sm:p-4 lg:p-5">
+        <header className="flex items-center justify-between bg-white shadow-md shadow-black/40 p-5">
           <Image
             src="assets/logos/Logo_CSS Apply.svg"
             alt="A descriptive alt text for your image"
@@ -38,19 +38,19 @@ export default function UserDashboard() {
           />
           <button
             onClick={handleLogout}
-            className="bg-[#134687] font-inter text-[11px] sm:text-xs text-white px-4 py-2 sm:px-8 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]"
+            className="bg-[#134687] font-inter text-[11px] sm:text-xs text-white px-4 py-1 lg:py-2 sm:px-8 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]"
           >
             Log Out
           </button>
         </header>
 
         <div className="flex flex-col justify-center items-center mt-14 lg:mt-20 w-full mb-10 lg:mb-16">
-          <div className="flex flex-col justify-center items-center gap-16">
+          <div className="flex flex-col justify-center items-center gap-7">
             <div className="flex flex-col justify-center items-center gap-2 lg:gap-5">
               <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-0 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-[70%]">
                 Welcome, {userName} 👋
               </div>
-              <div className="text-black text-xs lg:text-lg font-Inter font-light text-center px-3 w-full sm:w-[80%]">
+              <div className="text-black text-xs lg:text-lg font-Inter font-light text-center px-3 w-full sm:w-[80%] leading-5">
                 Manage your applications and explore opportunities with the
                 Computer Science Society. Choose how you'd like to be part of
                 CSS this year.
@@ -106,7 +106,7 @@ export default function UserDashboard() {
                 >
                   {/* Slide 1 - Member */}
                   <div className="min-w-full flex justify-center">
-                    <div className="relative flex flex-col w-64 h-[440px] md:w-80 md:h-[480px] rounded-[28px] border-2 border-[#005FD9] shadow-md lg:shadow-[0_8px_13px_0_rgba(0,0,0,0.25)] items-center justify-center">
+                    <div className="relative flex flex-col w-64 h-[440px] md:w-80 md:h-[480px] rounded-[28px] border-2 border-[#005FD9] bg-white shadow-md lg:shadow-[0_8px_13px_0_rgba(0,0,0,0.25)] items-center justify-center">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="88"
@@ -211,7 +211,7 @@ export default function UserDashboard() {
                       </div>
                       <a
                         href="/user/apply/executive-assistants"
-                        className="whitespace-nowrap absolute bottom-12 left-1/2 -translate-x-1/2 bg-[#044FAF] font-inter text-xs md:text-sm text-white px-4 py-2 md:px-6 md:py-3 rounded-md hover:bg-[#0349A2] transition-all duration-150 active:scale-95"
+                        className="whitespace-nowrap absolute bottom-12 left-1/2 -translate-x-1/2 bg-[#044FAF] font-inter text-xs md:text-sm text-white px-2 py-2 md:px-6 md:py-3 rounded-md hover:bg-[#0349A2] transition-all duration-150 active:scale-95"
                       >
                         Apply as Executive Assistant
                       </a>
@@ -235,7 +235,7 @@ export default function UserDashboard() {
             </div>
 
             {/* Desktop layout */}
-            <div className="hidden lg:flex gap-7 xl:gap-11">
+            <div className="hidden lg:flex gap-7 xl:gap-11 mt-10">
               <div className="relative flex flex-col w-64 xl:w-80 h-[400px] xl:h-[480px] rounded-[20px] xl:rounded-[28px] border-2 border-[#005FD9] bg-white shadow-[0_8px_13px_0_rgba(0,0,0,0.25)] items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

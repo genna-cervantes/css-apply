@@ -115,7 +115,7 @@ export default function MemberApplication() {
 
   return (
     <div className="bg-[rgb(243,243,253)]">
-      <header className="flex items-center justify-between bg-white shadow-md shadow-black/40 p-3 sm:p-4 lg:p-5">
+      <header className="flex items-center justify-between bg-white shadow-md shadow-black/40 p-5">
         <Image
           src="/assets/logos/Logo_CSS Apply.svg"
           alt="A descriptive alt text for your image"
@@ -135,7 +135,7 @@ export default function MemberApplication() {
         <div className="flex flex-col justify-center items-center w-[80%] lg:w-full lg:px-50 lg:py-20">
           <form
             onSubmit={handleSubmit}
-            className="rounded-[24px] md:bg-white lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] my-14 lg:my-0 md:p-20 lg:p-24"
+            className="rounded-[24px] lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] my-12 lg:my-0 md:p-20 lg:p-24"
           >
             <div className="text-2xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as </span>
