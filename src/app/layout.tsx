@@ -33,6 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    // REF: this shouldnt be wrapping the whole html, just the body
+    // REF: better yet use server side session auth instead
     <SessionWrapper>
       <html
         lang="en"

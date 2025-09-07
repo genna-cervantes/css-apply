@@ -3,6 +3,13 @@
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
+// import { useForm } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { z } from "zod";
+// import { signOut, useSession } from "next-auth/react";
+// import { useEffect } from "react";
+// import { useRef } from "react";
+// import { useState } from "react";
 
 export default function CommitteeApplication() {
   const router = useRouter();
@@ -12,6 +19,10 @@ export default function CommitteeApplication() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isChecked, setIsChecked] = useState(false);
+
+  // REF: lagyan din toh ng autofill kagaya sa member application
+  // REF: gumamit ng react form hook and zod para sa form handling
+  // REF: walang required or any input validation toh
   const [formData, setFormData] = useState({
     studentNumber: "",
     firstName: "",
@@ -319,6 +330,7 @@ export default function CommitteeApplication() {
                   </div>
                 </div>
               </div>
+              {/* REF: nag ssame upload  */}
               <div className="flex gap-2 items-center">
                 <div className="text-black text-sm font-Inter font-normal">
                   Curriculum Vitae (in pdf):

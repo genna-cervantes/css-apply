@@ -60,6 +60,7 @@ export default function SchedulePage() {
   }, [showModal]);
 
   // Generate sample admin-created available slots
+  // REF: connect sa BE
   useEffect(() => {
     const generateAdminSlots = () => {
       const slots: Array<{
@@ -826,6 +827,7 @@ export default function SchedulePage() {
         </div>
       </div>
 
+      {/* REF: lagay sa component */}
       {/* Confirmation Modal */}
       {showModal && (
         <div

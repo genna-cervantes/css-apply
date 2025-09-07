@@ -176,6 +176,7 @@ export default function ExecutiveAssistantApplication() {
   const selectedRole = roles.find((r) => r.id === ebId);
 
   const [isChecked, setIsChecked] = useState(false);
+  // REF: react hook form and zod
   const [formData, setFormData] = useState({
     studentNumber: "",
     firstName: "",

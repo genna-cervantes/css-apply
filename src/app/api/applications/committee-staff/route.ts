@@ -32,7 +32,10 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
+        // REF: should check for all types of applications
+        // REF: check for null values para walang error
         // Check if user already applied
+
         const existingApplication = await prisma.committeeApplication.findUnique({
             where: { studentNumber: user.studentNumber },
         })

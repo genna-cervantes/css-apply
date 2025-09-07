@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate student number format
+        // REF: walang gantong validatin sa iba?
         const studentNumberRegex = /^\d{10}$/
         if (!studentNumberRegex.test(studentNumber)) {
         return NextResponse.json(
@@ -92,6 +93,7 @@ export async function POST(request: NextRequest) {
             }, { status: 303 })
         }
 
+        // REF: asan ung validation for overlapping schedule?
         // Create EA application
         console.log('Creating EA application...')
         const application = await prisma.eAApplication.create({
