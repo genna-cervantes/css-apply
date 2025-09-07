@@ -137,6 +137,7 @@ export default function StaffApplication() {
           </button>
         </div>
       </header>
+
       <div className="flex flex-col justify-center items-center px-50 py-20">
         <div className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28">
           <div className="text-4xl font-raleway font-semibold mb-4">
@@ -278,6 +279,7 @@ export default function StaffApplication() {
           </div>
         </div>
       </div>
+
       <footer className="w-full mt-16 py-8 pl-20 pr-20 bg-[#044FAF] text-white flex flex-row gap-100 items-start border-b-10 border-[#287FEB]">
         <div className="flex flex-col">
           <Image
