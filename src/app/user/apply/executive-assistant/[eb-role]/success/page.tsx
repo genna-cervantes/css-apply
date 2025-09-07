@@ -156,7 +156,7 @@ export default function SuccessPage() {
 
   return (
     <section className="min-h-screen bg-[rgb(243,243,253)]">
-      <header className="flex p-5 items-center justify-between shadow-md shadow-black/40 bg-white">
+      <header className="flex p-3 items-center justify-between shadow-md shadow-black/40 bg-white">
         <Image
           src="/assets/logos/Logo_CSS Apply.svg"
           alt="CSS Apply Logo"
