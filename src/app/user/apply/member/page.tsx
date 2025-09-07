@@ -19,18 +19,14 @@ export default function MemberApplication() {
     firstName: "",
     lastName: "",
     section: "",
-    section: "",
   });
 
   useEffect(() => {
     // Pre-fill with any existing user data if available
     if (session?.user) {
-      setFormData(((prev)) => ({
+      setFormData((prev) => ({
         ...prev,
         studentNumber: session.user.studentNumber || "",
-        firstName: session.user.name?.split(" ")[0] || "",
-        lastName: session.user.name?.split(" ").slice(1).join(" ") || "",
-        section: session.user.section || "",
         firstName: session.user.name?.split(" ")[0] || "",
         lastName: session.user.name?.split(" ").slice(1).join(" ") || "",
         section: session.user.section || "",
@@ -43,11 +39,8 @@ export default function MemberApplication() {
     if (name === "studentNumber") {
       const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10); // Limit to 10 for studentNumber
       setFormData((prev) => ({ ...prev, [name]: numericValue }));
-    if (name === "studentNumber") {
-      const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10); // Limit to 10 for studentNumber
-      setFormData((prev) => ({ ...prev, [name]: numericValue }));
     } else {
-      setFormData(((prev)) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -84,10 +77,7 @@ export default function MemberApplication() {
     try {
       const response = await fetch("/api/applications/member", {
         method: "POST",
-      const response = await fetch("/api/applications/member", {
-        method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -95,20 +85,17 @@ export default function MemberApplication() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           section: formData.section,
-          fullName: `${formData.firstName} ${formData.lastName}`.trim(),,
+          fullName: `${formData.firstName} ${formData.lastName}`.trim(),
         }),
       });
 
       if (response.ok) {
         router.push("/user/member/application/payment");
-        router.push("/user/member/application/payment");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Application submission failed");
-        setError(errorData.error || "Application submission failed");
       }
     } catch (error) {
-      setError("An error occurred while submitting your application");
       setError("An error occurred while submitting your application");
     } finally {
       setLoading(false);
@@ -117,9 +104,6 @@ export default function MemberApplication() {
 
   const handleLogout = async () => {
     try {
-      await signOut({
-        callbackUrl: "/", // Redirect to home page after logout
-        redirect: true,
       await signOut({
         callbackUrl: "/", // Redirect to home page after logout
         redirect: true,
