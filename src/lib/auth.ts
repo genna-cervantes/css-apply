@@ -1,4 +1,3 @@
-// src/lib/auth.ts
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import { prisma } from './prisma'
@@ -19,7 +18,7 @@ export const authOptions = {
                 })
 
                 if (existingUser) {
-                return true
+                    return true
                 }
 
                 // If new user, create a basic user record
@@ -27,8 +26,7 @@ export const authOptions = {
                     data: {
                         email: user.email,
                         name: user.name || '',
-                        // studentNumber and section will be null initially
-                        // and filled during member application
+                        role: 'user', // Add default role
                     },
                 })
 
@@ -39,9 +37,39 @@ export const authOptions = {
             }
         },
         
+        async jwt({ token, user }: any) {
+            // Always fetch the latest user data from database to get current role
+            if (token?.email) {
+                try {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { email: token.email },
+                        select: { 
+                            id: true, 
+                            role: true,
+                            name: true 
+                        }
+                    })
+                    
+                    if (dbUser) {
+                        token.role = dbUser.role
+                        token.dbId = dbUser.id
+                        token.name = dbUser.name
+                    } else {
+                        console.log('No database user found for:', token.email);
+                    }
+                } catch (error) {
+                    console.error('JWT callback database error:', error)
+                }
+            }
+            
+            return token
+        },
+        
         async session({ session, token }: any) {
             if (session?.user && token?.sub) {
                 session.user.id = token.sub
+                session.user.role = token.role // Get role from token
+                session.user.dbId = token.dbId
                 
                 // Fetch complete user data from database
                 const dbUser = await prisma.user.findUnique({
@@ -51,6 +79,7 @@ export const authOptions = {
                     studentNumber: true,
                     section: true,
                     name: true,
+                    role: true,
                     createdAt: true,
                     updatedAt: true,
                     memberApplication: { 
@@ -74,6 +103,13 @@ export const authOptions = {
                             hasAccepted: true, 
                             status: true 
                         } 
+                    },
+                    ebProfile: {
+                        select: {
+                            position: true,
+                            committees: true,
+                            isActive: true
+                        }
                     }
                 }
                 })
@@ -84,8 +120,10 @@ export const authOptions = {
                     session.user.studentNumber = dbUser.studentNumber
                     session.user.section = dbUser.section
                     session.user.name = dbUser.name
+                    session.user.role = dbUser.role
                     session.user.createdAt = dbUser.createdAt
                     session.user.updatedAt = dbUser.updatedAt
+                    session.user.ebProfile = dbUser.ebProfile
                     
                     // Add application status information
                     session.user.hasMemberApplication = !!dbUser.memberApplication
@@ -125,24 +163,19 @@ export const authOptions = {
             return session
         },
         
-        async jwt({ token, user }: any) {
-            if (user) {
-                token.id = user.id
-            }
-            return token
-        },
-        
         async redirect({ url, baseUrl }: any) {
-            // Handle custom redirects based on application status
             if (url.startsWith('/user')) {
-                return url
+                return url;
             }
-            return baseUrl
+            
+            if (url.startsWith('/admin')) {
+                return url;
+            }
+            return baseUrl;
         }
     },
     pages: {
         signIn: '/auth/signin',
-        // To-do: add error page redirection
         error: '/auth/error',
     },
 }
