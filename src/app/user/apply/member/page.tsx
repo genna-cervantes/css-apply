@@ -134,8 +134,10 @@ export default function MemberApplication() {
 
     <section className="min-h-screen flex flex-col justify-center items-center">
       <div className="flex flex-col justify-center items-center px-50 py-20">
-        <form onSubmit={handleSubmit} className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28">
-          <div className="text-4xl font-raleway font-semibold mb-4">
+        <form 
+        onSubmit={handleSubmit} 
+        className="rounded-[24px] md:bg-white lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] my-12 lg:my-0 md:p-20 lg:p-24">
+          <div className="text-2xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
             <span className="text-black">Apply as </span>
             <span className="text-[#134687]">Member</span>
           </div>
@@ -145,13 +147,14 @@ export default function MemberApplication() {
             to grow alongside fellow students passionate about tech.
           </div>
           <hr className="my-8 border-t-1 border-[#717171]" />
-          <div className="flex gap-40">
+          <div className="flex flex-col lg:flex-row gap-40">
             <div className="flex flex-col gap-6">
+
               <div className="flex flex-col gap-2">
-                <div className="text-black text-sm font-Inter font-normal">
+                <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                   Student Number *
                 </div>
-                <div className="text-black text-sm font-Inter w-[400px]">
+                <div className="text-black text-sm font-Inter lg:w-[400px]">
                   <input
                     type="text"
                     name="studentNumber"
@@ -160,60 +163,64 @@ export default function MemberApplication() {
                     required
                     pattern="[0-9]{10}"
                     maxLength={10}
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full h-9 lg:h-12  rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
                     placeholder="e.g. 2019131907"
                   />
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
-                <div className="text-black text-sm font-Inter font-normal">
+                <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                   First Name *
                 </div>
-                <div className="text-black text-sm font-Inter w-[400px]">
+                <div className="text-black text-sm font-Inter lg:w-[400px]">
                   <input
                     type="text"
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
                     placeholder="e.g. Juan"
                   />
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
-                <div className="text-black text-sm font-Inter font-normal">
+                <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                   Last Name *
                 </div>
-                <div className="text-black text-sm font-Inter w-[400px]">
+                <div className="text-black text-sm font-Inter lg:w-[400px]">
                   <input
                     type="text"
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
                     required
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full h-9 lg:h-12  rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
                     placeholder="e.g. Dela Cruz"
                   />
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
-                <div className="text-black text-sm font-Inter font-normal">
+                <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                   Section *
                 </div>
-                <div className="text-black text-sm font-Inter w-[200px]">
+                <div className="text-black text-sm font-Inter w-36 lg:w-[200px]">
                   <input
                     type="text"
                     name="section"
                     value={formData.section}
                     onChange={handleInputChange}
                     required
-                    className="w-full rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-base"
+                    className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
                     placeholder="e.g. 1CSA"
                   />
                 </div>
               </div>
-              <div className="flex items-start gap-3">
+
+              <div className="flex items-center justify-center lg:items-start gap-3">
                 <div className="relative flex-shrink-0">
                   <input
                     type="checkbox"
@@ -221,16 +228,16 @@ export default function MemberApplication() {
                     checked={isChecked}
                     onChange={(e) => setIsChecked(e.target.checked)}
                     required
-                    className="w-6 h-6 appearance-none rounded-full border-2 border-gray-400 transition-all duration-200 focus:outline-none
-              hover:border-[#134687]
-              checked:bg-blue-500
-              shadow-inner cursor-pointer"
+                    className="w-4 h-4 lg:w-6 lg:h-6 appearance-none rounded-full border-2 border-gray-400 transition-all duration-200 focus:outline-none
+                    hover:border-[#134687]
+                    checked:bg-blue-500
+                    shadow-inner cursor-pointer"
                   />
                   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <svg
-                      className={`w-4 h-4 text-white transition-opacity duration-20 ${
-                        isChecked ? "opacity-100" : "opacity-0"
-                      }`}
+                      className={`w-2 h-2 lg:w-4 lg:h-4 text-white transition-opacity duration-20 ${
+                          isChecked ? "opacity-100" : "opacity-0"
+                        }`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 26 26"
@@ -244,6 +251,7 @@ export default function MemberApplication() {
                     </svg>
                   </div>
                 </div>
+
                 <label
                   htmlFor="circle-checkbox"
                   className="text-black text-sm font-normal select-none cursor-pointer text-justify"
@@ -252,8 +260,10 @@ export default function MemberApplication() {
                   only for academic purposes. It will not be shared with third
                   parties and will be handled responsibly and ethically.
                 </label>
+
               </div>
             </div>
+
             <div className="flex justify-center mt-8">
               <img
                 src="/assets/pictures/MemberImage.jpg"
@@ -261,6 +271,7 @@ export default function MemberApplication() {
                 className="w-190 h-110 object-cover shadow-md border border-[#2F7EE3] rounded-lg"
               />
             </div>
+
           </div>
           <hr className="my-8 border-t-1 border-[#717171]" />
           <div className="flex justify-center gap-4">
