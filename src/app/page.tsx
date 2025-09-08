@@ -71,6 +71,10 @@ export default function Home() {
     }
   };
 
+  const handleTakeTestClick = () => {
+    router.push('/personality-test');
+  };
+
   return (
     <div className="h-full w-full">
       <section className="min-h-screen w-full bg-gradient-to-b from-[#000000] via-[rgb(1,124,238)] via-69% to-[#0054FF] relative overflow-hidden">
@@ -577,8 +581,10 @@ export default function Home() {
               </div>
 
               {/* CTA Button */}
-              {/* REF: san toh nakaconnect? */}
-              <button className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 hover:bg-gray-100 transition-colors duration-200 font-semibold lg:ml-5">
+              <button 
+                onClick={handleTakeTestClick} 
+                className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 hover:bg-gray-100 transition-colors duration-200 font-semibold lg:ml-5"
+              >
                 <div className="flex items-center justify-center gap-2">
                   <p className="font-inter">Take the Test</p>
                   <Icon
@@ -592,7 +598,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-[#00459C] lg:bg-white p-9">
+  <section id="join-section" className="bg-[#00459C] lg:bg-white p-9">
         <div className="flex flex-col justify-center items-center lg:bg-[#00459C] lg:p-32 lg:rounded-3xl">
           <div className="text-2xl lg:text-5xl text-shadow-md text-white font-raleway">
             Build the future. Start with us.
