@@ -1,33 +1,52 @@
-import NextAuth from 'next-auth'
+import NextAuth, { type NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import { prisma } from './prisma'
+import { prisma } from '@/lib/prisma'
 
-export const authOptions = {
+interface UserSession {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role?: string;
+    dbId?: string;
+    studentNumber?: string | null;
+    section?: string | null;
+    createdAt?: Date;
+    updatedAt?: Date;
+    hasCompletedProfile?: boolean;
+    applicationStatus?: any;
+    hasMemberApplication?: boolean;
+    hasEAApplication?: boolean;
+    hasCommitteeApplication?: boolean;
+    ebProfile?: any;
+}
+
+export const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }),
     ],
     callbacks: {
-        async signIn({ user }: any) {
+        async signIn({ user, account, profile }) {
             try {
                 // Check if user exists in database
                 const existingUser = await prisma.user.findUnique({
-                    where: { email: user.email },
+                where: { email: user.email! },
                 })
 
                 if (existingUser) {
-                    return true
+                return true
                 }
 
                 // If new user, create a basic user record
                 await prisma.user.create({
-                    data: {
-                        email: user.email,
-                        name: user.name || '',
-                        role: 'user', // Add default role
-                    },
+                data: {
+                    email: user.email!,
+                    name: user.name || '',
+                    role: 'user', // Default role
+                },
                 })
 
                 return true
@@ -37,12 +56,15 @@ export const authOptions = {
             }
         },
         
-        async jwt({ token, user }: any) {
-            // Always fetch the latest user data from database to get current role
+        async jwt({ token, user, account, profile }) {
+            if (user) {
+                token.role = 'user'
+            }
+            
             if (token?.email) {
                 try {
                     const dbUser = await prisma.user.findUnique({
-                        where: { email: token.email },
+                        where: { email: token.email as string },
                         select: { 
                             id: true, 
                             role: true,
@@ -55,7 +77,7 @@ export const authOptions = {
                         token.dbId = dbUser.id
                         token.name = dbUser.name
                     } else {
-                        console.log('No database user found for:', token.email);
+                        console.log('No DB User found for email:', token.email);
                     }
                 } catch (error) {
                     console.error('JWT callback database error:', error)
@@ -65,118 +87,142 @@ export const authOptions = {
             return token
         },
         
-        async session({ session, token }: any) {
-            if (session?.user && token?.sub) {
-                session.user.id = token.sub
-                session.user.role = token.role // Get role from token
-                session.user.dbId = token.dbId
+        async session({ session, token }) {
+            if (session?.user && token) {
+                (session.user as UserSession).role = token.role as string
+                ;(session.user as UserSession).dbId = token.dbId as string
                 
-                // Fetch complete user data from database
-                const dbUser = await prisma.user.findUnique({
-                where: { email: session.user.email },
-                select: {
-                    id: true,
-                    studentNumber: true,
-                    section: true,
-                    name: true,
-                    role: true,
-                    createdAt: true,
-                    updatedAt: true,
-                    memberApplication: { 
-                        select: { 
-                            id: true, 
-                            hasAccepted: true, 
-                            paymentProof: true,
-                            createdAt: true
-                        } 
-                    },
-                    eaApplication: { 
-                        select: { 
-                            id: true, 
-                            hasAccepted: true, 
-                            status: true 
-                        } 
-                    },
-                    committeeApplication: { 
-                        select: { 
-                            id: true, 
-                            hasAccepted: true, 
-                            status: true 
-                        } 
-                    },
-                    ebProfile: {
+                const shouldFetchFullData = 
+                session.user.role === 'admin' || 
+                session.user.role === 'super_admin' ||
+                token.fetchFullData === true
+                
+                if (shouldFetchFullData) {
+                    try {
+                        const dbUser = await prisma.user.findUnique({
+                        where: { email: session.user.email! },
                         select: {
-                            position: true,
-                            committees: true,
-                            isActive: true
+                            id: true,
+                            studentNumber: true,
+                            section: true,
+                            name: true,
+                            role: true,
+                            createdAt: true,
+                            updatedAt: true,
+                            memberApplication: { 
+                                select: { 
+                                    id: true, 
+                                    hasAccepted: true, 
+                                    paymentProof: true,
+                                    createdAt: true
+                                } 
+                            },
+                            eaApplication: { 
+                                select: { 
+                                    id: true, 
+                                    hasAccepted: true, 
+                                    status: true 
+                                } 
+                            },
+                            committeeApplication: { 
+                                select: { 
+                                    id: true, 
+                                    hasAccepted: true, 
+                                    status: true 
+                                } 
+                            },
+                            ebProfile: {
+                                select: {
+                                    position: true,
+                                    committees: true,
+                                    isActive: true
+                                }
+                            }
                         }
-                    }
-                }
-                })
+                        })
 
-                if (dbUser) {
-                    // Add database ID and user details to session
-                    session.user.dbId = dbUser.id
-                    session.user.studentNumber = dbUser.studentNumber
-                    session.user.section = dbUser.section
-                    session.user.name = dbUser.name
-                    session.user.role = dbUser.role
-                    session.user.createdAt = dbUser.createdAt
-                    session.user.updatedAt = dbUser.updatedAt
-                    session.user.ebProfile = dbUser.ebProfile
-                    
-                    // Add application status information
-                    session.user.hasMemberApplication = !!dbUser.memberApplication
-                    session.user.memberApplication = dbUser.memberApplication
-                    session.user.hasEAApplication = !!dbUser.eaApplication
-                    session.user.eaApplication = dbUser.eaApplication
-                    session.user.hasCommitteeApplication = !!dbUser.committeeApplication
-                    session.user.committeeApplication = dbUser.committeeApplication
-                    
-                    // Check if user has completed their profile
-                    session.user.hasCompletedProfile = !!dbUser.studentNumber && !!dbUser.section
-                    
-                    // Check application status for routing
-                    session.user.applicationStatus = {
-                        member: dbUser.memberApplication ? {
-                        hasApplication: true,
-                        hasPayment: !!dbUser.memberApplication.paymentProof,
-                        isAccepted: dbUser.memberApplication.hasAccepted,
-                        appliedAt: dbUser.memberApplication.createdAt
-                        } : { hasApplication: false },
-                        
-                        ea: dbUser.eaApplication ? {
-                        hasApplication: true,
-                        status: dbUser.eaApplication.status,
-                        isAccepted: dbUser.eaApplication.hasAccepted,
-                        } : { hasApplication: false },
-                        
-                        committee: dbUser.committeeApplication ? {
-                        hasApplication: true,
-                        status: dbUser.committeeApplication.status,
-                        isAccepted: dbUser.committeeApplication.hasAccepted,
-                        } : { hasApplication: false }
+                        if (dbUser) {
+                            // Add database user details to session
+                            (session.user as UserSession).dbId = dbUser.id
+                            ;(session.user as UserSession).studentNumber = dbUser.studentNumber
+                            ;(session.user as UserSession).section = dbUser.section
+                            ;(session.user as UserSession).name = dbUser.name
+                            ;(session.user as UserSession).role = dbUser.role
+                            ;(session.user as UserSession).createdAt = dbUser.createdAt
+                            ;(session.user as UserSession).updatedAt = dbUser.updatedAt
+                            ;(session.user as UserSession).ebProfile = dbUser.ebProfile
+                            
+                            // Add application status information
+                            ;(session.user as UserSession).hasMemberApplication = !!dbUser.memberApplication
+                            ;(session.user as UserSession).hasEAApplication = !!dbUser.eaApplication
+                            ;(session.user as UserSession).hasCommitteeApplication = !!dbUser.committeeApplication
+                            
+                            // Check if user has completed their profile
+                            ;(session.user as UserSession).hasCompletedProfile = !!dbUser.studentNumber && !!dbUser.section
+                            
+                            // Check application status for routing
+                            ;(session.user as UserSession).applicationStatus = {
+                                    member: dbUser.memberApplication ? {
+                                    hasApplication: true,
+                                    hasPayment: !!dbUser.memberApplication.paymentProof,
+                                    isAccepted: dbUser.memberApplication.hasAccepted,
+                                    appliedAt: dbUser.memberApplication.createdAt
+                                } : { hasApplication: false },
+                                
+                                ea: dbUser.eaApplication ? {
+                                    hasApplication: true,
+                                    status: dbUser.eaApplication.status,
+                                    isAccepted: dbUser.eaApplication.hasAccepted,
+                                } : { hasApplication: false },
+                                
+                                committee: dbUser.committeeApplication ? {
+                                    hasApplication: true,
+                                    status: dbUser.committeeApplication.status,
+                                    isAccepted: dbUser.committeeApplication.hasAccepted,
+                                } : { hasApplication: false }
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Session callback database error:', error)
                     }
                 }
             }
-        
+            
             return session
         },
         
-        async redirect({ url, baseUrl }: any) {
-            if (url.startsWith('/user')) {
+        async redirect({ url }) {
+            if (url.startsWith('/api/auth')) {
                 return url;
             }
-            
-            if (url.startsWith('/admin')) {
+
+            if (url.startsWith('/')) {
                 return url;
             }
-            return baseUrl;
-        }
+
+            return url;
+        },
     },
     pages: {
-        signIn: '/auth/signin',
+        signIn: '/',
         error: '/auth/error',
+        signOut: '/',
+    },
+    // Add session strategy for better performance
+    session: {
+        strategy: 'jwt',
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
+    cookies: {
+        sessionToken: {
+            name: `next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+            },
+        },
     },
 }
 

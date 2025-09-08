@@ -1,3 +1,4 @@
+// src/app/user/apply/member/page.tsx
 "use client";
 
 import Image from "next/image";
@@ -11,34 +12,42 @@ export default function MemberApplication() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   // Form state - all fields will be filled by user
   const [formData, setFormData] = useState({
     studentNumber: "",
-    firstName: "",
-    lastName: "",
     section: ""
   });
 
   // REF: gawing naka disable
+  // Fetch existing application data when component mounts or session updates
   useEffect(() => {
-    if (session?.user) {
-      setFormData(prev => ({
-        ...prev,
-        studentNumber: session.user.studentNumber || "",
-        firstName: session.user.name?.split(' ')[0] || "",
-        lastName: session.user.name?.split(' ').slice(1).join(' ') || "",
-        section: session.user.section || ""
-      }));
-    }
-  }, [session]);
+    const fetchApplicationData = async () => {
+      if (status !== "authenticated" || !session?.user?.email) return;
+
+      try {
+        const response = await fetch('/api/applications/member');
+        if (response.ok) {
+          const data = await response.json();
+          setFormData({
+            studentNumber: data.user?.studentNumber || "",
+            section: data.user?.section || ""
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch application data:', err);
+      }
+    };
+
+    fetchApplicationData();
+  }, [session, status]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'studentNumber') {
-        const numericValue = value.replace(/[^0-9]/g, '').slice(0, 10); // Limit to 10 for studentNumber
-        setFormData(prev => ({ ...prev, [name]: numericValue }));
+      const numericValue = value.replace(/[^0-9]/g, '').slice(0, 10);
+      setFormData(prev => ({ ...prev, [name]: numericValue }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -62,12 +71,6 @@ export default function MemberApplication() {
       return;
     }
 
-    if (!formData.firstName || !formData.lastName) {
-      setError("Please enter your first and last name");
-      setLoading(false);
-      return;
-    }
-
     if (!formData.section) {
       setError("Please enter your section");
       setLoading(false);
@@ -82,10 +85,7 @@ export default function MemberApplication() {
         },
         body: JSON.stringify({
           studentNumber: formData.studentNumber,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
           section: formData.section,
-          fullName: `${formData.firstName} ${formData.lastName}`.trim()
         }),
       });
 
@@ -172,40 +172,6 @@ export default function MemberApplication() {
 
               <div className="flex flex-col gap-2">
                 <div className="text-black text-xs lg:text-sm font-Inter font-normal">
-                  First Name *
-                </div>
-                <div className="text-black text-sm font-Inter lg:w-[400px]">
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
-                    placeholder="e.g. Juan"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-black text-xs lg:text-sm font-Inter font-normal">
-                  Last Name *
-                </div>
-                <div className="text-black text-sm font-Inter lg:w-[400px]">
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full h-9 lg:h-12  rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
-                    placeholder="e.g. Dela Cruz"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                   Section *
                 </div>
                 <div className="text-black text-sm font-Inter w-36 lg:w-[200px]">
@@ -285,7 +251,7 @@ export default function MemberApplication() {
             </button>
             <button
               type="submit"
-              disabled={loading || !formData.studentNumber || formData.studentNumber.length !== 10 || !formData.firstName || !formData.lastName || !formData.section}
+              disabled={loading || !formData.studentNumber || formData.studentNumber.length !== 10 || !formData.section}
               className="whitespace-nowrap font-inter text-sm font-semibold text-white px-12 py-3 rounded-lg bg-[#134687] hover:bg-[#0d3569] disabled:opacity-50"
             >
               {loading ? 'Submitting...' : 'Pay Now'}

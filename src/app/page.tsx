@@ -6,12 +6,9 @@ import Footer from "@/components/Footer";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
+import EnterButton from "@/components/LoginButton";
 
 export default function Home() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
 
   // REF: di need ng useEffect for this, kaya toh css animations lng and tailwind
   const [showFirstLine, setShowFirstLine] = useState(false);
@@ -21,18 +18,9 @@ export default function Home() {
 
   useEffect(() => {
     setShowFirstLine(true);
-
-    const timer1 = setTimeout(() => {
-      setShowSecondLine(true);
-    }, 2000);
-
-    const timer2 = setTimeout(() => {
-      setShowThirdLine(true);
-    }, 4000);
-
-    const timer3 = setTimeout(() => {
-      setShowButton(true);
-    }, 6000);
+    const timer1 = setTimeout(() => { setShowSecondLine(true); }, 2000);
+    const timer2 = setTimeout(() => { setShowThirdLine(true); }, 4000);
+    const timer3 = setTimeout(() => { setShowButton(true); }, 6000);
 
     return () => {
       clearTimeout(timer1);
@@ -40,39 +28,12 @@ export default function Home() {
       clearTimeout(timer3);
     };
   }, []);
-
+  
   const scrollToNextSection = () => {
     const nextSection = document.getElementById("about-css-section");
     if (nextSection) {
       nextSection.scrollIntoView({ behavior: "smooth" });
     }
-  };
-
-  // Google Auth
-  const handleEnterClick = async () => {
-    if (session) {
-      // Redirect based on user role
-      const userRole = session.user.role;
-      console.log('User role for redirect:', userRole);
-      
-      if (userRole === 'super_admin') {
-        router.push("/admin/super-admin");
-      } else if (userRole === 'admin') {
-        router.push("/admin");
-      } else {
-        router.push("/user");
-      }
-    } else {
-      try {
-        await signIn('google', { callbackUrl: '/user' });
-      } catch (error) {
-        console.error("Sign-in error:", error);
-      }
-    }
-  };
-
-  const handleTakeTestClick = () => {
-    router.push('/personality-test');
   };
 
   return (
@@ -163,19 +124,7 @@ export default function Home() {
               </code>
             </div>
           </div>
-
-          {/* REF: eto ilagay nalang sa client component */}
-          {/* REF: lagyan ng loading state */}
-          {showButton && (
-            <div>
-              <button
-                onClick={handleEnterClick}
-                className="bg-[#0077FF] font-family-inter text-white py-2 px-16 font-medium text-xl shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] absolute top-[45%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 animate-fade-in hover:bg-[#0056CC] transition-colors duration-200 cursor-pointer"
-              >
-                ENTER
-              </button>
-            </div>
-          )}
+          {showButton && <EnterButton isVisible={showButton} />}
         </div>
 
         {/* Mobile/Tablet layout di p done */}
@@ -216,16 +165,7 @@ export default function Home() {
             </div>
 
             {/* Mobile button */}
-            {showButton && (
-              <div className="absolute top-[65%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40">
-                <button
-                  onClick={handleEnterClick}
-                  className="bg-[#0077FF] font-family-inter text-white py-2 px-8 md:py-3 md:px-12 font-medium text-sm md:text-lg shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] animate-fade-in rounded-sm hover:bg-[#0056CC] transition-colors duration-200 cursor-pointer"
-                >
-                  ENTER
-                </button>
-              </div>
-            )}
+            {showButton && <EnterButton isVisible={showButton} />}
           </div>
         </div>
 
@@ -581,10 +521,8 @@ export default function Home() {
               </div>
 
               {/* CTA Button */}
-              <button 
-                onClick={handleTakeTestClick} 
-                className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 hover:bg-gray-100 transition-colors duration-200 font-semibold lg:ml-5"
-              >
+              {/* REF: san toh nakaconnect? */}
+              <button className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 hover:bg-gray-100 transition-colors duration-200 font-semibold lg:ml-5">
                 <div className="flex items-center justify-center gap-2">
                   <p className="font-inter">Take the Test</p>
                   <Icon
@@ -598,7 +536,7 @@ export default function Home() {
         </div>
       </section>
 
-  <section id="join-section" className="bg-[#00459C] lg:bg-white p-9">
+      <section className="bg-[#00459C] lg:bg-white p-9">
         <div className="flex flex-col justify-center items-center lg:bg-[#00459C] lg:p-32 lg:rounded-3xl">
           <div className="text-2xl lg:text-5xl text-shadow-md text-white font-raleway">
             Build the future. Start with us.

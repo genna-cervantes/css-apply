@@ -35,14 +35,14 @@ export default function RootLayout({
   return (
     // REF: this shouldnt be wrapping the whole html, just the body
     // REF: better yet use server side session auth instead
-    <SessionWrapper>
       <html
         lang="en"
-        className={`${inter.variable} ${raleway.variable} ${poppins.variable}`}
-      >
-        <body>{children}</body>
+        className={`${inter.variable} ${raleway.variable} ${poppins.variable}`}>
+        <SessionWrapper>
+        <body suppressHydrationWarning={true}>
+          {children}
+        </body>
+        </SessionWrapper>
       </html>
-    </SessionWrapper>
-
   );
 }

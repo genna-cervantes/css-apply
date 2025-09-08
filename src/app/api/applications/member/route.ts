@@ -1,8 +1,9 @@
+// src/app/api/applications/member/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
-import { sendEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
     try {
@@ -12,11 +13,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { studentNumber, firstName, lastName, section, fullName } = await request.json()
+        // We no longer destructure firstName, lastName, or fullName
+        const { studentNumber, section } = await request.json()
 
-        if (!studentNumber || !firstName || !lastName || !section) {
+        if (!studentNumber || !section) {
             return NextResponse.json(
-                { error: 'All fields are required' },
+                { error: 'Student number and section are required' },
                 { status: 400 }
             )
         }
@@ -28,6 +30,7 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Check if student number is already used by another user
         const existingUserWithSN = await prisma.user.findUnique({
             where: { studentNumber },
         });
@@ -39,45 +42,54 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check for existing application
         const existingApplication = await prisma.memberApplication.findUnique({
             where: { studentNumber },
         })
 
-        if (existingApplication) {
+        if (existingApplication && existingApplication.hasAccepted) {
             return NextResponse.json(
-                { error: 'You already have a pending member application' },
+                { error: 'You already have an accepted member application' },
                 { status: 400 }
             )
         }
 
+        // Update the User record with the latest info
+        // This saves their progress even if they don't complete payment
         const updatedUser = await prisma.user.update({
             where: { email: session.user.email },
             data: {
                 studentNumber,
-                name: fullName,
                 section,
+                // We do not update the name here, as it comes from Google
             },
         })
 
-        const application = await prisma.memberApplication.create({
-            data: {
-                studentNumber,
-                paymentProof: "", // Empty initially, will be updated after payment
-                hasAccepted: false,
-            },
-        })
+        // If no application exists or the existing one is not accepted, create/update it
+        let application;
+        if (!existingApplication) {
+            application = await prisma.memberApplication.create({
+                data: {
+                    studentNumber,
+                    paymentProof: "", // Empty initially
+                    hasAccepted: false,
+                },
+            })
+        } else {
+            // If application exists but is not accepted, we can update it (e.g., reset paymentProof if needed)
+            // For now, we'll just return the existing one
+            application = existingApplication;
+        }
 
-        
         return NextResponse.json({ 
             success: true, 
             user: updatedUser,
             application,
-            message: 'Application submitted successfully. Please proceed to payment.' 
+            message: 'Application info saved. Please proceed to payment.' 
         })
 
     } catch (error) {
         console.error('Member application error:', error)
-        // Handle unique constraint violation
         if (error instanceof Error && error.message.includes('Unique constraint')) {
             return NextResponse.json(
                 { error: 'This student number already has an application' },
@@ -92,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
         
@@ -100,7 +112,6 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        // Get user from database
         if (!session?.user?.email) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
@@ -111,7 +122,7 @@ export async function GET() {
         })
 
         if (!user) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+            return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
         return NextResponse.json({ 
