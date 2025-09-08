@@ -14,76 +14,90 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(cuid())
-  email           String   @unique
-  name            String
-  studentNumber   String?   @unique @db.VarChar(10)
-  section         String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  studentNumber String?  @unique @db.VarChar(10)
+  section       String?
+  role          String   @default("user") // user, admin, super_admin
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relationships
-  memberApplication MemberApplication?
-  eaApplication     EAApplication?
+  memberApplication    MemberApplication?
+  eaApplication        EAApplication?
   committeeApplication CommitteeApplication?
+  ebProfile            EBProfile?
 }
 
 model MemberApplication {
-  id              String   @id @default(cuid())
-  studentNumber   String   @unique
-  user            User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
-  paymentProof    String
-  hasAccepted     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  studentNumber String   @unique
+  user          User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  paymentProof  String
+  hasAccepted   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model EAApplication {
-  id                      String   @id @default(cuid())
-  studentNumber           String   @unique
-  user                    User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
-  firstOptionEb           String
-  secondOptionEb          String
-  portfolioLink           String
-  cv                      String
-  interviewSlotDay        String
-  interviewSlotTimeStart  String
-  interviewSlotTimeEnd    String
-  hasFinishedInterview    Boolean  @default(false)
-  status                  String?  // passed, failed, redirected
-  redirection             String?
-  hasAccepted             Boolean  @default(false)
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  studentNumber          String   @unique
+  user                   User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  firstOptionEb          String
+  secondOptionEb         String
+  portfolioLink          String
+  cv                     String
+  interviewSlotDay       String
+  interviewSlotTimeStart String
+  interviewSlotTimeEnd   String
+  hasFinishedInterview   Boolean  @default(false)
+  status                 String? // passed, failed, redirected
+  redirection            String?
+  hasAccepted            Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
 
 model CommitteeApplication {
-  id                      String   @id @default(cuid())
-  studentNumber           String   @unique
-  user                    User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
-  firstOptionCommittee    String
-  secondOptionCommittee   String
-  portfolioLink           String
-  cv                      String
-  interviewSlotDay        String
-  interviewSlotTimeStart  String
-  interviewSlotTimeEnd    String
-  hasFinishedInterview    Boolean  @default(false)
-  status                  String?  // passed, failed, redirected
-  redirection             String?
-  hasAccepted             Boolean  @default(false)
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id                     String   @id @default(cuid())
+  studentNumber          String   @unique
+  user                   User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  firstOptionCommittee   String
+  secondOptionCommittee  String
+  portfolioLink          String?
+  cv                     String
+  supabaseFilePath       String?
+  interviewSlotDay       String
+  interviewSlotTimeStart String
+  interviewSlotTimeEnd   String
+  hasFinishedInterview   Boolean  @default(false)
+  status                 String? // passed, failed, redirected
+  redirection            String?
+  hasAccepted            Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
 
 model AvailableEBInterviewTime {
+  id           String   @id @default(cuid())
+  eb           String
+  day          String
+  timeStart    String
+  timeEnd      String
+  maxSlots     Int
+  currentSlots Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model EBProfile {
   id          String   @id @default(cuid())
-  eb          String
-  day         String
-  timeStart   String
-  timeEnd     String
-  maxSlots    Int
-  currentSlots Int     @default(0)
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position    String
+  committees  String[] 
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
