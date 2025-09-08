@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
         console.log('Parsed:', { date, start, end })
 
         // Update application
-        // REF: naka store na agad kahit di pa complete?
         const application = await prisma.eAApplication.update({
             where: { studentNumber: user.studentNumber },
             data: {
