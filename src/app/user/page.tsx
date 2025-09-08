@@ -1,30 +1,46 @@
+// src/app/user/page.tsx
 "use client";
 
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
-import { redirect, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function UserDashboard() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check authentication status
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (!session) {
+      // Redirect to signin if not authenticated
+      router.push("/"); // Go back to main page so they can sign in
+      return;
+    }
+    
+    setIsLoading(false);
+  }, [session, status, router]);
 
   const handleLogout = async () => {
-    try {
-      await signOut({
-        callbackUrl: "/", // Redirect to home page after logout
-        redirect: true,
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await signOut({
+      callbackUrl: "/",
+      redirect: true,
+    });
   };
 
-  // Get user name from session, fallback to default
-  // REF: if wala session ibig sabihin di authorized so dapat redirection toh
-  const userName = session?.user?.name || "User";
+  // Show loading screen while checking authentication
+  if (isLoading || status === "loading") {
+    return <LoadingScreen />;
+  }
+  
+  // Get user name from session
+  const userName = session?.user?.name;
 
   return (
     <div>
