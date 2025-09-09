@@ -104,7 +104,7 @@ export default function MemberApplication() {
   };
 
   return (
-    <div className="bg-[rgb(243,243,253)]">
+    <div className="bg-white lg:bg-[rgb(243,243,253)]">
       <Header />
 
       <section className="min-h-screen flex flex-col justify-center items-center">
