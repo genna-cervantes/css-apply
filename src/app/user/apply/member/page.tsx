@@ -104,14 +104,14 @@ export default function MemberApplication() {
   };
 
   return (
-    <div className="bg-white lg:bg-[rgb(243,243,253)]">
+    <div className="md:bg-[rgb(243,243,253)]">
       <Header />
 
-      <section className="min-h-screen flex flex-col justify-center items-center">
-        <div className="flex flex-col justify-center items-center px-50 py-20">
+      <section className="flex flex-col items-center">
+        <div className="flex flex-col justify-center items-center my-28 px-10 md:px-16 lg:px-50">
           <form
             onSubmit={handleSubmit}
-            className="rounded-[24px] md:bg-white lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] my-12 lg:my-0 md:p-20 lg:p-24"
+            className="rounded-[24px] md:bg-white md:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] md:p-20 lg:p-24"
           >
             <div className="text-2xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as </span>
@@ -205,7 +205,7 @@ export default function MemberApplication() {
                 </div>
               </div>
 
-              <div className="flex justify-center mt-8">
+              <div className="hidden xl:flex justify-center mt-8">
                 <img
                   src="/assets/pictures/MemberImage.jpg"
                   alt="Member"
@@ -238,6 +238,7 @@ export default function MemberApplication() {
           </form>
         </div>
       </section>
+
       <Footer />
     </div>
   );

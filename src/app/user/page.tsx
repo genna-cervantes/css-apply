@@ -34,7 +34,10 @@ export default function UserDashboard() {
   }
 
   // Get user name from session
-  const userName = session?.user?.name;
+  const rawFirstName = session?.user?.name?.split(" ")[0];
+  const firstName = rawFirstName
+    ? rawFirstName.charAt(0).toUpperCase() + rawFirstName.slice(1).toLowerCase()
+    : "";
 
   return (
     <div>
@@ -45,7 +48,7 @@ export default function UserDashboard() {
           <div className="flex flex-col justify-center items-center gap-7">
             <div className="flex flex-col justify-center items-center gap-2 lg:gap-5">
               <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-0 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-[70%]">
-                Welcome, {userName} 👋
+                Welcome, {firstName} 👋
               </div>
               <div className="text-black text-xs lg:text-lg font-Inter font-light text-center px-3 w-[85%] lg:w-full  leading-5">
                 Ready to start your journey with the Computer Science Society?
