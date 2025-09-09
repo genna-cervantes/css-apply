@@ -47,10 +47,9 @@ export default function UserDashboard() {
               <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-0 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-[70%]">
                 Welcome, {userName} 👋
               </div>
-              <div className="text-black text-xs lg:text-lg font-Inter font-light text-center px-3 w-full sm:w-[80%] leading-5">
-                Manage your applications and explore opportunities with the
-                Computer Science Society. Choose how you'd like to be part of
-                CSS this year.
+              <div className="text-black text-xs lg:text-lg font-Inter font-light text-center px-3 w-[85%] lg:w-full  leading-5">
+                Ready to start your journey with the Computer Science Society?
+                Choose how you’d like to be part of CSS this year.
               </div>
             </div>
             {/* Mobile carousel */}

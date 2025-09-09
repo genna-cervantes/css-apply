@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
 export default function AssistantApplication() {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string | null>("president");
   const router = useRouter();
 
   const committeeRoles = [
@@ -290,14 +290,14 @@ export default function AssistantApplication() {
                           })()}
                         </div>
                         {/* Right side - Committee picture */}
-                        <div className="hidden lg:block lg:w-2/5 bg-gray-200 lg:h-80"></div>
+                        <div className="hidden xl:block lg:w-2/5 bg-gray-200 lg:h-80"></div>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mt-1 hidden lg:block">
                       <div className="flex">
-                        <div className="w-3/5 p-6 flex items-center justify-center h-80">
-                          <p className="text-gray-500 font-inter text-center">
+                        <div className="lg:w-3/5 p-4 lg:p-6 flex items-center justify-center lg:h-80">
+                          <p className="text-gray-500 font-inter text-center text-sm lg:text-base">
                             Select an EB role to be their Executive Assistant
                           </p>
                         </div>
