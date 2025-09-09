@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
+import Header from "@/components/Header";
 
 export default function UserDashboard() {
   const { data: session, status } = useSession();
@@ -23,43 +24,22 @@ export default function UserDashboard() {
       router.push("/"); // Go back to main page so they can sign in
       return;
     }
-    
+
     setIsLoading(false);
   }, [session, status, router]);
-
-  const handleLogout = async () => {
-    await signOut({
-      callbackUrl: "/",
-      redirect: true,
-    });
-  };
 
   // Show loading screen while checking authentication
   if (isLoading || status === "loading") {
     return <LoadingScreen />;
   }
-  
+
   // Get user name from session
   const userName = session?.user?.name;
 
   return (
     <div>
       <section className="min-h-screen bg-[#F3F3FD] flex flex-col justify-between">
-        <header className="flex items-center justify-between bg-white shadow-md shadow-black/40 p-5">
-          <Image
-            src="assets/logos/Logo_CSS Apply.svg"
-            alt="A descriptive alt text for your image"
-            width={110}
-            height={190}
-            className="drop-shadow-md w-24 h-auto sm:w-[110px]"
-          />
-          <button
-            onClick={handleLogout}
-            className="bg-[#134687] font-inter text-[11px] sm:text-xs text-white px-4 py-2 md:py-3 sm:px-8 rounded-sm transition-all duration-150 active:scale-95 hover:bg-[#0f3a6b]"
-          >
-            Log Out
-          </button>
-        </header>
+        <Header />
 
         <div className="flex flex-col justify-center items-center mt-14 lg:mt-20 w-full mb-10 lg:mb-16">
           <div className="flex flex-col justify-center items-center gap-7">

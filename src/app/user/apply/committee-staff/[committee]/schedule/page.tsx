@@ -7,6 +7,7 @@ import { useMemo, useState, useEffect } from "react";
 
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
+import Header from "@/components/Header";
 export default function SchedulePage() {
   const router = useRouter();
   const { committee: committeeId } = useParams<{ committee: string }>();
@@ -542,20 +543,7 @@ export default function SchedulePage() {
 
   return (
     <section className="min-h-screen bg-[rgb(243,243,253)]">
-      <header className="flex p-5 items-center justify-between shadow-md shadow-black/40 bg-white">
-        <Image
-          src="/assets/logos/Logo_CSS Apply.svg"
-          alt="CSS Apply Logo"
-          width={110}
-          height={190}
-          className="drop-shadow-md"
-        />
-        <div className="flex items-center gap-4">
-          <button className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm transition-all duration-150 active:scale-95">
-            Log Out
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <div className="flex flex-col justify-center items-center px-50 py-20">
         <div className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28  w-full">
