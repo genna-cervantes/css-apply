@@ -131,14 +131,14 @@ export default function AssistantApplication() {
     <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
       <Header />
 
-      <section className="flex flex-col items-center justify-center sm:my-12">
-        <div className="w-[90%] flex flex-col justify-center items-center">
+      <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
+        <div className="w-[80%] flex flex-col justify-center items-center">
           <div className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
             <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as </span>
               <span className="text-[#134687]">Executive Assistant</span>
             </div>
-            <div className="text-black text-xs lg:text-md font-Inter font-light text-justify">
+            <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
               Executive Assistants work closely with the CSS Executive Boards to
               help them with their tasks in events and committees. This role
               requires responsibility, attention to detail, and strong
