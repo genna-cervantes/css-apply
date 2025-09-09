@@ -128,209 +128,209 @@ export default function AssistantApplication() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[rgb(243,243,253)] flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
       <Header />
 
-      <section className="flex flex-col items-center justify-center my-20 lg:my-0">
-        <div className="w-[80%] lg:w-full">
-          <div className="flex flex-col justify-center items-center  lg:px-50 lg:py-20">
-            <div className="rounded-[24px] lg:bg-white lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] lg:p-20">
-              <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
-                <span className="text-black">Apply as </span>
-                <span className="text-[#134687]">Executive Assistant</span>
-              </div>
-              <div className="text-black text-xs lg:text-md font-Inter font-light text-justify">
-                Executive Assistants work closely with the CSS Executive Boards
-                to help them with their tasks in events and committees. This
-                role requires responsibility, attention to detail, and strong
-                communication skills.
-              </div>
+      <section className="flex flex-col items-center justify-center sm:my-12">
+        <div className="w-[90%] flex flex-col justify-center items-center">
+          <div className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
+            <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
+              <span className="text-black">Apply as </span>
+              <span className="text-[#134687]">Executive Assistant</span>
+            </div>
+            <div className="text-black text-xs lg:text-md font-Inter font-light text-justify">
+              Executive Assistants work closely with the CSS Executive Boards to
+              help them with their tasks in events and committees. This role
+              requires responsibility, attention to detail, and strong
+              communication skills.
+            </div>
 
-              <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
+            <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
 
-              <div className="w-full flex flex-col items-center justify-center">
-                <div className="flex items-center">
-                  <div className="flex items-center justify-center rounded-full bg-[#2F7EE3] w-5 h-5 lg:w-10 lg:h-10">
-                    <span className="text-white text-[9px] lg:text-xs lg:font-bold font-inter">
-                      1
-                    </span>
-                  </div>
-
-                  <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
-
-                  <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-5 h-5 lg:w-10 lg:h-10">
-                    <span className="text-[#696767] text-[9px] lg:text-xs lg:font-bold font-inter">
-                      2
-                    </span>
-                  </div>
-
-                  <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
-
-                  <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-5 h-5 lg:w-10 lg:h-10">
-                    <span className="text-[#696767] text-[9px] lg:text-xs lg:font-bold font-inter">
-                      3
-                    </span>
-                  </div>
+            <div className="w-full flex flex-col items-center justify-center">
+              <div className="flex items-center">
+                <div className="flex items-center justify-center rounded-full bg-[#2F7EE3] w-5 h-5 lg:w-10 lg:h-10">
+                  <span className="text-white text-[9px] lg:text-xs lg:font-bold font-inter">
+                    1
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-3 w-72 lg:w-100 mt-3 gap-x-0 place-items-center font-inter font-medium">
-                  <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
-                    Select a Role
+                <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
+
+                <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-5 h-5 lg:w-10 lg:h-10">
+                  <span className="text-[#696767] text-[9px] lg:text-xs lg:font-bold font-inter">
+                    2
                   </span>
-                  <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
-                    Enter Information
-                  </span>
-                  <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
-                    Schedule Interview
+                </div>
+
+                <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
+
+                <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-5 h-5 lg:w-10 lg:h-10">
+                  <span className="text-[#696767] text-[9px] lg:text-xs lg:font-bold font-inter">
+                    3
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-col lg:flex-row justify-center lg:gap-8 lg:mt-8">
-                {/* Left Column - Scrollable Role List / Mobile Dropdown */}
-                <div className="lg:w-1/3 lg:max-w-md">
-                  {/* Mobile Dropdown (below lg) */}
-                  <div className="lg:hidden relative mt-6">
-                    <button
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="w-full px-5 border h-9 border-gray-300 rounded-lg bg-white flex items-center justify-between"
-                    >
-                      <span className="font-inter text-xs text-[#7a7a7a]">
-                        {selectedRole
-                          ? committeeRoles.find(
-                              (role) => role.id === selectedRole
-                            )?.title
-                          : "Select an EB role"}
-                      </span>
-                      <span className="text-[#7a7a7a] text-xs font-extralight">
-                        ▼
-                      </span>
-                    </button>
-                    {isDropdownOpen && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-y-auto">
-                        {committeeRoles.map((role) => (
-                          <div
-                            key={role.id}
-                            onClick={() => {
-                              setSelectedRole(role.id);
-                              setIsDropdownOpen(false);
-                            }}
-                            className="p-2 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-3 last:border-b-0"
-                          >
-                            <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
-                              <span className="text-gray-500 text-xs">IMG</span>
-                            </div>
-                            <h4 className="font-inter font-semibold text-xs text-black">
-                              {role.title}
-                            </h4>
+              <div className="grid grid-cols-3 w-72 lg:w-100 mt-3 gap-x-0 place-items-center font-inter font-medium">
+                <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
+                  Select a Role
+                </span>
+                <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
+                  Enter Information
+                </span>
+                <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
+                  Schedule Interview
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col lg:flex-row justify-center lg:gap-8 lg:mt-8">
+              {/* Left Column - Scrollable Role List / Mobile Dropdown */}
+              <div className="lg:w-1/3 lg:max-w-md">
+                {/* Mobile Dropdown (below lg) */}
+                <div className="lg:hidden relative mt-6">
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="w-full px-5 border h-9 border-gray-300 rounded-lg bg-white flex items-center justify-between"
+                  >
+                    <span className="font-inter text-xs text-[#7a7a7a]">
+                      {selectedRole
+                        ? committeeRoles.find(
+                            (role) => role.id === selectedRole
+                          )?.title
+                        : "Select an EB role"}
+                    </span>
+                    <span className="text-[#7a7a7a] text-xs font-extralight">
+                      ▼
+                    </span>
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+                      {committeeRoles.map((role) => (
+                        <div
+                          key={role.id}
+                          onClick={() => {
+                            setSelectedRole(role.id);
+                            setIsDropdownOpen(false);
+                          }}
+                          className="p-2 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-3 last:border-b-0"
+                        >
+                          <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
+                            <span className="text-gray-500 text-xs">IMG</span>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Desktop Scrollable List (lg and above) */}
-                  <div className="hidden lg:block max-h-80 overflow-y-auto">
-                    {committeeRoles.map((role) => (
-                      <div
-                        key={role.id}
-                        onClick={() => setSelectedRole(role.id)}
-                        className={`p-3 border-t border-b cursor-pointer transition-all duration-200 flex items-center gap-3 ${
-                          selectedRole === role.id
-                            ? "border-[#2F7EE3] bg-blue-50"
-                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                        }`}
-                      >
-                        <div className="lg:w-12 lg:h-12 bg-gray-300 rounded-lg flex items-center justify-center">
-                          <span className="text-gray-500 text-xs">IMG</span>
+                          <h4 className="font-inter font-semibold text-xs text-black">
+                            {role.title}
+                          </h4>
                         </div>
-                        <h4 className="font-inter font-semibold text-xs text-black">
-                          {role.title}
-                        </h4>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right Column - Role Information */}
-                <div className="lg:w-2/3 lg:max-w-2xl">
-                  {selectedRole ? (
-                    <div className="lg:bg-white rounded-lg lg:border lg:border-gray-200 overflow-hidden">
-                      <div className="flex">
-                        {/* Left side - Text content */}
-                        <div className="lg:w-3/5 mt-5 lg:mt-0 lg:p-6">
-                          {(() => {
-                            const role = committeeRoles.find(
-                              (r) => r.id === selectedRole
-                            );
-                            return role ? (
-                              <>
-                                <div className="flex gap-5">
-                                  <div className="lg:hidden w-14 h-14 rounded-full overflow-hidden bg-[#7a7a7a]"></div>
-                                  <div>
-                                    <div className="text-[10px] lg:text-xs font-inter text-[#7a7a7a] lg:mb-1">
-                                      <p>Be an Executive Assistant of</p>
-                                    </div>
-                                    <h4 className="flex text-md lg:text-xl font-inter font-bold text-black">
-                                      {role.title}
-                                    </h4>
-                                    {role.ebName && (
-                                      <p className="text-xs lg:text-sm italic font-inter text-[#134687] mb-3">
-                                        {role.ebName}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <p className="text-[10px] lg:text-[13px] font-normal font-inter text-black lg:mb-6 leading-relaxed text-justify">
-                                  {role.description}
-                                </p>
-                              </>
-                            ) : null;
-                          })()}
-                        </div>
-                        {/* Right side - Committee picture */}
-                        <div className="hidden xl:block lg:w-2/5 bg-gray-200 lg:h-80"></div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mt-1 hidden lg:block">
-                      <div className="flex">
-                        <div className="lg:w-3/5 p-4 lg:p-6 flex items-center justify-center lg:h-80">
-                          <p className="text-gray-500 font-inter text-center text-sm lg:text-base">
-                            Select an EB role to be their Executive Assistant
-                          </p>
-                        </div>
-                        <div className="lg:w-2/5 bg-gray-200 lg:h-80"></div>
-                      </div>
+                      ))}
                     </div>
                   )}
                 </div>
+
+                {/* Desktop Scrollable List (lg and above) */}
+                <div className="hidden lg:block max-h-80 overflow-y-auto">
+                  {committeeRoles.map((role) => (
+                    <div
+                      key={role.id}
+                      onClick={() => setSelectedRole(role.id)}
+                      className={`p-3 border-t border-b cursor-pointer transition-all duration-200 flex items-center gap-3 ${
+                        selectedRole === role.id
+                          ? "border-[#2F7EE3] bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="lg:w-12 lg:h-12 bg-gray-300 rounded-lg flex items-center justify-center">
+                        <span className="text-gray-500 text-xs">IMG</span>
+                      </div>
+                      <h4 className="font-inter font-semibold text-xs text-black">
+                        {role.title}
+                      </h4>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <hr className="my-8 border-t-1 border-[#717171]" />
+              {/* Right Column - Role Information */}
+              <div className="lg:w-2/3 lg:max-w-2xl">
+                {selectedRole ? (
+                  <div className="lg:bg-white rounded-lg lg:border lg:border-gray-200 overflow-hidden">
+                    <div className="flex">
+                      {/* Left side - Text content */}
+                      <div className="lg:w-3/5 mt-5 lg:mt-0 lg:p-6">
+                        {(() => {
+                          const role = committeeRoles.find(
+                            (r) => r.id === selectedRole
+                          );
+                          return role ? (
+                            <>
+                              <div className="flex gap-5">
+                                <div className="lg:hidden w-14 h-14 rounded-full overflow-hidden bg-[#7a7a7a]"></div>
+                                <div>
+                                  <div className="text-[10px] lg:text-xs font-inter text-[#7a7a7a] lg:mb-1">
+                                    <p>Be an Executive Assistant of</p>
+                                  </div>
+                                  <h4 className="flex text-md lg:text-xl font-inter font-bold text-black">
+                                    {role.title}
+                                  </h4>
+                                  {role.ebName && (
+                                    <p className="text-xs lg:text-sm italic font-inter text-[#134687] mb-3">
+                                      {role.ebName}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
 
-              <div className="flex justify-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => router.push("/user")}
-                  className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
-                >
-                  Back
-                </button>
-                {selectedRole && (
-                  <button
-                    onClick={() =>
-                      router.push(
-                        `/user/apply/executive-assistant/${selectedRole}/application`
-                      )
-                    }
-                    className="bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
-                  >
-                    Apply
-                  </button>
+                              <p className="text-[10px] lg:text-[13px] font-normal font-inter text-black lg:mb-6 leading-relaxed text-justify">
+                                {role.description}
+                              </p>
+                            </>
+                          ) : null;
+                        })()}
+                      </div>
+                      {/* Right side - Committee picture */}
+                      <div className="hidden lg:block lg:w-2/5 bg-gray-200 lg:h-80">
+                        is it here
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mt-1 hidden lg:block">
+                    <div className="flex">
+                      <div className="lg:w-3/5 p-4 lg:p-6 flex items-center justify-center lg:h-80">
+                        <p className="text-gray-500 font-inter text-center text-sm lg:text-base">
+                          Select an EB role to be their Executive Assistant
+                        </p>
+                      </div>
+                      <div className="lg:w-2/5 bg-gray-200 lg:h-80"></div>
+                    </div>
+                  </div>
                 )}
               </div>
+            </div>
+
+            <hr className="my-8 border-t-1 border-[#717171]" />
+
+            <div className="flex justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => router.push("/user")}
+                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+              >
+                Back
+              </button>
+              {selectedRole && (
+                <button
+                  onClick={() =>
+                    router.push(
+                      `/user/apply/executive-assistant/${selectedRole}/application`
+                    )
+                  }
+                  className="bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
+                >
+                  Apply
+                </button>
+              )}
             </div>
           </div>
         </div>
