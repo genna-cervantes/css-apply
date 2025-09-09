@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function AssistantApplication() {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -128,20 +129,7 @@ export default function AssistantApplication() {
 
   return (
     <div className="min-h-screen bg-[rgb(243,243,253)] flex flex-col justify-between">
-      <header className="flex px-5 py-3 lg:py-5 items-center justify-between shadow-md shadow-black/40 bg-white">
-        <Image
-          src="/assets/logos/Logo_CSS Apply.svg"
-          alt="CSS Apply Logo"
-          width={110}
-          height={190}
-          className="drop-shadow-md"
-        />
-        <div className="flex items-center">
-          <button className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm">
-            Log Out
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <section className="flex flex-col items-center justify-center my-20 lg:my-0">
         <div className="w-[80%] lg:w-full">

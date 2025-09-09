@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Header from "@/components/Header";
 
 export default function SuccessPage() {
   const router = useRouter();
@@ -106,20 +107,7 @@ export default function SuccessPage() {
 
   return (
     <section className="min-h-screen bg-[rgb(243,243,253)]">
-      <header className="flex p-5 items-center justify-between shadow-md shadow-black/40 bg-white">
-        <Image
-          src="/assets/logos/Logo_CSS Apply.svg"
-          alt="CSS Apply Logo"
-          width={110}
-          height={190}
-          className="drop-shadow-md"
-        />
-        <div className="flex items-center gap-4">
-          <button className="bg-[#134687] font-inter text-xs text-white px-8 py-2 rounded-sm transition-all duration-150 active:scale-95">
-            Log Out
-          </button>
-        </div>
-      </header>
+      <Header />
 
       <div className="flex flex-col items-center py-20 gap-6">
         {/* CSAR Excited Image */}
