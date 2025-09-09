@@ -258,18 +258,18 @@ export default function ExecutiveAssistantApplication() {
   }
 
   return (
-    <div className="min-h-screen bg-white lg:bg-[rgb(243,243,253)] flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
       <Header />
 
-      <section className="flex flex-col justify-center items-center">
-        <div className="w-[80%] my-20 lg:w-full lg:px-50 lg:py-20">
-          <div className="rounded-[24px] lg:bg-white lg:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] lg:p-28  w-full">
-            <div className="text-2xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
+      <section className="flex flex-col items-center justify-center sm:my-12">
+        <div className="w-[90%] flex flex-col justify-center items-center">
+          <div className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
+            <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as EA to the </span>
               <span className="text-[#134687]">{selectedRole.title}</span>
             </div>
 
-            <div className="text-black text-xs lg:text-md font-Inter font-light text-justify mb-4 lg:mb-8">
+            <div className="text-black text-xs lg:text-md font-Inter font-light text-justify">
               Executive Assistants work closely with the CSS Executive Boards to
               help them with their tasks in events and committees. This role
               requires responsibility, attention to detail, and strong
@@ -279,7 +279,7 @@ export default function ExecutiveAssistantApplication() {
             <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
 
             {/* Stepper */}
-            <div className="w-full flex flex-col items-center justify-center mb-5 lg:mb-8">
+            <div className="w-full flex flex-col items-center justify-center">
               <div className="flex items-center">
                 <div
                   onClick={() => router.push("/user/apply/executive-assistant")}
@@ -316,7 +316,7 @@ export default function ExecutiveAssistantApplication() {
             </div>
 
             {/* Application Form */}
-            <div className="flex lg:gap-40 ">
+            <div className="flex lg:px-20 lg:gap-60 lg:mt-8 justify-center">
               <div className="flex flex-col gap-4 lg:gap-6">
                 <div className="flex flex-col gap-1 lg:gap-2">
                   <div className="text-black text-xs lg:text-sm font-Inter font-normal">
@@ -534,7 +534,7 @@ export default function ExecutiveAssistantApplication() {
                 </div>
               </div>
 
-              <div className="hidden xl:flex justify-center mt-8">
+              <div className="hidden xl:block justify-center mt-8">
                 <div className="lg:w-80 lg:h-96 bg-gray-200 rounded-lg flex items-center justify-center">
                   <span className="text-gray-500 text-sm">EB Image</span>
                 </div>
@@ -542,7 +542,7 @@ export default function ExecutiveAssistantApplication() {
             </div>
 
             <hr className="my-8 border-t-1 border-[#717171]" />
-            <div className="flex gap-4 justify-center">
+            <div className="flex justify-center gap-4">
               <button
                 type="button"
                 onClick={() => router.push("/user/apply/executive-assistant")}

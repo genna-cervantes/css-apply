@@ -195,7 +195,7 @@ export default function CommitteeApplication() {
             </div>
           </div>
 
-          <div className="flex gap-40 ">
+          <div className="flex gap-40">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
                 <div className="text-black text-sm font-Inter font-normal">
