@@ -1,4 +1,3 @@
-"use client"; 
 // REF: di kailangan na use client ung buong file
 
 import Footer from "@/components/Footer";
@@ -9,7 +8,6 @@ import { useState, useEffect } from "react";
 import EnterButton from "@/components/LoginButton";
 
 export default function Home() {
-
   // REF: di need ng useEffect for this, kaya toh css animations lng and tailwind
   const [showFirstLine, setShowFirstLine] = useState(false);
   const [showSecondLine, setShowSecondLine] = useState(false);
@@ -18,9 +16,15 @@ export default function Home() {
 
   useEffect(() => {
     setShowFirstLine(true);
-    const timer1 = setTimeout(() => { setShowSecondLine(true); }, 2000);
-    const timer2 = setTimeout(() => { setShowThirdLine(true); }, 4000);
-    const timer3 = setTimeout(() => { setShowButton(true); }, 6000);
+    const timer1 = setTimeout(() => {
+      setShowSecondLine(true);
+    }, 2000);
+    const timer2 = setTimeout(() => {
+      setShowThirdLine(true);
+    }, 4000);
+    const timer3 = setTimeout(() => {
+      setShowButton(true);
+    }, 6000);
 
     return () => {
       clearTimeout(timer1);
@@ -28,7 +32,44 @@ export default function Home() {
       clearTimeout(timer3);
     };
   }, []);
-  
+
+  const committeeRoles = [
+    { id: "academics", title: "Academics Committee", icon: "ri:book-fill" },
+    {
+      id: "community",
+      title: "Community Development Committee",
+      icon: "ri:community-fill",
+    },
+    {
+      id: "creatives",
+      title: "Creatives & Technical Committee",
+      icon: "mdi:art",
+    },
+    {
+      id: "documentation",
+      title: "Documentation Committee",
+      icon: "mdi:camera",
+    },
+    {
+      id: "external",
+      title: "External Affairs Committee",
+      icon: "mdi:handshake",
+    },
+    {
+      id: "finance",
+      title: "Finance Committee",
+      icon: "material-symbols:money-bag-rounded",
+    },
+    { id: "logistics", title: "Logistics Committee", icon: "mdi:truck" },
+    { id: "publicity", title: "Publicity Committee", icon: "mdi:bullhorn" },
+    { id: "sports", title: "Sports & Talent Committee", icon: "mdi:trophy" },
+    {
+      id: "technology",
+      title: "Technology Development Committee",
+      icon: "mdi:laptop",
+    },
+  ];
+
   const scrollToNextSection = () => {
     const nextSection = document.getElementById("about-css-section");
     if (nextSection) {
@@ -457,32 +498,17 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex w-full max-w-md flex-col justify-center items-center text-white mt-6 gap-3 font-inter">
-              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
-                <Icon icon="ri:book-fill" className="text-lg" /> Academics
-              </div>
-
-              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
-                <Icon icon="ri:community-fill" className="text-lg" /> Community
-                Development
-              </div>
-
-              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
-                <Icon icon="mdi:partnership" className="text-lg" /> External
-                Affairs
-              </div>
-
-              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
-                <Icon icon="mdi:art" className="text-lg" />
-                Creatives and Technicals
-              </div>
-
-              <div className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-sm md:text-base">
-                <Icon
-                  icon="material-symbols:money-bag-rounded"
-                  className="text-lg"
-                />
-                Finance
+            {/* Scrollable committee list using original blue card design */}
+            <div className="w-full max-w-md mt-6 font-inter">
+              <div className="max-h-72 overflow-y-auto pr-1 space-y-3">
+                {committeeRoles.map((role) => (
+                  <div
+                    key={role.id}
+                    className="bg-[#1457AC] w-full rounded-lg flex justify-center items-center py-3 gap-2 text-white text-sm md:text-base"
+                  >
+                    <Icon icon={role.icon} className="text-lg" /> {role.title}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -496,9 +522,9 @@ export default function Home() {
               <Image
                 src="/assets/logos/csar.png"
                 alt="CSAR Logo"
-                width={250}
-                height={250}
-                className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 object-contain"
+                width={300}
+                height={300}
+                className="w-56 h-56 sm:w-56 sm:h-56 lg:w-64 lg:h-64 xl:w-72 xl:h-72 object-contain"
               />
             </div>
 
@@ -537,26 +563,33 @@ export default function Home() {
       </section>
 
       <section className="bg-[#00459C] lg:bg-white p-9">
-        <div className="flex flex-col justify-center items-center lg:bg-[#00459C] lg:p-32 lg:rounded-3xl">
-          <div className="text-2xl lg:text-5xl text-shadow-md text-white font-raleway">
-            Build the future. Start with us.
-          </div>
-          <div className="text-center text-sm lg:text-lg text-extralight text-shadow-sm text-white mt-2 font-inter">
-            Join the Computer Science Society and turn your passion into impact.
-          </div>
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
-            {/* REF: toh rin */}
-            <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
-              Apply as Member
-            </button>
+        <div
+          className="relative overflow-hidden flex flex-col justify-center items-center lg:p-32 lg:rounded-3xl bg-center bg-cover"
+          style={{ backgroundImage: "url('/assets/pictures/csspromo.gif')" }}
+        >
+          <div className="absolute inset-0 bg-[#00459C]/60"></div>
+          <div className="relative z-10 flex flex-col justify-center items-center">
+            <div className="text-2xl lg:text-5xl text-white font-raleway drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
+              Build the future. Start with us.
+            </div>
+            <div className="text-center text-sm lg:text-lg text-extralight text-white mt-2 font-inter drop-shadow-[0_3px_10px_rgba(0,0,0,0.8)]">
+              Join the Computer Science Society and turn your passion into
+              impact.
+            </div>
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
+              {/* REF: toh rin */}
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200">
+                Apply as Member
+              </button>
 
-            <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
-              Apply as Staff
-            </button>
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200">
+                Apply as Staff
+              </button>
 
-            <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-2xl hover:scale-105 transition-transform duration-200">
-              Apply as Executive Assistant
-            </button>
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200">
+                Apply as Executive Assistant
+              </button>
+            </div>
           </div>
         </div>
       </section>
