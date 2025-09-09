@@ -1,3 +1,4 @@
+"use client";
 // REF: di kailangan na use client ung buong file
 
 import Footer from "@/components/Footer";
