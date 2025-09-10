@@ -8,8 +8,8 @@ interface UseScrollAnimationOptions {
 
 export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
   const {
-    threshold = 0.2,
-    rootMargin = "-5% 0px -5% 0px",
+    threshold = 0.35,
+    rootMargin = "0px 0px -15% 0px",
     delay = 0,
   } = options;
 
@@ -80,16 +80,7 @@ export const useScrollAnimation = (options: UseScrollAnimationOptions = {}) => {
         }
       });
 
-      // Fallback for mobile devices - trigger animations after a longer delay if they haven't triggered
-      const fallbackTimer = setTimeout(() => {
-        if (!isAboutVisible) setIsAboutVisible(true);
-        if (!isPerksVisible) setIsPerksVisible(true);
-        if (!isExpectVisible) setIsExpectVisible(true);
-        if (!isJoinVisible) setIsJoinVisible(true);
-      }, 5000);
-
       return () => {
-        clearTimeout(fallbackTimer);
         refs.forEach(({ ref }) => {
           if (ref.current) {
             observer.unobserve(ref.current);
