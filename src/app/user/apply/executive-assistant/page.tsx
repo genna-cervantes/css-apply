@@ -132,8 +132,8 @@ export default function AssistantApplication() {
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
-        <div className="w-[80%] rounded-[24px] flex flex-col justify-center items-center">
-          <div className=" sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
+        <div className="w-[80%] flex flex-col justify-center items-center">
+          <div className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
             <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as </span>
               <span className="text-[#134687]">Executive Assistant</span>
