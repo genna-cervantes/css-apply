@@ -187,7 +187,7 @@ export default function AssistantApplication() {
 
             <div className="flex flex-col lg:flex-row justify-center lg:gap-8 lg:mt-8">
               {/* Left Column - Scrollable Role List / Mobile Dropdown */}
-              <div className="lg:w-1/3 lg:max-w-md">
+              <div className="">
                 {/* Mobile Dropdown (below lg) */}
                 <div className="lg:hidden relative mt-6">
                   <button
@@ -234,15 +234,12 @@ export default function AssistantApplication() {
                     <div
                       key={role.id}
                       onClick={() => setSelectedRole(role.id)}
-                      className={`p-3 border-t border-b cursor-pointer transition-all duration-200 flex items-center gap-3 ${
+                      className={`p-7 border-t border-b cursor-pointer transition-all duration-200 flex items-center gap-3 ${
                         selectedRole === role.id
                           ? "border-[#2F7EE3] bg-blue-50"
                           : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                     >
-                      <div className="lg:w-12 lg:h-12 bg-gray-300 rounded-lg flex items-center justify-center">
-                        <span className="text-gray-500 text-xs">IMG</span>
-                      </div>
                       <h4 className="font-inter font-semibold text-xs text-black">
                         {role.title}
                       </h4>
@@ -252,19 +249,19 @@ export default function AssistantApplication() {
               </div>
 
               {/* Right Column - Role Information */}
-              <div className="lg:w-2/3 lg:max-w-2xl">
+              <div className="lg:w-[80%] flex flex-col items-center justify-center">
                 {selectedRole ? (
-                  <div className="lg:bg-white rounded-lg lg:border lg:border-gray-200 overflow-hidden">
-                    <div className="flex">
+                  <div className="lg:bg-white rounded-lg lg:border lg:border-gray-200">
+                    <div className="flex overflow-hidden items-center">
                       {/* Left side - Text content */}
-                      <div className="lg:w-3/5 mt-5 lg:mt-0 lg:p-6">
+                      <div className="lg:w-3/5  lg:p-4">
                         {(() => {
                           const role = committeeRoles.find(
                             (r) => r.id === selectedRole
                           );
                           return role ? (
                             <>
-                              <div className="flex gap-5">
+                              <div className="flex gap-5 mt-5 lg:mt-0">
                                 <div className="lg:hidden w-14 h-14 rounded-full overflow-hidden bg-[#7a7a7a]"></div>
                                 <div>
                                   <div className="text-[10px] lg:text-xs font-inter text-[#7a7a7a] lg:mb-1">
@@ -281,15 +278,16 @@ export default function AssistantApplication() {
                                 </div>
                               </div>
 
-                              <p className="text-[10px] lg:text-[13px] font-normal font-inter text-black lg:mb-6 leading-relaxed text-justify">
+                              <p className="text-[10px] lg:text-[13px] font-normal font-inter text-black lg:mb-6 leading-relaxed text-justify max-h-36 overflow-y-auto p-2">
                                 {role.description}
                               </p>
                             </>
                           ) : null;
                         })()}
                       </div>
+
                       {/* Right side - Committee picture */}
-                      <div className="hidden lg:block lg:w-2/5 bg-gray-200 lg:h-80">
+                      <div className="hidden w-2/5 lg:block bg-gray-200 lg:h-80">
                         is it here
                       </div>
                     </div>
