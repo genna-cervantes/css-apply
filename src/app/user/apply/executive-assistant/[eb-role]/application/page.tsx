@@ -262,14 +262,14 @@ export default function ExecutiveAssistantApplication() {
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
-        <div className="flex flex-col justify-center items-center">
-          <div className="w-[80%] rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
-            <div className="text-2xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
+        <div className="w-[80%] rounded-[24px] flex flex-col justify-center items-center">
+          <div className=" sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
+            <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as EA to the </span>
               <span className="text-[#134687]">{selectedRole.title}</span>
             </div>
 
-            <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify mb-4 lg:mb-8">
+            <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
               Executive Assistants work closely with the CSS Executive Boards to
               help them with their tasks in events and committees. This role
               requires responsibility, attention to detail, and strong
@@ -316,7 +316,7 @@ export default function ExecutiveAssistantApplication() {
             </div>
 
             {/* Application Form */}
-            <div className="flex lg:px-20 lg:gap-60 lg:mt-8 justify-centerxl:px-32">
+            <div className="flex flex-col lg:flex-row justify-center lg:gap-8 mt-5 lg:mt-8">
               <div className="flex flex-col gap-4 lg:gap-6">
                 <div className="flex flex-col gap-1 lg:gap-2">
                   <div className="text-black text-xs lg:text-sm font-Inter font-normal">
@@ -534,8 +534,8 @@ export default function ExecutiveAssistantApplication() {
                 </div>
               </div>
 
-              <div className="hidden lg:flex justify-center mt-8">
-                <div className="lg:w-50 lg:h-64 xl:w-80 xl:h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+              <div className="hidden lg:flex justify-center">
+                <div className="w-80 h-96 bg-gray-200 rounded-lg flex items-center justify-center">
                   <span className="text-gray-500 text-sm">EB Image</span>
                 </div>
               </div>
