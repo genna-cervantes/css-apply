@@ -132,12 +132,13 @@ export default function AssistantApplication() {
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
-        <div className="w-[80%] flex flex-col justify-center items-center">
-          <div className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
+        <div className="w-[80%] rounded-[24px] flex flex-col justify-center items-center">
+          <div className=" sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
             <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply as </span>
               <span className="text-[#134687]">Executive Assistant</span>
             </div>
+
             <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
               Executive Assistants work closely with the CSS Executive Boards to
               help them with their tasks in events and committees. This role
@@ -147,6 +148,7 @@ export default function AssistantApplication() {
 
             <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
 
+            {/* Stepper */}
             <div className="w-full flex flex-col items-center justify-center">
               <div className="flex items-center">
                 <div className="flex items-center justify-center rounded-full bg-[#2F7EE3] w-5 h-5 lg:w-10 lg:h-10">
@@ -185,6 +187,7 @@ export default function AssistantApplication() {
               </div>
             </div>
 
+            {/* Application Form */}
             <div className="flex flex-col lg:flex-row justify-center lg:gap-8 lg:mt-8">
               {/* Left Column - Scrollable Role List / Mobile Dropdown */}
               <div className="">
@@ -261,8 +264,10 @@ export default function AssistantApplication() {
                           );
                           return role ? (
                             <>
-                              <div className="flex gap-5 mt-5 lg:mt-0">
-                                <div className="lg:hidden w-14 h-14 rounded-full overflow-hidden bg-[#7a7a7a]"></div>
+                              <div className="flex items-center gap-5 mt-5 lg:mt-0">
+                                <div className="lg:hidden w-14 h-14 min-w-14 min-h-14 rounded-full overflow-hidden bg-[#7a7a7a]">
+                                  img
+                                </div>
                                 <div>
                                   <div className="text-[10px] lg:text-xs font-inter text-[#7a7a7a] lg:mb-1">
                                     <p>Be an Executive Assistant of</p>
