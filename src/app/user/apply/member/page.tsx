@@ -203,7 +203,7 @@ export default function MemberApplication() {
               </div>
             </div>
 
-            <div className="hidden xl:flex justify-center mt-8">
+            <div className="hidden lg:flex justify-center items-center mt-8">
               <img
                 src="/assets/pictures/MemberImage.jpg"
                 alt="Member"
