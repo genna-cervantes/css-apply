@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -25,14 +25,9 @@ export default function Home() {
   const { isAboutVisible, isPerksVisible, isExpectVisible, isJoinVisible } =
     visibility;
 
-  // GSAP refs for hero elements
   const heroSubRef = useRef<HTMLHeadingElement | null>(null);
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null);
   const heroCtaRef = useRef<HTMLButtonElement | null>(null);
-
-  // Removed GSAP: using pure CSS animations below
-
-  // Hover will handle color reveal via CSS utilities
 
   // Auth button state and handler (migrated from old LoginButton)
   const searchParams = useSearchParams();
@@ -48,6 +43,26 @@ export default function Home() {
       setIsLoggingIn(false);
     }
   };
+
+  // Hero title rotating phrases
+  const heroPhrases = [
+    "READY TO ENTER CSS?",
+    "BUILD THE FUTURE WITH CSS",
+    "COMPUTER SCIENCE SOCIETY",
+  ];
+  const [heroPhraseIndex, setHeroPhraseIndex] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => {
+      setHeroPhraseIndex((prev) => (prev + 1) % heroPhrases.length);
+    }, 2800);
+    return () => clearInterval(id);
+  }, [heroPhrases.length]);
+
+  const currentHeroPhrase = heroPhrases[heroPhraseIndex];
+  const isSecondaryHeroPhrase = currentHeroPhrase !== "READY TO ENTER CSS?";
+  const heroTitleSizeClass = isSecondaryHeroPhrase
+    ? "text-4xl md:text-6xl lg:text-7xl xl:text-8xl"
+    : "text-5xl md:text-7xl lg:text-8xl xl:text-9xl";
 
   const committeeRoles = [
     { id: "academics", title: "Academics Committee", icon: "ri:book-fill" },
@@ -256,10 +271,12 @@ export default function Home() {
                 Your journey in tech starts here
               </h3>
               <h1
+                key={heroPhraseIndex}
                 ref={heroTitleRef}
-                className="animate-fadeUpDelay relative z-30 text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold bg-gradient-to-b from-white from-20% to-[#0768c3] to-70% bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_18px_rgba(59,130,246,0.75)]"
+                className={`animate-fadeUpDelay relative z-30 ${heroTitleSizeClass} font-bold bg-gradient-to-b from-white from-20% to-[#0768c3] to-70% bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_18px_rgba(59,130,246,0.75)]`}
+                aria-live="polite"
               >
-                READY TO JOIN CSS?
+                {currentHeroPhrase}
               </h1>
 
               {/* Enter Button */}
