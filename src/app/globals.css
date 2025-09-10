@@ -20,3 +20,73 @@
 .font-family-inter {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
+
+/* ===== Global Animations and Utilities (migrated from page styles) ===== */
+@keyframes slideRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.65));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.95));
+  }
+}
+
+@keyframes glowPulseBtn {
+  0%,
+  100% {
+    box-shadow: 0 0 22px rgba(59, 130, 246, 0.8),
+      0 0 44px rgba(59, 130, 246, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(59, 130, 246, 0.95),
+      0 0 68px rgba(59, 130, 246, 0.7);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeUp {
+  animation: fadeUp 0.5s ease-out both;
+}
+.animate-fadeUpDelay {
+  animation: fadeUp 0.6s ease-out 0.1s both;
+}
+.animate-fadeUpDelay2 {
+  animation: fadeUp 0.6s ease-out 0.2s both;
+}
+
+/* Performance hint for hero images */
+.hero-img {
+  will-change: transform, filter, opacity;
+}
+.hero-img:hover {
+  opacity: 1;
+}

@@ -4,35 +4,50 @@
 import Footer from "@/components/Footer";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
-import EnterButton from "@/components/LoginButton";
+import { useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import heroStyles from "@/styles/Hero.module.css";
+import {
+  getScrollAnimationClasses,
+  getScrollAnimationStyles,
+  getStaggeredAnimationStyles,
+} from "@/utils/animations";
 
 export default function Home() {
-  // REF: di need ng useEffect for this, kaya toh css animations lng and tailwind
-  const [showFirstLine, setShowFirstLine] = useState(false);
-  const [showSecondLine, setShowSecondLine] = useState(false);
-  const [showThirdLine, setShowThirdLine] = useState(false);
-  const [showButton, setShowButton] = useState(false);
+  // Scroll animation hook
+  const { refs, visibility } = useScrollAnimation();
+  const { aboutRef, perksRef, expectRefMobile, expectRefDesktop, joinRef } =
+    refs;
+  const { isAboutVisible, isPerksVisible, isExpectVisible, isJoinVisible } =
+    visibility;
 
-  useEffect(() => {
-    setShowFirstLine(true);
-    const timer1 = setTimeout(() => {
-      setShowSecondLine(true);
-    }, 2000);
-    const timer2 = setTimeout(() => {
-      setShowThirdLine(true);
-    }, 4000);
-    const timer3 = setTimeout(() => {
-      setShowButton(true);
-    }, 6000);
+  // GSAP refs for hero elements
+  const heroSubRef = useRef<HTMLHeadingElement | null>(null);
+  const heroTitleRef = useRef<HTMLHeadingElement | null>(null);
+  const heroCtaRef = useRef<HTMLButtonElement | null>(null);
 
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
-  }, []);
+  // Removed GSAP: using pure CSS animations below
+
+  // Hover will handle color reveal via CSS utilities
+
+  // Auth button state and handler (migrated from old LoginButton)
+  const searchParams = useSearchParams();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const callbackUrl = searchParams.get("callbackUrl") || "/user";
+
+  const handleEnterClick = async () => {
+    setIsLoggingIn(true);
+    try {
+      await signIn("google", { callbackUrl, redirect: true });
+    } catch (error) {
+      console.error("Sign-in error:", error);
+      setIsLoggingIn(false);
+    }
+  };
 
   const committeeRoles = [
     { id: "academics", title: "Academics Committee", icon: "ri:book-fill" },
@@ -71,6 +86,46 @@ export default function Home() {
     },
   ];
 
+  const partnerLogos = [
+    {
+      src: "/assets/partners/BiteSlice.jpg",
+      alt: "BiteSlice",
+      size: "h-20 w-20",
+    },
+    {
+      src: "/assets/partners/HomeRoom.jpg",
+      alt: "HomeRoom",
+      size: "h-20 w-20",
+    },
+    {
+      src: "/assets/partners/MindZone.jpg",
+      alt: "MindZone",
+      size: "h-20 w-20",
+    },
+    {
+      src: "/assets/partners/NomuCafe.png",
+      alt: "NomuCafe",
+      size: "h-20 w-20",
+    },
+    { src: "/assets/partners/Sumu.jpg", alt: "Sumu", size: "h-20 w-20" },
+    {
+      src: "/assets/partners/TheCatalyst.jpg",
+      alt: "TheCatalyst",
+      size: "h-28 w-28",
+    },
+    {
+      src: "/assets/partners/Yorokobi.jpg",
+      alt: "Yorokobi",
+      size: "h-20 w-20",
+    },
+    {
+      src: "/assets/partners/ZeroCafe.png",
+      alt: "ZeroCafe",
+      size: "h-20 w-20",
+      shape: "rounded-lg",
+    },
+  ];
+
   const scrollToNextSection = () => {
     const nextSection = document.getElementById("about-css-section");
     if (nextSection) {
@@ -79,184 +134,296 @@ export default function Home() {
   };
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full overflow-x-hidden">
       <section className="min-h-screen w-full bg-gradient-to-b from-[#000000] via-[rgb(1,124,238)] via-69% to-[#0054FF] relative overflow-hidden">
-        <header className="flex justify-center sm:justify-start p-9 md:p-6 relative z-30">
-          <Image
-            src="/assets/logos/cssapply_logo.png"
-            alt=""
-            width={110}
-            height={190}
-            className="w-16 h-auto md:w-[110px]"
-          />
+        {/* Header */}
+        <header className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-center sm:justify-start p-6 z-30">
+          <div className="inline-flex items-center justify-center transition-transform duration-200 hover:scale-105 hover:opacity-90 active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded cursor-pointer">
+            <div className="w-16 h-12 md:w-28 md:h-20  flex items-center justify-center">
+              <img
+                src="/assets/logos/Logo_CSS Apply.svg"
+                alt="CSS Apply Logo"
+                className="w-full h-full object-contain brightness-0 invert"
+              />
+            </div>
+          </div>
         </header>
 
-        <div className="flex flex-col mt-9 md:mt-5 justify-center items-center font-inter relative z-10 px-4">
-          <h3 className="text-[#285C9F] text-sm md:text-lg font-medium text-center">
-            YOUR JOURNEY IN TECH STARTS HERE
-          </h3>
-          <h1 className="text-6xl md:text-6xl lg:text-9xl font-extrabold bg-gradient-to-b from-[#003A78] to-[#003C7F] bg-clip-text text-transparent text-center">
-            READY TO <br className="md:hidden" /> JOIN CSS?
-          </h1>
-        </div>
-
-        {/* Desktop layout - hidden on mobile */}
-        <div className="hidden lg:flex flex-col space-y-5 mt-9 relative">
-          <div className="flex justify-between">
-            <Image
-              src="/assets/pictures/landing_pic1.png"
-              alt=""
-              width={300}
-              height={400}
-            />
-            <Image
-              src="/assets/pictures/landing_pic2.png"
-              alt=""
-              width={300}
-              height={400}
-            />
-          </div>
-          <div className="flex justify-between">
-            <Image
-              src="/assets/pictures/landing_pic3.png"
-              alt=""
-              width={400}
-              height={500}
-            />
-            <Image
-              src="/assets/pictures/landing_pic4.png"
-              alt=""
-              width={400}
-              height={500}
-            />
-          </div>
-
-          <div className="absolute top-[25%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 scale-155">
-            <Image
-              src="/assets/pictures/laptop.png"
-              alt=""
-              width={2500}
-              height={2500}
-              className="w-[90vw] h-auto"
-            />
-          </div>
-
-          <div className="absolute left-[45%] transform -translate-x-1/2 -translate-y-1/2 z-30 scale-90">
-            <div className="flex flex-col text-[#285C9F] h-16">
-              <code
-                className={`${
-                  showFirstLine ? "animate-fade-in opacity-100" : "opacity-0"
-                }`}
-              >
-                &#62; Booting System...
-              </code>
-              <code
-                className={`${
-                  showSecondLine ? "animate-fade-in opacity-100" : "opacity-0"
-                }`}
-              >
-                &#62; Connecting to Computer Science Society
-              </code>
-              <code
-                className={`${
-                  showThirdLine ? "animate-fade-in opacity-100" : "opacity-0"
-                }`}
-              >
-                &#62; Access Granted
-              </code>
-            </div>
-          </div>
-          {showButton && <EnterButton isVisible={showButton} />}
-        </div>
-
-        {/* Mobile/Tablet layout di p done */}
-        <div className="lg:hidden flex flex-col items-center mt-16 relative px-4">
-          <div className="relative w-full max-w-md md:max-w-lg">
-            <Image
-              src="/assets/pictures/laptop.png"
-              alt=""
-              width={1000}
-              height={1000}
-              className="w-full h-auto scale-170"
-            />
-
-            <div className="absolute top-[35%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
-              <div className="flex flex-col text-[#285C9F] text-xs md:text-sm space-y-1">
-                <code
-                  className={`${
-                    showFirstLine ? "animate-fade-in opacity-100" : "opacity-0"
-                  }`}
-                >
-                  &#62; Booting System...
-                </code>
-                <code
-                  className={`${
-                    showSecondLine ? "animate-fade-in opacity-100" : "opacity-0"
-                  }`}
-                >
-                  &#62; Connecting to CSS
-                </code>
-                <code
-                  className={`${
-                    showThirdLine ? "animate-fade-in opacity-100" : "opacity-0"
-                  }`}
-                >
-                  &#62; Access Granted
-                </code>
+        {/* Middle Layer with Three Rows */}
+        <div className="absolute inset-0 z-20 grid grid-rows-[1fr_auto_1fr] isolate">
+          {/* Row 1: Top Images */}
+          <div className="w-full relative overflow-hidden z-10">
+            <div className="absolute top-0 left-0 w-[200%] h-full flex animate-[slideRight_30s_linear_infinite]">
+              <div className="flex w-full h-full">
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage1.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage2.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage3.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage4.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage5.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage6.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+              </div>
+              {/* Duplicate for seamless loop */}
+              <div className="flex w-full h-full">
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage7.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage8.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage9.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage10.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage11.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/6 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage12.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Mobile button */}
-            {showButton && <EnterButton isVisible={showButton} />}
+          {/* Row 2: Text Content */}
+          <div className="w-full flex flex-col items-center z-50 relative py-6 min-h-[240px]">
+            <div className="relative z-30 flex flex-col items-center text-center font-inter">
+              <h3
+                ref={heroSubRef}
+                className="animate-fadeUp text-blue-200 text-sm md:text-base font-light tracking-wide uppercase leading-tight drop-shadow-[0_0_12px_rgba(59,130,246,0.8)]"
+              >
+                Your journey in tech starts here
+              </h3>
+              <h1
+                ref={heroTitleRef}
+                className="animate-fadeUpDelay relative z-30 text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold bg-gradient-to-b from-white from-20% to-[#0768c3] to-70% bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_18px_rgba(59,130,246,0.75)]"
+              >
+                READY TO JOIN CSS?
+              </h1>
+
+              {/* Enter Button */}
+              <button
+                ref={heroCtaRef}
+                onClick={handleEnterClick}
+                disabled={isLoggingIn}
+                className={`animate-fadeUpDelay2 ${heroStyles.enterButton} relative z-[60] bg-[#0077FF] font-family-inter text-white py-2 px-16 font-medium text-xl opacity-100 hover:bg-[#0056CC] transition-all duration-300 hover:scale-105 animate-[glowPulseBtn_2.4s_ease-in-out_infinite]`}
+              >
+                {isLoggingIn ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Logging in...
+                  </div>
+                ) : (
+                  "ENTER"
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Row 3: Bottom Images */}
+          <div className="w-full relative overflow-hidden z-10">
+            <div className="absolute bottom-0 left-0 w-[200%] h-full flex animate-[slideLeft_40s_linear_infinite]">
+              <div className="flex w-full h-full">
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage13.png"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage14.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage15.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage16.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage17.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+              </div>
+              {/* Duplicate for seamless loop */}
+              <div className="flex w-full h-full">
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage18.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage19.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage20.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage21.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+                <div className="w-1/5 h-full flex items-center justify-center">
+                  <img
+                    src="/assets/pictures/landingpage/landingpage22.jpg"
+                    alt="Landing page image"
+                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* Bottom Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center animate-bounce">
           <button
             onClick={scrollToNextSection}
             className="group flex flex-col items-center space-y-2 hover:scale-105 transition-transform duration-300"
           >
-            <Image
-              src="/assets/logos/arrow-down.png"
-              alt=""
-              width={15}
-              height={15}
-            />
-            <span className="font-inter text-white text-sm md:text-base font-bold group-hover:opacity-100 transition-opacity duration-300">
+            <Icon icon="mdi:chevron-down" className="text-2xl text-white" />
+            <span className="font-light text-white text-xs md:text-sm group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
               Get to know more about CSS
             </span>
           </button>
         </div>
 
         {/* Bottom gradient overlay */}
-        <div className="absolute bottom-0 left-0 w-full h-30 md:h-50 bg-gradient-to-t from-[#000000] via-[#006CF8] via-52% to-transparent z-10 pointer-events-none opacity-60"></div>
+        <div className="absolute bottom-0 left-0 w-full h-40 md:h-50 bg-gradient-to-t from-black/80 via-transparent to-transparent z-20 pointer-events-none"></div>
       </section>
 
-      {/* REF: bakit tayo may inline styles? stick to one */}
-      <style jsx>{`
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
-
-      <section id="about-css-section" className="p-10 w-full">
+      <section
+        ref={aboutRef}
+        id="about-css-section"
+        className="py-20 px-10 w-full overflow-hidden"
+      >
         <div className="space-y-5 lg:space-y-0 lg:flex lg:justify-around">
-          <div className="font-raleway lg:w-1/2 flex flex-col justify-center">
-            <p className="text-md md:text-xl">WHAT HAPPENS</p>
-            <p className="text-3xl md:text-4xl lg:text-6xl font-bold ">
+          {/* Text content with slide-in animation */}
+          <div
+            className={getScrollAnimationClasses(
+              isAboutVisible,
+              "left",
+              "font-raleway lg:w-1/2 flex flex-col justify-center"
+            )}
+            style={getScrollAnimationStyles(isAboutVisible, "left")}
+          >
+            <p
+              className={getScrollAnimationClasses(
+                isAboutVisible,
+                "up",
+                "text-lg md:text-xl"
+              )}
+              style={getScrollAnimationStyles(isAboutVisible, "up", "0.2s")}
+            >
+              WHAT HAPPENS
+            </p>
+            <p
+              className={getScrollAnimationClasses(
+                isAboutVisible,
+                "up",
+                "text-4xl md:text-5xl lg:text-6xl font-bold"
+              )}
+              style={getScrollAnimationStyles(isAboutVisible, "up", "0.4s")}
+            >
               when <span className="text-[#3F74B8]">passion</span> <br /> meets{" "}
               <span className="text-[#134687]">technology?</span>
             </p>
-            <div className=" text-sm md:text-lg lg:text-lg text-justify mt-5">
+            <div
+              className={getScrollAnimationClasses(
+                isAboutVisible,
+                "up",
+                "text-sm md:text-[18px] lg:text-lg text-justify mt-5"
+              )}
+              style={getScrollAnimationStyles(isAboutVisible, "up", "0.6s")}
+            >
               The{" "}
               <span className="font-bold"> Computer Science Society (CSS)</span>{" "}
               is where curious minds, creative thinkers, and future tech leaders
@@ -275,44 +442,107 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex-shrink-0 flex justify-center items-center">
+          {/* Image with slide-in animation */}
+          <div
+            className={getScrollAnimationClasses(
+              isAboutVisible,
+              "right",
+              "flex-shrink-0 flex justify-center items-center"
+            )}
+            style={{
+              ...getScrollAnimationStyles(isAboutVisible, "right", "0.3s"),
+              transform: isAboutVisible
+                ? "translateX(0) scale(1)"
+                : "translateX(48px) scale(0.95)",
+            }}
+          >
             <Image
               src="/assets/pictures/sec2_pic.png"
               alt=""
               width={450}
               height={450}
+              className="transition-transform duration-500 hover:scale-105"
             />
           </div>
         </div>
       </section>
 
-      <section className="h-44">
-        <div className="flex justify-center">
+      <section
+        ref={perksRef}
+        id="perks-section"
+        className="h-50 overflow-hidden"
+      >
+        {/* Title with scroll-triggered animation */}
+        <div
+          className={getScrollAnimationClasses(
+            isPerksVisible,
+            "up",
+            "flex justify-center"
+          )}
+          style={getScrollAnimationStyles(isPerksVisible, "up")}
+        >
           <p className="font-inter font-bold text-lg md:text-2xl xl:text-3xl">
-            {" "}
             🎉Enjoy Exclusive Perks🎉
           </p>
         </div>
 
-        <div className="flex justify-center mt-5">
+        {/* Partners container with scroll-triggered staggered animations */}
+        <div
+          className={getScrollAnimationClasses(
+            isPerksVisible,
+            "up",
+            "flex justify-center mt-8"
+          )}
+          style={getScrollAnimationStyles(isPerksVisible, "up", "0.3s")}
+        >
           <div className="w-[90%] flex justify-center items-center overflow-x-auto gap-4 md:gap-6 lg:gap-8 pb-3">
-            <div className="bg-gray-400 h-20 w-20 rounded-full flex-shrink-0"></div>
-            <div className="bg-gray-400 h-20 w-20 rounded-full flex-shrink-0"></div>
-            <div className="bg-gray-400 h-20 w-20 rounded-full flex-shrink-0"></div>
-            <div className="bg-gray-400 h-20 w-20 rounded-full flex-shrink-0"></div>
-            <div className="bg-gray-400 h-20 w-20 rounded-full flex-shrink-0"></div>
-            <div className="bg-gray-400 h-20 w-20 rounded-full flex-shrink-0"></div>
-            <div className="bg-gray-400 h-20 w-20 rounded-full flex-shrink-0"></div>
+            {partnerLogos.map((partner, index) => (
+              <div
+                key={partner.alt}
+                className={`${partner.size} ${
+                  partner.shape || "rounded-full"
+                } flex-shrink-0 overflow-hidden bg-white hover:animate-pulse hover:scale-110 transition-all duration-500 cursor-pointer ${
+                  isPerksVisible
+                    ? "opacity-100 transform scale-100 translate-y-0"
+                    : "opacity-0 transform scale-75 translate-y-8"
+                } ${
+                  partner.shape === "rounded-lg"
+                    ? "p-2 flex items-center justify-center"
+                    : ""
+                }`}
+                style={getStaggeredAnimationStyles(isPerksVisible, index, 0.5)}
+              >
+                <Image
+                  src={partner.src}
+                  alt={partner.alt}
+                  width={partner.size.includes("h-28") ? 100 : 80}
+                  height={partner.size.includes("h-28") ? 100 : 80}
+                  className={`w-full h-full ${
+                    partner.shape === "rounded-lg"
+                      ? "object-contain"
+                      : "object-cover"
+                  } hover:scale-110 transition-transform duration-300`}
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* REF: bakit separate tong mobile and desktop view? hindi ba kaya ng tailwind breakpoints? */}
       {/* Mobile View */}
-      <section className="lg:hidden">
+      <section
+        ref={expectRefMobile}
+        id="expect-section"
+        className="lg:hidden overflow-hidden"
+      >
         <div className="">
+          {/* Header Card */}
           <div
-            className="relative w-full h-60 bg-cover bg-center flex items-center"
+            className={`relative w-full h-60 bg-cover bg-center flex items-center transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-y-0"
+                : "opacity-0 transform translate-y-8"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic1.png')",
             }}
@@ -328,10 +558,16 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Card 01 */}
           <div
-            className="relative w-full h-60 bg-cover bg-center flex items-end"
+            className={`relative w-full h-60 bg-cover bg-center flex items-end transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-y-0"
+                : "opacity-0 transform translate-y-8"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic2.png')",
+              transitionDelay: "0.2s",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-1/2 sm:ml-4 md:ml-6">
@@ -347,10 +583,16 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Card 02 */}
           <div
-            className="relative w-full h-60 bg-cover bg-center flex items-end"
+            className={`relative w-full h-60 bg-cover bg-center flex items-end transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-y-0"
+                : "opacity-0 transform translate-y-8"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic3.png')",
+              transitionDelay: "0.4s",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -365,10 +607,16 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Card 03 */}
           <div
-            className="relative w-full h-60 bg-cover bg-center flex items-end"
+            className={`relative w-full h-60 bg-cover bg-center flex items-end transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-y-0"
+                : "opacity-0 transform translate-y-8"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic4.png')",
+              transitionDelay: "0.6s",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -386,10 +634,19 @@ export default function Home() {
       </section>
 
       {/* Desktop View */}
-      <section className="hidden lg:block bg-black">
-        <div className="sm:flex sm:flex-row h-[700px] w-screen">
+      <section
+        ref={expectRefDesktop}
+        id="expect-section-desktop"
+        className="hidden lg:block bg-black overflow-hidden mt-5"
+      >
+        <div className="sm:flex sm:flex-row h-[700px] w-full">
+          {/* Header Card */}
           <div
-            className="w-[28%] h-full bg-cover bg-center flex items-center pl-10"
+            className={`w-[28%] h-full bg-cover bg-center flex items-center pl-10 transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-x-0"
+                : "opacity-0 transform -translate-x-12"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic1.png')",
             }}
@@ -405,10 +662,16 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Card 01 */}
           <div
-            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
+            className={`relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-y-0"
+                : "opacity-0 transform translate-y-12"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic2.png')",
+              transitionDelay: "0.2s",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
@@ -420,10 +683,16 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Card 02 */}
           <div
-            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
+            className={`relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-y-0"
+                : "opacity-0 transform translate-y-12"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic3.png')",
+              transitionDelay: "0.4s",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5 ">
@@ -435,10 +704,16 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Card 03 */}
           <div
-            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
+            className={`relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end transition-all duration-800 ease-out ${
+              isExpectVisible
+                ? "opacity-100 transform translate-y-0"
+                : "opacity-0 transform translate-y-12"
+            }`}
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic4.png')",
+              transitionDelay: "0.6s",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
@@ -452,10 +727,21 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-8 md:py-12">
+      <section
+        ref={joinRef}
+        id="join-section"
+        className="py-8 md:py-12 overflow-hidden"
+      >
         <div className="min-h-screen md:min-h-[60vh] w-full flex flex-col lg:flex-row justify-center items-stretch gap-8 lg:gap-0">
           {/* Why Join Us Section */}
-          <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8">
+          <div
+            className={getScrollAnimationClasses(
+              isJoinVisible,
+              "left",
+              "flex-1 flex flex-col justify-center items-center px-4 md:px-8"
+            )}
+            style={getScrollAnimationStyles(isJoinVisible, "left")}
+          >
             <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-4 md:p-6 gap-2 w-full max-w-md">
               <p className="text-2xl md:text-3xl font-semibold text-center font-raleway">
                 Why join us?
@@ -489,7 +775,14 @@ export default function Home() {
           </div>
 
           {/* Our Committees Section */}
-          <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8">
+          <div
+            className={getScrollAnimationClasses(
+              isJoinVisible,
+              "right",
+              "flex-1 flex flex-col justify-center items-center px-4 md:px-8"
+            )}
+            style={getScrollAnimationStyles(isJoinVisible, "right")}
+          >
             <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-4 md:p-6 gap-2 w-full max-w-md">
               <p className="text-2xl md:text-3xl font-semibold text-center font-raleway">
                 Our Committees
@@ -548,8 +841,10 @@ export default function Home() {
               </div>
 
               {/* CTA Button */}
-              {/* REF: san toh nakaconnect? */}
-              <button className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 hover:bg-gray-100 transition-colors duration-200 font-semibold lg:ml-5">
+              <Link
+                href="/personality-test"
+                className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 font-semibold lg:ml-5 shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200 inline-block"
+              >
                 <div className="flex items-center justify-center gap-2">
                   <p className="font-inter">Take the Test</p>
                   <Icon
@@ -557,27 +852,27 @@ export default function Home() {
                     className="text-xl sm:text-2xl"
                   />
                 </div>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-[#00459C] lg:bg-white p-9">
+      <section className="bg-white lg:bg-white px-5 py-9">
         <div
-          className="relative overflow-hidden flex flex-col justify-center items-center lg:p-32 lg:rounded-3xl bg-center bg-cover"
+          className="relative overflow-hidden flex flex-col justify-center items-center rounded-xl bg-center bg-cover"
           style={{ backgroundImage: "url('/assets/pictures/csspromo.gif')" }}
         >
           <div className="absolute inset-0 bg-[#00459C]/60"></div>
-          <div className="relative z-10 flex flex-col justify-center items-center">
-            <div className="text-2xl lg:text-5xl text-white font-raleway drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)]">
+          <div className="relative py-30 px-10 z-10 flex flex-col justify-center items-center">
+            <div className="text-3xl md:text-4xl lg:text-5xl text-white font-raleway drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)] text-center">
               Build the future. Start with us.
             </div>
-            <div className="text-center text-sm lg:text-lg text-extralight text-white mt-2 font-inter drop-shadow-[0_3px_10px_rgba(0,0,0,0.8)]">
+            <div className="text-center text-xs lg:text-lg text-extralight text-white mt-2 font-inter drop-shadow-[0_3px_10px_rgba(0,0,0,0.8)]">
               Join the Computer Science Society and turn your passion into
               impact.
             </div>
-            <div className="flex flex-col lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
+            <div className="flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
               {/* REF: toh rin */}
               <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200">
                 Apply as Member
