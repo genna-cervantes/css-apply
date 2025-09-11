@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export default function StaffApplication() {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string | null>("academics");
   const router = useRouter();
 
   const committeeRoles = [
@@ -123,6 +123,8 @@ export default function StaffApplication() {
     },
   ];
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
       <Header />
@@ -134,6 +136,7 @@ export default function StaffApplication() {
               <span className="text-black">Apply as </span>
               <span className="text-[#134687]">Committee Staff</span>
             </div>
+
             <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
               As a Committee Staff of the Computer Science Society, you will
               play a vital role in bringing our initiatives to life. From
@@ -141,7 +144,9 @@ export default function StaffApplication() {
               fellow members and leaders, your efforts ensure that every project
               runs smoothly and every idea has the chance to shine.
             </div>
+
             <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
+
             {/* Stepper */}
             <div className="w-full flex flex-col items-center justify-center">
               <div className="flex items-center">
@@ -163,6 +168,7 @@ export default function StaffApplication() {
                   </span>
                 </div>
               </div>
+
               <div className="grid grid-cols-3 w-72 lg:w-100 mt-3 gap-x-0 place-items-center font-inter font-medium">
                 <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
                   Select a Role
@@ -175,23 +181,63 @@ export default function StaffApplication() {
                 </span>
               </div>
             </div>
+
+            {/* Application Form */}
             <div className="flex flex-col lg:flex-row justify-center lg:gap-8 mt-5 lg:mt-8">
-              {/* Left Column - Scrollable Role List */}
-              <div className="w-full lg:w-1/3 max-w-md">
-                <div className="max-h-80 overflow-y-auto">
+              {/* Left Column - Scrollable Role List / Mobile Dropdown */}
+              <div className="">
+                {/* Mobile Dropdown (below lg) */}
+                <div className="lg:hidden relative mt-6">
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="w-full px-5 border h-9 border-gray-300 rounded-lg bg-white flex items-center justify-between"
+                  >
+                    <span className="font-inter text-xs text-[#7a7a7a]">
+                      {selectedRole
+                        ? committeeRoles.find(
+                            (role) => role.id === selectedRole
+                          )?.title
+                        : "Select an EB role"}
+                    </span>
+                    <span className="text-[#7a7a7a] text-xs font-extralight">
+                      ▼
+                    </span>
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+                      {committeeRoles.map((role) => (
+                        <div
+                          key={role.id}
+                          onClick={() => {
+                            setSelectedRole(role.id);
+                            setIsDropdownOpen(false);
+                          }}
+                          className="p-2 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-3 last:border-b-0"
+                        >
+                          <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
+                            <span className="text-gray-500 text-xs">IMG</span>
+                          </div>
+                          <h4 className="font-inter font-semibold text-xs text-black">
+                            {role.title}
+                          </h4>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Desktop Scrollable List (lg and above) */}
+                <div className="hidden lg:block max-h-80 overflow-y-auto">
                   {committeeRoles.map((role) => (
                     <div
                       key={role.id}
                       onClick={() => setSelectedRole(role.id)}
-                      className={`p-3 border-t border-b cursor-pointer transition-all duration-200 flex items-center gap-3 ${
+                      className={`p-7 border-t border-b cursor-pointer transition-all duration-200 flex items-center gap-3 ${
                         selectedRole === role.id
                           ? "border-[#2F7EE3] bg-blue-50"
                           : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                     >
-                      <div className="w-12 h-12 bg-gray-300 rounded-lg flex items-center justify-center">
-                        <span className="text-gray-500 text-xs">IMG</span>
-                      </div>
                       <h4 className="font-inter font-semibold text-xs text-black">
                         {role.title}
                       </h4>
@@ -216,7 +262,7 @@ export default function StaffApplication() {
                               <h4 className="text-xl font-inter font-bold text-black mb-4">
                                 {role.title}
                               </h4>
-                              <p className="text-[13px] font-normal font-inter text-black mb-6 leading-relaxed text-justify">
+                              <p className="text-[10px] lg:text-[13px] font-normal font-inter text-black lg:mb-6 leading-relaxed text-justify max-h-48 overflow-y-auto p-2">
                                 {role.description}
                               </p>
                             </>
@@ -224,7 +270,9 @@ export default function StaffApplication() {
                         })()}
                       </div>
                       {/* Right side - Committee picture */}
-                      <div className="w-full lg:w-2/5 bg-gray-200 h-80"></div>
+                      <div className="hidden w-2/5 lg:block bg-gray-200 lg:h-80">
+                        is it here
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -241,7 +289,9 @@ export default function StaffApplication() {
                 )}
               </div>
             </div>
+
             <hr className="my-8 border-t-1 border-[#717171]" />
+
             <div className="flex justify-center gap-4">
               <button
                 type="button"
@@ -267,6 +317,7 @@ export default function StaffApplication() {
           </div>
         </div>
       </section>
+
       <Footer />
     </div>
   );
