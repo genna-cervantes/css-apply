@@ -47,7 +47,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
             </div>
           ) : (
             <Link 
-              href="/"
+              href="/admin"
               className="group flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
             >
               <div className="w-5 h-5 mr-3 text-gray-500 group-hover:text-[#164e96] transition-all duration-300">
@@ -89,7 +89,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
             </div>
           ) : (
             <Link 
-              href="/applications"
+              href="/admin/applications"
               className="group flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
             >
               <div className="w-5 h-5 mr-3 text-gray-500 group-hover:text-[#164e96] transition-all duration-300">
@@ -131,7 +131,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
             </div>
           ) : (
             <Link 
-              href="/members"
+              href="/admin/members"
               className="group flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
             >
               <div className="w-5 h-5 mr-3 text-gray-500 group-hover:text-[#164e96] transition-all duration-300">
@@ -177,7 +177,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
             </div>
           ) : (
             <Link 
-              href="/staffs"
+              href="/admin/staffs"
               className="group flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
             >
               <div className="w-5 h-5 mr-3 text-gray-500 group-hover:text-[#164e96] transition-all duration-300">
@@ -221,7 +221,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
             </div>
           ) : (
             <Link 
-              href="/eas"
+              href="/admin/eas"
               className="group flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
             >
               <div className="w-5 h-5 mr-3 text-gray-500 group-hover:text-[#164e96] transition-all duration-300">
