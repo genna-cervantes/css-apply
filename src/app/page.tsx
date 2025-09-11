@@ -9,26 +9,8 @@ import { Icon } from "@iconify/react";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import heroStyles from "@/styles/Hero.module.css";
-import {
-  getScrollAnimationClasses,
-  getScrollAnimationStyles,
-  getStaggeredAnimationStyles,
-} from "@/utils/animations";
 
 export default function Home() {
-  // Scroll animation hook
-  const { refs, visibility } = useScrollAnimation();
-  const { aboutRef, perksRef, expectRefMobile, expectRefDesktop, joinRef } =
-    refs;
-  const { isAboutVisible, isPerksVisible, isExpectVisible, isJoinVisible } =
-    visibility;
-
-  const heroSubRef = useRef<HTMLHeadingElement | null>(null);
-  const heroTitleRef = useRef<HTMLHeadingElement | null>(null);
-  const heroCtaRef = useRef<HTMLButtonElement | null>(null);
-
   // Auth button state and handler (migrated from old LoginButton)
   const searchParams = useSearchParams();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -153,7 +135,7 @@ export default function Home() {
       <section className="min-h-screen w-full bg-gradient-to-b from-[#000000] via-[rgb(1,124,238)] via-69% to-[#0054FF] relative overflow-hidden">
         {/* Header */}
         <header className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-center sm:justify-start p-6 z-30">
-          <div className="inline-flex items-center justify-center transition-transform duration-200 hover:scale-105 hover:opacity-90 active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded cursor-pointer">
+          <div className="inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded cursor-pointer">
             <div className="w-16 h-12 md:w-28 md:h-20  flex items-center justify-center">
               <img
                 src="/assets/logos/Logo_CSS Apply.svg"
@@ -168,48 +150,48 @@ export default function Home() {
         <div className="absolute inset-0 z-20 grid grid-rows-[1fr_auto_1fr] isolate">
           {/* Row 1: Top Images */}
           <div className="w-full relative overflow-hidden z-10">
-            <div className="absolute top-0 left-0 w-[200%] h-full flex animate-[slideRight_30s_linear_infinite]">
+            <div className="absolute top-0 left-0 w-[200%] h-full flex">
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage5.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage6.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
               </div>
@@ -219,42 +201,42 @@ export default function Home() {
                   <img
                     src="/assets/pictures/landingpage/landingpage7.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage8.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage9.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage10.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage11.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage12.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
               </div>
@@ -264,16 +246,12 @@ export default function Home() {
           {/* Row 2: Text Content */}
           <div className="w-full flex flex-col items-center z-50 relative py-6 min-h-[240px]">
             <div className="relative z-30 flex flex-col items-center text-center font-inter">
-              <h3
-                ref={heroSubRef}
-                className="animate-fadeUp text-blue-200 text-sm md:text-base font-light tracking-wide uppercase leading-tight drop-shadow-[0_0_12px_rgba(59,130,246,0.8)]"
-              >
+              <h3 className="text-blue-200 text-sm md:text-base font-light tracking-wide uppercase leading-tight drop-shadow-[0_0_12px_rgba(59,130,246,0.8)]">
                 Your journey in tech starts here
               </h3>
               <h1
                 key={heroPhraseIndex}
-                ref={heroTitleRef}
-                className={`animate-fadeUpDelay relative z-30 ${heroTitleSizeClass} font-bold bg-gradient-to-b from-white from-20% to-[#0768c3] to-70% bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_18px_rgba(59,130,246,0.75)]`}
+                className={`relative z-30 ${heroTitleSizeClass} font-bold bg-gradient-to-b from-white from-20% to-[#0768c3] to-70% bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_18px_rgba(59,130,246,0.75)]`}
                 aria-live="polite"
               >
                 {currentHeroPhrase}
@@ -281,10 +259,9 @@ export default function Home() {
 
               {/* Enter Button */}
               <button
-                ref={heroCtaRef}
                 onClick={handleEnterClick}
                 disabled={isLoggingIn}
-                className={`animate-fadeUpDelay2 ${heroStyles.enterButton} relative z-[60] bg-[#0077FF] font-family-inter text-white py-2 px-16 font-medium text-xl opacity-100 hover:bg-[#0056CC] transition-all duration-300 hover:scale-105 animate-[glowPulseBtn_2.4s_ease-in-out_infinite]`}
+                className="relative z-[60] bg-[#0077FF] shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] rounded-full font-family-inter text-white py-2 px-16 font-medium text-xl opacity-100 hover:bg-[#0056CC]"
               >
                 {isLoggingIn ? (
                   <div className="flex items-center justify-center">
@@ -300,41 +277,41 @@ export default function Home() {
 
           {/* Row 3: Bottom Images */}
           <div className="w-full relative overflow-hidden z-10">
-            <div className="absolute bottom-0 left-0 w-[200%] h-full flex animate-[slideLeft_40s_linear_infinite]">
+            <div className="absolute bottom-0 left-0 w-[200%] h-full flex">
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage13.png"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage14.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage15.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage16.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage17.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
               </div>
@@ -344,35 +321,35 @@ export default function Home() {
                   <img
                     src="/assets/pictures/landingpage/landingpage18.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage19.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage20.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage21.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
                     src="/assets/pictures/landingpage/landingpage22.jpg"
                     alt="Landing page image"
-                    className="hero-img cursor-pointer transition duration-300 w-full h-full object-cover opacity-70 grayscale hover:grayscale-0 hover:saturate-100 hover:scale-[1.03] shadow-md"
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
               </div>
@@ -381,13 +358,13 @@ export default function Home() {
         </div>
 
         {/* Bottom Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center animate-bounce">
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
           <button
             onClick={scrollToNextSection}
-            className="group flex flex-col items-center space-y-2 hover:scale-105 transition-transform duration-300"
+            className="group flex flex-col items-center space-y-2"
           >
             <Icon icon="mdi:chevron-down" className="text-2xl text-white" />
-            <span className="font-light text-white text-xs md:text-sm group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+            <span className="font-light font-poppins text-white text-xs md:text-sm group-hover:opacity-100 whitespace-nowrap">
               Get to know more about CSS
             </span>
           </button>
@@ -398,49 +375,18 @@ export default function Home() {
       </section>
 
       <section
-        ref={aboutRef}
         id="about-css-section"
         className="py-20 px-10 w-full overflow-hidden"
       >
         <div className="space-y-5 lg:space-y-0 lg:flex lg:justify-around">
-          {/* Text content with slide-in animation */}
-          <div
-            className={getScrollAnimationClasses(
-              isAboutVisible,
-              "left",
-              "font-raleway lg:w-1/2 flex flex-col justify-center"
-            )}
-            style={getScrollAnimationStyles(isAboutVisible, "left")}
-          >
-            <p
-              className={getScrollAnimationClasses(
-                isAboutVisible,
-                "up",
-                "text-lg md:text-xl"
-              )}
-              style={getScrollAnimationStyles(isAboutVisible, "up", "0.2s")}
-            >
-              WHAT HAPPENS
-            </p>
-            <p
-              className={getScrollAnimationClasses(
-                isAboutVisible,
-                "up",
-                "text-4xl md:text-5xl lg:text-6xl font-bold"
-              )}
-              style={getScrollAnimationStyles(isAboutVisible, "up", "0.4s")}
-            >
+          {/* Text content */}
+          <div className="font-raleway lg:w-1/2 flex flex-col justify-center">
+            <p className="text-lg md:text-xl">WHAT HAPPENS</p>
+            <p className="text-4xl md:text-5xl lg:text-6xl font-bold">
               when <span className="text-[#3F74B8]">passion</span> <br /> meets{" "}
               <span className="text-[#134687]">technology?</span>
             </p>
-            <div
-              className={getScrollAnimationClasses(
-                isAboutVisible,
-                "up",
-                "text-sm md:text-[18px] lg:text-lg text-justify mt-5"
-              )}
-              style={getScrollAnimationStyles(isAboutVisible, "up", "0.6s")}
-            >
+            <div className="text-sm md:text-[18px] lg:text-lg text-justify mt-5">
               The{" "}
               <span className="font-bold"> Computer Science Society (CSS)</span>{" "}
               is where curious minds, creative thinkers, and future tech leaders
@@ -459,75 +405,40 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Image with slide-in animation */}
-          <div
-            className={getScrollAnimationClasses(
-              isAboutVisible,
-              "right",
-              "flex-shrink-0 flex justify-center items-center"
-            )}
-            style={{
-              ...getScrollAnimationStyles(isAboutVisible, "right", "0.3s"),
-              transform: isAboutVisible
-                ? "translateX(0) scale(1)"
-                : "translateX(48px) scale(0.95)",
-            }}
-          >
+          {/* Image */}
+          <div className="flex-shrink-0 flex justify-center items-center">
             <Image
               src="/assets/pictures/sec2_pic.png"
               alt=""
               width={450}
               height={450}
-              className="transition-transform duration-500 hover:scale-105"
+              className=""
             />
           </div>
         </div>
       </section>
 
-      <section
-        ref={perksRef}
-        id="perks-section"
-        className="h-50 overflow-hidden"
-      >
-        {/* Title with scroll-triggered animation */}
-        <div
-          className={getScrollAnimationClasses(
-            isPerksVisible,
-            "up",
-            "flex justify-center"
-          )}
-          style={getScrollAnimationStyles(isPerksVisible, "up")}
-        >
+      <section id="perks-section" className="h-50 overflow-hidden">
+        {/* Title */}
+        <div className="flex justify-center">
           <p className="font-inter font-bold text-lg md:text-2xl xl:text-3xl">
             🎉Enjoy Exclusive Perks🎉
           </p>
         </div>
 
-        {/* Partners container with scroll-triggered staggered animations */}
-        <div
-          className={getScrollAnimationClasses(
-            isPerksVisible,
-            "up",
-            "flex justify-center mt-8"
-          )}
-          style={getScrollAnimationStyles(isPerksVisible, "up", "0.3s")}
-        >
+        {/* Partners container */}
+        <div className="flex justify-center mt-8">
           <div className="w-[90%] flex justify-center items-center overflow-x-auto gap-4 md:gap-6 lg:gap-8 pb-3">
             {partnerLogos.map((partner, index) => (
               <div
                 key={partner.alt}
                 className={`${partner.size} ${
                   partner.shape || "rounded-full"
-                } flex-shrink-0 overflow-hidden bg-white hover:animate-pulse hover:scale-110 transition-all duration-500 cursor-pointer ${
-                  isPerksVisible
-                    ? "opacity-100 transform scale-100 translate-y-0"
-                    : "opacity-0 transform scale-75 translate-y-8"
-                } ${
+                } flex-shrink-0 overflow-hidden bg-white cursor-pointer ${
                   partner.shape === "rounded-lg"
                     ? "p-2 flex items-center justify-center"
                     : ""
                 }`}
-                style={getStaggeredAnimationStyles(isPerksVisible, index, 0.5)}
               >
                 <Image
                   src={partner.src}
@@ -538,7 +449,7 @@ export default function Home() {
                     partner.shape === "rounded-lg"
                       ? "object-contain"
                       : "object-cover"
-                  } hover:scale-110 transition-transform duration-300`}
+                  }`}
                 />
               </div>
             ))}
@@ -547,19 +458,11 @@ export default function Home() {
       </section>
 
       {/* Mobile View */}
-      <section
-        ref={expectRefMobile}
-        id="expect-section"
-        className="lg:hidden overflow-hidden"
-      >
+      <section id="expect-section" className="lg:hidden overflow-hidden">
         <div className="">
           {/* Header Card */}
           <div
-            className={`relative w-full h-60 bg-cover bg-center flex items-center transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-y-0"
-                : "opacity-0 transform translate-y-8"
-            }`}
+            className="relative w-full h-60 bg-cover bg-center flex items-center"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic1.png')",
             }}
@@ -577,14 +480,9 @@ export default function Home() {
 
           {/* Card 01 */}
           <div
-            className={`relative w-full h-60 bg-cover bg-center flex items-end transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-y-0"
-                : "opacity-0 transform translate-y-8"
-            }`}
+            className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic2.png')",
-              transitionDelay: "0.2s",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-1/2 sm:ml-4 md:ml-6">
@@ -602,14 +500,9 @@ export default function Home() {
 
           {/* Card 02 */}
           <div
-            className={`relative w-full h-60 bg-cover bg-center flex items-end transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-y-0"
-                : "opacity-0 transform translate-y-8"
-            }`}
+            className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic3.png')",
-              transitionDelay: "0.4s",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -626,14 +519,9 @@ export default function Home() {
 
           {/* Card 03 */}
           <div
-            className={`relative w-full h-60 bg-cover bg-center flex items-end transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-y-0"
-                : "opacity-0 transform translate-y-8"
-            }`}
+            className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_mobile_pic4.png')",
-              transitionDelay: "0.6s",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -652,18 +540,13 @@ export default function Home() {
 
       {/* Desktop View */}
       <section
-        ref={expectRefDesktop}
         id="expect-section-desktop"
         className="hidden lg:block bg-black overflow-hidden mt-5"
       >
         <div className="sm:flex sm:flex-row h-[700px] w-full">
           {/* Header Card */}
           <div
-            className={`w-[28%] h-full bg-cover bg-center flex items-center pl-10 transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-x-0"
-                : "opacity-0 transform -translate-x-12"
-            }`}
+            className="w-[28%] h-full bg-cover bg-center flex items-center pl-10"
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic1.png')",
             }}
@@ -681,14 +564,9 @@ export default function Home() {
 
           {/* Card 01 */}
           <div
-            className={`relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-y-0"
-                : "opacity-0 transform translate-y-12"
-            }`}
+            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic2.png')",
-              transitionDelay: "0.2s",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
@@ -702,14 +580,9 @@ export default function Home() {
 
           {/* Card 02 */}
           <div
-            className={`relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-y-0"
-                : "opacity-0 transform translate-y-12"
-            }`}
+            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic3.png')",
-              transitionDelay: "0.4s",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5 ">
@@ -723,14 +596,9 @@ export default function Home() {
 
           {/* Card 03 */}
           <div
-            className={`relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end transition-all duration-800 ease-out ${
-              isExpectVisible
-                ? "opacity-100 transform translate-y-0"
-                : "opacity-0 transform translate-y-12"
-            }`}
+            className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
               backgroundImage: "url('/assets/pictures/s4_desktop_pic4.png')",
-              transitionDelay: "0.6s",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
@@ -744,21 +612,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        ref={joinRef}
-        id="join-section"
-        className="py-8 md:py-12 overflow-hidden"
-      >
+      <section id="join-section" className="py-8 md:py-12 overflow-hidden">
         <div className="min-h-screen md:min-h-[60vh] w-full flex flex-col lg:flex-row justify-center items-stretch gap-8 lg:gap-0">
           {/* Why Join Us Section */}
-          <div
-            className={getScrollAnimationClasses(
-              isJoinVisible,
-              "left",
-              "flex-1 flex flex-col justify-center items-center px-4 md:px-8"
-            )}
-            style={getScrollAnimationStyles(isJoinVisible, "left")}
-          >
+          <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8">
             <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-4 md:p-6 gap-2 w-full max-w-md">
               <p className="text-2xl md:text-3xl font-semibold text-center font-raleway">
                 Why join us?
@@ -792,14 +649,7 @@ export default function Home() {
           </div>
 
           {/* Our Committees Section */}
-          <div
-            className={getScrollAnimationClasses(
-              isJoinVisible,
-              "right",
-              "flex-1 flex flex-col justify-center items-center px-4 md:px-8"
-            )}
-            style={getScrollAnimationStyles(isJoinVisible, "right")}
-          >
+          <div className="flex-1 flex flex-col justify-center items-center px-4 md:px-8">
             <div className="text-[#1457AC] flex flex-col justify-center items-center border-b-2 border-[#1457AC] p-4 md:p-6 gap-2 w-full max-w-md">
               <p className="text-2xl md:text-3xl font-semibold text-center font-raleway">
                 Our Committees
@@ -860,7 +710,7 @@ export default function Home() {
               {/* CTA Button */}
               <Link
                 href="/personality-test"
-                className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 font-semibold lg:ml-5 shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200 inline-block"
+                className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 font-semibold lg:ml-5 shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] inline-block"
               >
                 <div className="flex items-center justify-center gap-2">
                   <p className="font-inter">Take the Test</p>
@@ -891,15 +741,15 @@ export default function Home() {
             </div>
             <div className="flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
               {/* REF: toh rin */}
-              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200">
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
                 Apply as Member
               </button>
 
-              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200">
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
                 Apply as Staff
               </button>
 
-              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-transform duration-200">
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
                 Apply as Executive Assistant
               </button>
             </div>
