@@ -19,6 +19,8 @@ export default function MemberApplication() {
   const [formData, setFormData] = useState({
     studentNumber: "",
     section: "",
+    firstName: "",
+    lastName: "",
   });
 
   // REF: gawing naka disable
@@ -28,13 +30,27 @@ export default function MemberApplication() {
       if (status !== "authenticated" || !session?.user?.email) return;
 
       try {
+        // Prefill first and last name from Google session
+        const fullName = session?.user?.name || "";
+        if (fullName) {
+          const nameParts = fullName.trim().split(/\s+/);
+          const extractedFirstName = nameParts.shift() || "";
+          const extractedLastName = nameParts.join(" ");
+          setFormData((prev) => ({
+            ...prev,
+            firstName: prev.firstName || extractedFirstName,
+            lastName: prev.lastName || extractedLastName,
+          }));
+        }
+
         const response = await fetch("/api/applications/member");
         if (response.ok) {
           const data = await response.json();
-          setFormData({
+          setFormData((prev) => ({
+            ...prev,
             studentNumber: data.user?.studentNumber || "",
             section: data.user?.section || "",
-          });
+          }));
         }
       } catch (err) {
         console.error("Failed to fetch application data:", err);
@@ -122,7 +138,7 @@ export default function MemberApplication() {
             to grow alongside fellow students passionate about tech.
           </div>
           <hr className="my-8 border-t-1 border-[#717171]" />
-          <div className="flex flex-col lg:flex-row gap-40">
+          <div className="flex flex-col lg:flex-row gap-20">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
                 <div className="text-black text-xs lg:text-sm font-Inter font-normal">
@@ -137,8 +153,27 @@ export default function MemberApplication() {
                     required
                     pattern="[0-9]{10}"
                     maxLength={10}
-                    className="w-full h-9 lg:h-12  rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
+                    className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
                     placeholder="e.g. 2019131907"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="text-black text-xs lg:text-sm font-Inter font-normal">
+                  Name *
+                </div>
+                <div className="text-black text-sm font-Inter lg:w-[400px]">
+                  <input
+                    type="text"
+                    name="name"
+                    value={[formData.firstName, formData.lastName]
+                      .filter(Boolean)
+                      .join(" ")}
+                    readOnly
+                    disabled
+                    aria-readonly
+                    className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] bg-gray-100 text-gray-700 px-4 py-3 text-sm lg:text-base"
+                    placeholder="Full name"
                   />
                 </div>
               </div>
@@ -154,7 +189,7 @@ export default function MemberApplication() {
                     value={formData.section}
                     onChange={handleInputChange}
                     required
-                    className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
+                    className="w-full h-9 lg:h-12 rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
                     placeholder="e.g. 1CSA"
                   />
                 </div>
@@ -196,9 +231,10 @@ export default function MemberApplication() {
                   htmlFor="circle-checkbox"
                   className="text-black text-xs md:text-sm font-normal select-none cursor-pointer text-justify"
                 >
-                  The information you provide will be kept confidential and used
-                  only for academic purposes. It will not be shared with third
-                  parties and will be handled responsibly and ethically.
+                  I agree that the information I provide will be kept
+                  confidential and used only for academic purposes. It will not
+                  be shared with third parties and will be handled responsibly
+                  and ethically.
                 </label>
               </div>
             </div>
@@ -207,7 +243,7 @@ export default function MemberApplication() {
               <img
                 src="/assets/pictures/MemberImage.jpg"
                 alt="Member"
-                className="w-190 h-110 object-cover shadow-md border border-[#2F7EE3] rounded-lg"
+                className="w-300 h-90 object-cover shadow-md border border-[#2F7EE3] rounded-lg"
               />
             </div>
           </div>
