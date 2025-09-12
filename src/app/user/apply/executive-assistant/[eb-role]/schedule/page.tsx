@@ -558,22 +558,21 @@ export default function SchedulePage() {
     <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
       <Header />
 
-      <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
-        <div className="w-[80%] flex flex-col justify-center items-center">
-          <div className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
-            <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
-              <span className="text-black">
-                Apply as Executive Assistant for{" "}
-              </span>
-              <span className="text-[#134687]">{selectedEB.title}</span>
-            </div>
+      <section className="flex flex-col items-center justify-center my-12 lg:my-28">
+        <div className="w-[80%] rounded-[24px]  sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] md:p-16 lg:py-20 lg:px-24">
+          <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
+            <span className="text-black">
+              Apply as Executive Assistant for{" "}
+            </span>
+            <span className="text-[#134687]">{selectedEB.title}</span>
+          </div>
 
-            <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
-              {selectedEB.description}
-            </div>
+          <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
+            {selectedEB.description}
+          </div>
 
-            <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
-
+          <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
+          <div className="flex flex-col items-center justify-center">
             {/* Stepper */}
             <div className="w-full flex flex-col items-center justify-center">
               <div className="flex items-center">
@@ -624,8 +623,8 @@ export default function SchedulePage() {
             </div>
 
             {/* Scheduling Section */}
-            <div className="mb-8 mt-5 lg:mt-8">
-              <p className="text-black font-bold text-center mb-6 font-inter">
+            <div className="lg:mb-8 mt-5 lg:mt-8 flex flex-col items-center justify-center w-full">
+              <p className="text-black text-xs lg:text-md font-bold text-center mb-3 lg:mb-6 font-inter">
                 Click on any colorless slot to reserve your interview schedule.
               </p>
 
@@ -634,7 +633,7 @@ export default function SchedulePage() {
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#134687]"></div>
                 </div>
               ) : (
-                <div className="space-y-6 bg-amber-200 w-[50%]">
+                <div className="space-y-6 w-full">
                   {/* Calendar Grid Schedule View */}
                   {Object.keys(groupedSlots).length === 0 ? (
                     <div className="text-center py-8 text-gray-500 font-inter">
@@ -645,9 +644,9 @@ export default function SchedulePage() {
                       {/* Calendar Grid Container */}
                       <div className="overflow-x-auto divide-y divide-[#164E96]">
                         {/* Header Row */}
-                        <div className="flex min-w-max">
+                        <div className="flex min-w-fit">
                           {/* Time column header */}
-                          <div className="sticky left-0 bg-white z-10 p-3 font-inter font-semibold text-sm text-gray-700 flex items-center justify-center text-center lg:w-[100px] flex-shrink-0 shadow-[8px_0_16px_-2px_rgba(0,0,0,0.40)]">
+                          <div className="sticky left-0 bg-white z-10 p-3 font-inter font-semibold text-sm text-gray-700 flex items-center justify-center text-center w-[60px] lg:w-[100px] flex-shrink-0 shadow-[8px_0_16px_-2px_rgba(0,0,0,0.40)]">
                             Time
                           </div>
 
@@ -669,9 +668,9 @@ export default function SchedulePage() {
                                 return (
                                   <div
                                     key={date}
-                                    className="bg-[#164E96] p-3 text-center flex-1 min-w-[100px]"
+                                    className="bg-[#164E96] p-3 text-center flex-1 w-[60px] lg:w-[100px]"
                                   >
-                                    <div className="font-inter font-semibold text-sm text-white">
+                                    <div className="font-inter font-semibold text-sm text-white p-1">
                                       {dayName}
                                     </div>
                                     <div className="font-inter text-xs text-white">
@@ -726,7 +725,7 @@ export default function SchedulePage() {
                           return allTimeSlots.map((timeSlot, timeIndex) => (
                             <div key={timeIndex} className="flex min-w-max">
                               {/* Time label */}
-                              <div className="sticky left-0 bg-white z-10 p-3 text-center w-[100px] flex-shrink-0 shadow-[10px_0_12px_-0px_rgba(0,0,0,0.4)]">
+                              <div className="sticky left-0 bg-white z-10 p-3 text-center w-[60px] lg:w-[100px] flex-shrink-0 shadow-[10px_0_12px_-0px_rgba(0,0,0,0.4)]">
                                 <div className="font-inter text-sm text-gray-700">
                                   {timeSlot.displayTime} -
                                 </div>
@@ -756,7 +755,7 @@ export default function SchedulePage() {
                                     return (
                                       <div
                                         key={date}
-                                        className="min-h-[60px] flex-1 min-w-[100px]"
+                                        className="min-h-[60px] flex-1 w-[60px] lg:w-[100px]"
                                       >
                                         {slotForThisTime ? (
                                           <button
@@ -768,7 +767,7 @@ export default function SchedulePage() {
                                                 : null
                                             }
                                             disabled={!isAvailable}
-                                            className={`w-full h-full p-2 transition-all duration-200 ${
+                                            className={`w-full h-full transition-all duration-200 ${
                                               !isAvailable
                                                 ? "bg-[#164E96] cursor-not-allowed"
                                                 : isSelected
