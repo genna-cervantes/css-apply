@@ -8,7 +8,6 @@ export default function LoadingScreen() {
     const [showText, setShowText] = useState(false);
 
     useEffect(() => {
-        // Simulate progress for a better user experience
         const interval = setInterval(() => {
             setProgress((prev) => {
                 if (prev >= 100) {
@@ -19,7 +18,6 @@ export default function LoadingScreen() {
             });
         }, 200);
 
-        // Show text after a short delay
         const textTimer = setTimeout(() => {
             setShowText(true);
         }, 500);

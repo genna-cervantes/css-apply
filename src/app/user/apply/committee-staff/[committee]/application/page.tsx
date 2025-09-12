@@ -1,41 +1,68 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { z } from "zod";
-// import { signOut, useSession } from "next-auth/react";
-// import { useEffect } from "react";
-// import { useRef } from "react";
-// import { useState } from "react";
 
 export default function CommitteeApplication() {
   const router = useRouter();
   const { committee: committeeId } = useParams<{ committee: string }>();
-
-  const [isOpen, setIsOpen] = useState(false);
+  const { data: session, status } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [isOpen, setIsOpen] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // REF: lagyan din toh ng autofill kagaya sa member application
-  // REF: gumamit ng react form hook and zod para sa form handling
-  // REF: walang required or any input validation toh
   const [formData, setFormData] = useState({
     studentNumber: "",
     firstName: "",
     lastName: "",
     section: "",
     secondChoice: "",
-    email: "",
-    phone: "",
     cv: "",
-    motivation: "",
+    portfolioLink: "",
   });
+
+  // Prefill user data from session
+  useEffect(() => {
+    const fetchApplicationData = async () => {
+      if (status !== "authenticated" || !session?.user?.email) return;
+
+      try {
+        // Prefill first and last name from Google session
+        const fullName = session?.user?.name || "";
+        if (fullName) {
+          const nameParts = fullName.trim().split(/\s+/);
+          const extractedFirstName = nameParts.shift() || "";
+          const extractedLastName = nameParts.join(" ");
+          setFormData((prev) => ({
+            ...prev,
+            firstName: prev.firstName || extractedFirstName,
+            lastName: prev.lastName || extractedLastName,
+          }));
+        }
+
+        // Fetch existing user data
+        const response = await fetch("/api/applications/committee-staff");
+        if (response.ok) {
+          const data = await response.json();
+          setFormData((prev) => ({
+            ...prev,
+            studentNumber: data.user?.studentNumber || "",
+            section: data.user?.section || "",
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch application data:", err);
+      }
+    };
+
+    fetchApplicationData();
+  }, [session, status]);
 
   const committeeRoles = [
     {
@@ -121,6 +148,112 @@ export default function CommitteeApplication() {
     };
   }, [isOpen]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === "studentNumber") {
+      const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // Update the handleSubmit function in your committee-staff application page.tsx
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    if (!isChecked) {
+      setError("Please agree to the data privacy terms");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.studentNumber || formData.studentNumber.length !== 10) {
+      setError("Please enter a valid 10-digit student number");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.firstName || !formData.lastName) {
+      setError("Please enter your full name");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.section) {
+      setError("Please enter your section");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.secondChoice) {
+      setError("Please select a second choice committee");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.cv) {
+      setError("Please upload your CV");
+      setLoading(false);
+      return;
+    }
+
+    if (
+      (selectedCommittee?.id === "creatives" || selectedCommittee?.id === "technology") &&
+      !formData.portfolioLink
+    ) {
+      setError("Please upload your portfolio");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      console.log('Submitting application data:', {
+        studentNumber: formData.studentNumber,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        section: formData.section,
+        firstOptionCommittee: committeeId,
+        secondOptionCommittee: formData.secondChoice,
+        cv: formData.cv,
+        portfolio: formData.portfolioLink,
+      });
+
+      const response = await fetch("/api/applications/committee-staff", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentNumber: formData.studentNumber,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          section: formData.section,
+          firstOptionCommittee: committeeId,
+          secondOptionCommittee: formData.secondChoice,
+          cv: formData.cv,
+          portfolio: formData.portfolioLink,
+        }),
+      });
+
+      const responseData = await response.json();
+      console.log('API response:', responseData);
+
+      if (response.ok) {
+        router.push(`/user/apply/committee-staff/${committeeId}/schedule`);
+      } else {
+        setError(responseData.error || responseData.details || "Application submission failed");
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setError("An error occurred while submitting your application");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!selectedCommittee) {
     return (
       <div>
@@ -149,7 +282,10 @@ export default function CommitteeApplication() {
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
         <div className="w-[80%] flex flex-col justify-center items-center">
-          <div className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24"
+          >
             <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply for </span>
               <span className="text-[#134687]">
@@ -200,6 +336,13 @@ export default function CommitteeApplication() {
               </div>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
+                {error}
+              </div>
+            )}
+
             {/* Application Form */}
             <div className="flex flex-col lg:flex-row justify-center lg:gap-8 mt-5 lg:mt-8">
               <div className="flex flex-col gap-4 lg:gap-6">
@@ -210,13 +353,9 @@ export default function CommitteeApplication() {
                   <div className="text-black text-xs lg:text-sm font-Inter w-full lg:w-[400px]">
                     <input
                       type="text"
+                      name="studentNumber"
                       value={formData.studentNumber}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          studentNumber: e.target.value,
-                        })
-                      }
+                      onChange={handleInputChange}
                       className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
                       placeholder="e.g. 2019131907"
                       required
@@ -230,6 +369,7 @@ export default function CommitteeApplication() {
                   <div className="text-black text-sm font-Inter w-full lg:w-[400px]">
                     <input
                       type="text"
+                      name="firstName"
                       value={formData.firstName}
                       onChange={(e) =>
                         setFormData({ ...formData, firstName: e.target.value })
@@ -247,6 +387,7 @@ export default function CommitteeApplication() {
                   <div className="text-black lg:text-sm font-Inter lg:w-[400px]">
                     <input
                       type="text"
+                      name="lastName"
                       value={formData.lastName}
                       onChange={(e) =>
                         setFormData({ ...formData, lastName: e.target.value })
@@ -265,6 +406,7 @@ export default function CommitteeApplication() {
                     <div className="text-black lg:text-sm font-Inter w-28 lg:w-[150px]">
                       <input
                         type="text"
+                        name="section"
                         value={formData.section}
                         onChange={(e) =>
                           setFormData({
@@ -308,25 +450,27 @@ export default function CommitteeApplication() {
                       </button>
                       {isOpen && (
                         <div className="absolute top-full left-0 right-0 bg-white border-2 border-[#044FAF] rounded-md mt-1 shadow-lg z-10 max-h-60 overflow-y-auto">
-                          {committeeRoles.map((role) => (
-                            <div
-                              key={role.id}
-                              onClick={() => {
-                                setFormData({
-                                  ...formData,
-                                  secondChoice: role.id,
-                                });
-                                setIsOpen(false);
-                              }}
-                              className={`px-4 py-3 text-base text-black cursor-pointer hover:bg-[#DCECFF] transition-colors duration-150 ${
-                                formData.secondChoice === role.id
-                                  ? "border-l-4 border-[#044FAF]"
-                                  : ""
-                              }`}
-                            >
-                              {role.title}
-                            </div>
-                          ))}
+                          {committeeRoles
+                            .filter((role) => role.id !== committeeId)
+                            .map((role) => (
+                              <div
+                                key={role.id}
+                                onClick={() => {
+                                  setFormData({
+                                    ...formData,
+                                    secondChoice: role.id,
+                                  });
+                                  setIsOpen(false);
+                                }}
+                                className={`px-4 py-3 text-base text-black cursor-pointer hover:bg-[#DCECFF] transition-colors duration-150 ${
+                                  formData.secondChoice === role.id
+                                    ? "border-l-4 border-[#044FAF]"
+                                    : ""
+                                }`}
+                              >
+                                {role.title}
+                              </div>
+                            ))}
                         </div>
                       )}
                     </div>
@@ -379,14 +523,16 @@ export default function CommitteeApplication() {
                       Portfolio (in pdf):
                     </div>
                     <div className="text-black lg:text-xs font-Inter lg:w-[200px]">
-                      {formData.cv ? (
+                      {formData.portfolioLink ? (
                         <div className="flex items-center justify-between bg-gray-100 p-2 lg:px-3 lg:py-2 rounded-md">
                           <span className="lg:text-sm text-black truncate">
-                            {formData.cv}
+                            {formData.portfolioLink}
                           </span>
                           <button
                             type="button"
-                            onClick={() => setFormData({ ...formData, cv: "" })}
+                            onClick={() =>
+                              setFormData({ ...formData, portfolioLink: "" })
+                            }
                             className="text-black hover:text-[#044FAF] lg:ml-2 lg:text-lg"
                           >
                             ×
@@ -404,7 +550,10 @@ export default function CommitteeApplication() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                setFormData({ ...formData, cv: file.name });
+                                setFormData({
+                                  ...formData,
+                                  portfolioLink: file.name,
+                                });
                               }
                             }}
                             className="hidden"
@@ -474,23 +623,14 @@ export default function CommitteeApplication() {
                 Back
               </button>
               <button
-                type="button"
-                onClick={() => {
-                  // Save form data to localStorage before navigating
-                  localStorage.setItem(
-                    "committeeApplicationData",
-                    JSON.stringify(formData)
-                  );
-                  router.push(
-                    `/user/apply/committee-staff/${committeeId}/schedule`
-                  );
-                }}
-                className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
+                type="submit"
+                disabled={loading}
+                className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                {loading ? "Submitting..." : "Next"}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </section>
       <Footer />

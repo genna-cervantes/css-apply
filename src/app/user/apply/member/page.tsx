@@ -1,11 +1,10 @@
-// src/app/user/apply/member/page.tsx
+// member application page.tsx
 "use client";
 
-import Image from "next/image";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 
 export default function MemberApplication() {
@@ -15,7 +14,6 @@ export default function MemberApplication() {
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  // Form state - all fields will be filled by user
   const [formData, setFormData] = useState({
     studentNumber: "",
     section: "",
@@ -24,7 +22,6 @@ export default function MemberApplication() {
   });
 
   // REF: gawing naka disable
-  // Fetch existing application data when component mounts or session updates
   useEffect(() => {
     const fetchApplicationData = async () => {
       if (status !== "authenticated" || !session?.user?.email) return;
@@ -81,7 +78,6 @@ export default function MemberApplication() {
       return;
     }
 
-    // Validate all fields
     if (!formData.studentNumber || formData.studentNumber.length !== 10) {
       setError("Please enter a valid 10-digit student number");
       setLoading(false);
