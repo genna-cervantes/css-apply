@@ -1,5 +1,4 @@
 // src/app/api/applications/member/route.ts
-
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { prisma } from '@/lib/prisma'
@@ -13,7 +12,6 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        // We no longer destructure firstName, lastName, or fullName
         const { studentNumber, section } = await request.json()
 
         if (!studentNumber || !section) {
@@ -30,7 +28,6 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Check if student number is already used by another user
         const existingUserWithSN = await prisma.user.findUnique({
             where: { studentNumber },
         });

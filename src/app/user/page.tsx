@@ -1,8 +1,6 @@
-// src/app/user/page.tsx
 "use client";
 
-import Image from "next/image";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
@@ -14,14 +12,45 @@ export default function UserDashboard() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
+
+  useEffect(() => {
+    const checkApplications = async () => {
+      if (status === "authenticated") {
+        try {
+          const response = await fetch('/api/applications/check-existing');
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Redirect based on existing applications
+            if (data.hasMemberApplication) {
+              router.push('/user/member/application/progress');
+            } else if (data.hasCommitteeApplication) {
+              const committeeId = data.applications.committee?.firstOptionCommittee;
+              if (committeeId) {
+                router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+              }
+            } else if (data.hasEAApplication) {
+              router.push('/user/ea/application/progress');
+            }
+          }
+        } catch (error) {
+          console.error('Error checking applications:', error);
+        } finally {
+          setHasCheckedApplications(true);
+        }
+      }
+    };
+
+    checkApplications();
+  }, [status, router]);
 
   // Check authentication status
   useEffect(() => {
     if (status === "loading") return;
 
     if (!session) {
-      // Redirect to signin if not authenticated
-      router.push("/"); // Go back to main page so they can sign in
+      router.push("/");
       return;
     }
 
@@ -29,7 +58,7 @@ export default function UserDashboard() {
   }, [session, status, router]);
 
   // Show loading screen while checking authentication
-  if (isLoading || status === "loading") {
+  if (isLoading || status === "loading" || (status === "authenticated" && !hasCheckedApplications)) {
     return <LoadingScreen />;
   }
 

@@ -1,128 +1,91 @@
-// src/lib/supabase-storage.ts
-import { supabase, supabaseAdmin } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase';
 
-const BUCKET_NAME = 'portfolio-applications'
+export const STORAGE_BUCKET = 'committee-applications';
 
-export async function ensureBucketExists() {
+export async function createStorageBucket() {
+    const { data, error } = await supabase.storage.createBucket(STORAGE_BUCKET, {
+        public: false,
+        allowedMimeTypes: ['application/pdf'],
+        fileSizeLimit: 10 * 1024 * 1024,
+    });
+
+    if (error && error.message !== 'Bucket already exists') {
+        console.error('Error creating bucket:', error);
+        throw error;
+    }
+    
+    return data;
+}
+
+export async function uploadFile(file: File, studentNumber: string, fileType: 'cv' | 'portfolio'): Promise<string> {
     try {
-        const { data: buckets, error } = await supabaseAdmin.storage.listBuckets()
-        
+        const timestamp = Date.now();
+        const fileName = `${studentNumber}/${fileType}_${timestamp}.pdf`;
+
+        const { data, error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+        });
+
         if (error) {
-            console.error('Error listing buckets:', error)
-            throw error
+        throw error;
         }
 
-        const bucketExists = buckets.some(bucket => bucket.name === BUCKET_NAME)
-        
-        if (!bucketExists) {
-            console.log(`Creating bucket: ${BUCKET_NAME}`)
-            const { error: createError } = await supabaseAdmin.storage.createBucket(BUCKET_NAME, {
-                public: true,
-                fileSizeLimit: 10 * 1024 * 1024, // 10MB limit
-        })
-        
-        if (createError) {
-            console.error('Error creating bucket:', createError)
-            throw createError
-        }
-            console.log('Bucket created successfully')
-        } else {
-            console.log('Bucket already exists')
-        }
-        
-        return true
+        return fileName; // Return the file path for database storage
     } catch (error) {
-        console.error('Error ensuring bucket exists:', error)
-        throw error
+        console.error('Error uploading file:', error);
+        throw error;
     }
 }
 
-export async function uploadFileToSupabase(
-        file: File,
-        folder: 'cv' | 'portfolio',
-        userIdentifier: string
-    ): Promise<{ filePath: string; publicUrl: string }> {
+// Delete file from Supabase Storage
+export async function deleteFile(filePath: string): Promise<void> {
     try {
-        // Create a unique file name
-        const fileExtension = file.name.split('.').pop()
-        const fileName = `${folder}-${userIdentifier}-${Date.now()}.${fileExtension}`
-        const filePath = `${folder}/${fileName}`
-
-        // Upload file to Supabase Storage
-        const { data, error } = await supabaseAdmin.storage
-        .from(BUCKET_NAME)
-        .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-        })
+        const { error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .remove([filePath]);
 
         if (error) {
-            throw new Error(`Supabase upload error: ${error.message}`)
+           throw error;
         }
-
-        // Get public URL
-        const { data: urlData } = supabaseAdmin.storage
-            .from(BUCKET_NAME)
-            .getPublicUrl(filePath)
-
-        return {
-            filePath: data.path,
-            publicUrl: urlData.publicUrl
-        }
-
     } catch (error) {
-        console.error('Error uploading to Supabase:', error)
-        throw error
+        console.error('Error deleting file:', error);
+        throw error;
     }
 }
 
 export async function getFileUrl(filePath: string): Promise<string> {
-    const { data } = supabase.storage
-        .from(BUCKET_NAME)
-        .getPublicUrl(filePath)
+    try {
+        const { data, error } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .createSignedUrl(filePath, 3600); // URL expires in 1 hour
 
-    return data.publicUrl
-}
-
-export const deleteFileFromSupabase = async (filePath: string) => {
-  try {
-    const { error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .remove([filePath])
-
-    if (error) {
-      console.error('Error deleting file from Supabase:', error)
-      throw error
-    }
-
-    return { success: true }
-  } catch (error) {
-    console.error('Failed to delete file:', error)
-    throw error
-  }
-}
-
-// Create bucket if it doesn't exist
-export async function createStorageBucket() {
-    const { data: buckets, error } = await supabaseAdmin.storage.listBuckets()
-    
-    if (error) {
-        console.error('Error listing buckets:', error)
-        return
-    }
-
-    const bucketExists = buckets.some(bucket => bucket.name === BUCKET_NAME)
-    
-    if (!bucketExists) {
-        const { error: createError } = await supabaseAdmin.storage.createBucket(BUCKET_NAME, {
-            public: true,
-            fileSizeLimit: 5 * 1024 * 1024,
-        })
-        
-        if (createError) {
-        console.error('Error creating bucket:', createError)
-        } else {
-        console.log('Bucket created successfully')
+        if (error) {
+           throw error;
         }
+
+        return data.signedUrl;
+    } catch (error) {
+        console.error('Error getting file URL:', error);
+        throw error;
+    }
+}
+
+export async function replaceFile(oldFilePath: string, newFile: File, studentNumber: string, fileType: 'cv' | 'portfolio'): Promise<string> {
+    try {
+        // Delete old file first
+        if (oldFilePath) {
+        await deleteFile(oldFilePath);
+        }
+
+        // Upload new file
+        const newFilePath = await uploadFile(newFile, studentNumber, fileType);
+        
+        return newFilePath;
+    } catch (error) {
+        console.error('Error replacing file:', error);
+        throw error;
     }
 }

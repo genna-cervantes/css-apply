@@ -48,9 +48,9 @@ model EAApplication {
   secondOptionEb         String
   portfolioLink          String
   cv                     String
-  interviewSlotDay       String
-  interviewSlotTimeStart String
-  interviewSlotTimeEnd   String
+  interviewSlotDay       String?
+  interviewSlotTimeStart String?
+  interviewSlotTimeEnd   String?
   hasFinishedInterview   Boolean  @default(false)
   status                 String? // passed, failed, redirected
   redirection            String?
@@ -68,9 +68,9 @@ model CommitteeApplication {
   portfolioLink          String?
   cv                     String
   supabaseFilePath       String?
-  interviewSlotDay       String
-  interviewSlotTimeStart String
-  interviewSlotTimeEnd   String
+  interviewSlotDay       String?
+  interviewSlotTimeStart String?
+  interviewSlotTimeEnd   String?
   hasFinishedInterview   Boolean  @default(false)
   status                 String? // passed, failed, redirected
   redirection            String?
