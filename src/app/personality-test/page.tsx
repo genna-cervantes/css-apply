@@ -24,6 +24,7 @@ export default function PersonalityTestPage() {
       <div className={styles['pt-theme']}>
         <AppHeader page={page} onTakeTest={handleStartQuiz} onGoHome={handleGoHome} />
         {/* STEP 2: Update the dynamic className on the <main> tag */}
+        {/* REF: is this safe?? why are we overwriting the main tag? */}
         <main className={`${styles['app-container']} ${page === 'home' ? styles['home-main-container'] : ''}`}>
          {page === 'home' ? (
             <>

@@ -10,7 +10,7 @@ import Header from "@/components/Header";
 export default function MemberApplication() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // REF: not used
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -21,7 +21,6 @@ export default function MemberApplication() {
     lastName: "",
   });
 
-  // REF: gawing naka disable
   useEffect(() => {
     const fetchApplicationData = async () => {
       if (status !== "authenticated" || !session?.user?.email) return;

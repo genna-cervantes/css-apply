@@ -29,11 +29,13 @@ const Schedule = () => {
         {/* MAIN SHAPE */}
         <div 
           className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 min-h-[calc(100vh-180px)] md:min-h-[calc(100vh-280px)]"
+          // REF: why the style prop, pwede toh tailwind lng
           style={{ minHeight: 'calc(100vh - 280px)' }}
         >
           {/* schedule header */}
           <div className="flex items-center justify-center md:justify-start mb-6 space-x-2">
             {/* schedule icon */}
+            {/* REF: not really readable, import nlng ng icon library instead */}
             <svg 
               viewBox="0 0 24 24" 
               fill="currentColor"

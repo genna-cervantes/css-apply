@@ -10,6 +10,7 @@ export default function SuccessPage() {
   const { committee: committeeId } = useParams<{ committee: string }>();
   const [scheduledTime, setScheduledTime] = useState<string>("");
 
+  // REF: does not need useEffect just put directly in to state useState(() => localStorage.getItem("scheduledTime"))
   useEffect(() => {
     // Get scheduled time from localStorage or URL params
     const time = localStorage.getItem("scheduledTime");

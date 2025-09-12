@@ -60,6 +60,7 @@ export default function ExecutiveAssistantApplication() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // REF: also put this in a separate file 
   const roles = [
     {
       id: "president",
@@ -190,6 +191,7 @@ export default function ExecutiveAssistantApplication() {
     motivation: "",
   });
 
+  // REF: hindi ba pwede do this nlng on click sa ibang eb?
   useEffect(() => {
     // Reset form when role changes
     setFormData({
