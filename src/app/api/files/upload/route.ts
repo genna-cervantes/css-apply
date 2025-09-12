@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         )
         }
 
+        // REF: file size limits?
         if (file.type !== 'application/pdf') {
         return NextResponse.json(
             { error: 'Only PDF files are allowed' },

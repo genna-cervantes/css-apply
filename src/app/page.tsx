@@ -153,6 +153,7 @@ export default function Home() {
             <div className="absolute top-0 left-0 w-[200%] h-full flex">
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
+                  {/* REF: Use next image instead of img */}
                   <img
                     src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
@@ -429,7 +430,7 @@ export default function Home() {
         {/* Partners container */}
         <div className="flex justify-center mt-8">
           <div className="w-[90%] flex justify-center items-center overflow-x-auto gap-4 md:gap-6 lg:gap-8 pb-3">
-            {partnerLogos.map((partner, index) => (
+            {partnerLogos.map((partner) => (
               <div
                 key={partner.alt}
                 className={`${partner.size} ${
@@ -740,7 +741,6 @@ export default function Home() {
               impact.
             </div>
             <div className="flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
-              {/* REF: toh rin */}
               <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
                 Apply as Member
               </button>

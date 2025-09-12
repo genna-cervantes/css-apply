@@ -32,6 +32,7 @@ interface PendingChange {
   newRole: string
 }
 
+// REF: put in separate data file
 // EB Positions and Committees
 const EB_POSITIONS = [
   'President',
@@ -68,6 +69,7 @@ const EB_COMMITTEES = [
 export default function SuperAdminDashboard() {
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+  // REF: search params instead of state so mag ppersist ung search/filter term
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showEbForm, setShowEbForm] = useState(false)
@@ -99,6 +101,7 @@ export default function SuperAdminDashboard() {
     fetchUsers()
   }, [status, session, router])
 
+  // REF: doesnt need a useEffect
   useEffect(() => {
     const filtered = users.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

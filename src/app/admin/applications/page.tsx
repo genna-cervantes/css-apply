@@ -16,6 +16,7 @@ const Applications = () => {
         <div className="mb-8 mt-12 md:mt-8 text-center md:text-left">
           <h1 
             className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-2 flex items-center justify-center md:justify-start"
+            // REF: naka set na ung font sa layout.tsx and kung iibahin man use next font instead
             style={{ fontFamily: "var(--font-raleway)" }}
           >
             Committee Applications

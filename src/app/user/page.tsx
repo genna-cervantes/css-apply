@@ -16,6 +16,7 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const checkApplications = async () => {
+      // REF: you dont need useEffect for this, this would work the same kahit nasa same level ng states ung if (status) just make sure to use useserversession instead of usesession
       if (status === "authenticated") {
         try {
           const response = await fetch('/api/applications/check-existing');
@@ -46,6 +47,7 @@ export default function UserDashboard() {
   }, [status, router]);
 
   // Check authentication status
+  // REF: this too does not need useEffect
   useEffect(() => {
     if (status === "loading") return;
 
@@ -92,6 +94,7 @@ export default function UserDashboard() {
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10 grid place-items-center h-9 w-9 rounded-full text-shadow-md text-[#A8A8A8] hover:bg-gray-50 active:scale-95"
               >
                 {/* Left chevron */}
+                {/* REF: not really readable, import nlng ng icon library instead */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="30"

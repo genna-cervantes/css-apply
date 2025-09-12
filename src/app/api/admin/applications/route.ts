@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     try {
         const session = await getServerSession()
         // Add admin validation here - you'll need to implement your own admin check logic
-        // REF: add this and session validation
+        // REF: add session validation
         
         const { searchParams } = new URL(request.url)
         const type = searchParams.get('type')

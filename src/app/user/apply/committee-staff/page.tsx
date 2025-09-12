@@ -9,6 +9,7 @@ export default function StaffApplication() {
   const [selectedRole, setSelectedRole] = useState<string | null>("academics");
   const router = useRouter();
 
+  // REF: put static data in a separate file (make a data.ts or something)
   const committeeRoles = [
     {
       id: "academics",
