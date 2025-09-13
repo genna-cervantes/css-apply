@@ -572,6 +572,7 @@ export default function SchedulePage() {
           </div>
 
           <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
+
           <div className="flex flex-col items-center justify-center">
             {/* Stepper */}
             <div className="w-full flex flex-col items-center justify-center">

@@ -378,7 +378,7 @@ export default function SchedulePage() {
         // You might need to store this in localStorage or get it from an API
         const userResponse = await fetch("/api/applications/committee-staff");
         let studentNumber = "";
-        
+
         if (userResponse.ok) {
           const userData = await userResponse.json();
           studentNumber = userData.user?.studentNumber || "";
@@ -389,18 +389,21 @@ export default function SchedulePage() {
         }
 
         // Call the schedule API
-        const response = await fetch("/api/applications/committee-staff/schedule", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            studentNumber,
-            interviewSlotDay: selectedSlotData.date,
-            interviewSlotTimeStart: selectedSlotData.time,
-            interviewSlotTimeEnd: selectedSlotData.end,
-          }),
-        });
+        const response = await fetch(
+          "/api/applications/committee-staff/schedule",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              studentNumber,
+              interviewSlotDay: selectedSlotData.date,
+              interviewSlotTimeStart: selectedSlotData.time,
+              interviewSlotTimeEnd: selectedSlotData.end,
+            }),
+          }
+        );
 
         const result = await response.json();
 
@@ -532,81 +535,87 @@ export default function SchedulePage() {
   }
 
   return (
-    <section className="min-h-screen bg-[rgb(243,243,253)]">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
       <Header />
 
-      <div className="flex flex-col justify-center items-center px-50 py-20">
-        <div className="rounded-[24px] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-28  w-full">
-          <div className="text-4xl font-raleway font-semibold mb-4">
+      <section className="flex flex-col items-center justify-center my-12 lg:my-28">
+        <div className="w-[80%] rounded-[24px]  sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] md:p-16 lg:py-20 lg:px-24">
+          <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
             <span className="text-black">Apply for </span>
             <span className="text-[#134687]">
               {selectedCommittee.title} Committee
             </span>
           </div>
 
-          <div className="text-black text-md font-Inter font-light text-justify mb-8">
+          <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
             {selectedCommittee.description}
           </div>
 
-          <hr className="my-8 border-t-1 border-[#717171]" />
+          <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
 
-          <div className="w-full flex flex-col items-center justify-center mb-8">
-            <div className="flex items-center">
-              <div
-                onClick={() => router.push("/user/apply/committee-staff")}
-                className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
-              >
-                <span className="text-[#696767] text-xs font-bold font-inter">
-                  1
-                </span>
+          <div className="flex flex-col items-center justify-center">
+            {/* Stepper */}
+            <div className="w-full flex flex-col items-center justify-center">
+              <div className="flex items-center">
+                <div
+                  onClick={() => router.push("/user/apply/committee-staff")}
+                  className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-5 h-5 lg:w-10 lg:h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
+                >
+                  <span className="text-[#696767] text-[9px] lg:text-xs font-bold font-inter">
+                    1
+                  </span>
+                </div>
+
+                <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
+
+                <div
+                  onClick={() =>
+                    router.push(
+                      `/user/apply/committee-staff/${committeeId}/application`
+                    )
+                  }
+                  className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-5 h-5 lg:w-10 lg:h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
+                >
+                  <span className="text-[#696767] text-[9px] lg:text-xs font-bold font-inter">
+                    2
+                  </span>
+                </div>
+
+                <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
+
+                <div className="flex items-center justify-center rounded-full bg-[#2F7EE3] w-5 h-5 lg:w-10 lg:h-10">
+                  <span className="text-white text-[9px] lg:text-xs font-bold font-inter">
+                    3
+                  </span>
+                </div>
               </div>
-              <div className="w-24 h-[3px] bg-[#D9D9D9]" />
-              <div
-                onClick={() =>
-                  router.push(
-                    `/user/apply/committee-staff/${committeeId}/application`
-                  )
-                }
-                className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-10 h-10 cursor-pointer hover:bg-[#DAE2ED] transition-colors"
-              >
-                <span className="text-[#696767] text-xs font-bold font-inter">
-                  2
+
+              <div className="grid grid-cols-3 w-72 lg:w-100 mt-3 gap-x-0 place-items-center font-inter font-medium">
+                <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
+                  Select a Role
                 </span>
-              </div>
-              <div className="w-24 h-[3px] bg-[#D9D9D9]" />
-              <div className="flex items-center justify-center rounded-full bg-[#2F7EE3] w-10 h-10">
-                <span className="text-white text-xs font-bold font-inter">
-                  3
+                <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
+                  Enter Information
+                </span>
+                <span className="text-[9px] lg:text-[11px] leading-none whitespace-nowrap text-center">
+                  Schedule Interview
                 </span>
               </div>
             </div>
-            <div className="grid grid-cols-3 w-100 mt-3 gap-x-0 place-items-center font-inter font-medium">
-              <span className="text-[11px] leading-none whitespace-nowrap text-center">
-                Select a Role
-              </span>
-              <span className="text-[11px] leading-none whitespace-nowrap text-center">
-                Enter Information
-              </span>
-              <span className="text-[11px] leading-none whitespace-nowrap text-center">
-                Schedule Interview
-              </span>
-            </div>
-          </div>
 
-          {/* Scheduling Section */}
-          <div className="mb-8">
-            <p className="text-black font-bold text-center mb-6 font-inter">
-              Click on any colorless slot to reserve your interview schedule.
-            </p>
+            {/* Scheduling Section */}
+            <div className="lg:mb-8 mt-5 lg:mt-8 flex flex-col items-center justify-center w-full">
+              <p className="text-black text-xs lg:text-md font-bold text-center mb-3 lg:mb-6 font-inter">
+                Click on any colorless slot to reserve your interview schedule.
+              </p>
 
-            {isLoading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#134687]"></div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Calendar Grid Schedule View */}
-                <div className="space-y-4">
+              {isLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#134687]"></div>
+                </div>
+              ) : (
+                <div className="space-y-6 w-full">
+                  {/* Calendar Grid Schedule View */}
                   {Object.keys(groupedSlots).length === 0 ? (
                     <div className="text-center py-8 text-gray-500 font-inter">
                       No available slots at the moment. Please check back later.
@@ -616,9 +625,9 @@ export default function SchedulePage() {
                       {/* Calendar Grid Container */}
                       <div className="overflow-x-auto divide-y divide-[#164E96]">
                         {/* Header Row */}
-                        <div className="flex min-w-max">
+                        <div className="flex min-w-fit">
                           {/* Time column header */}
-                          <div className="sticky left-0 bg-white z-10 p-3 font-inter font-semibold text-sm text-gray-700 flex items-center justify-center text-center w-[100px] flex-shrink-0 shadow-[8px_0_16px_-2px_rgba(0,0,0,0.40)]">
+                          <div className="sticky left-0 bg-white z-10 p-3 font-inter font-semibold text-sm text-gray-700 flex items-center justify-center text-center w-[60px] lg:w-[100px] flex-shrink-0 shadow-[8px_0_16px_-2px_rgba(0,0,0,0.40)]">
                             Time
                           </div>
 
@@ -640,9 +649,9 @@ export default function SchedulePage() {
                                 return (
                                   <div
                                     key={date}
-                                    className="bg-[#164E96] p-3 text-center flex-1 min-w-[100px]"
+                                    className="bg-[#164E96] p-3 text-center flex-1 w-[60px] lg:w-[100px]"
                                   >
-                                    <div className="font-inter font-semibold text-sm text-white">
+                                    <div className="font-inter font-semibold text-sm text-white p-1">
                                       {dayName}
                                     </div>
                                     <div className="font-inter text-xs text-white">
@@ -697,7 +706,7 @@ export default function SchedulePage() {
                           return allTimeSlots.map((timeSlot, timeIndex) => (
                             <div key={timeIndex} className="flex min-w-max">
                               {/* Time label */}
-                              <div className="sticky left-0 bg-white z-10 p-3 text-center w-[100px] flex-shrink-0 shadow-[10px_0_12px_-0px_rgba(0,0,0,0.4)]">
+                              <div className="sticky left-0 bg-white z-10 p-3 text-center w-[60px] lg:w-[100px] flex-shrink-0 shadow-[10px_0_12px_-0px_rgba(0,0,0,0.4)]">
                                 <div className="font-inter text-sm text-gray-700">
                                   {timeSlot.displayTime} -
                                 </div>
@@ -727,7 +736,7 @@ export default function SchedulePage() {
                                     return (
                                       <div
                                         key={date}
-                                        className="min-h-[60px] flex-1 min-w-[100px]"
+                                        className="min-h-[60px] flex-1 w-[60px] lg:w-[100px]"
                                       >
                                         {slotForThisTime ? (
                                           <button
@@ -739,7 +748,7 @@ export default function SchedulePage() {
                                                 : null
                                             }
                                             disabled={!isAvailable}
-                                            className={`w-full h-full p-2 transition-all duration-200 ${
+                                            className={`w-full h-full transition-all duration-200 ${
                                               !isAvailable
                                                 ? "bg-[#164E96] cursor-not-allowed"
                                                 : isSelected
@@ -772,164 +781,41 @@ export default function SchedulePage() {
                     name. Changes are not allowed after confirmation.
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-          <hr className="my-8 border-t-1 border-[#717171]" />
+              )}
+            </div>
 
-          <div className="flex gap-4 justify-center">
-            <button
-              type="button"
-              onClick={() =>
-                router.push(
-                  `/user/apply/committee-staff/${committeeId}/application`
-                )
-              }
-              className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
-            >
-              Back
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmitClick}
-              disabled={!selectedSlot}
-              className={`whitespace-nowrap font-inter text-sm font-semibold px-15 py-3 rounded-lg border-2 transition-all duration-150 active:scale-95 ${
-                selectedSlot
-                  ? "text-[#134687] border-[#134687] bg-white hover:bg-[#B1CDF0]"
-                  : "text-gray-400 border-gray-300 bg-gray-100 cursor-not-allowed"
-              }`}
-            >
-              {selectedSlot ? "Submit" : "Select a Time Slot"}
-            </button>
-          </div>
-        </div>
-      </div>
+            <hr className="my-8 border-t-1 border-[#717171]" />
 
-      {/* REF: lagay sa component */}
-      {/* Confirmation Modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-          }}
-          onClick={handleCancelSubmit}
-        >
-          <div
-            className="bg-white rounded-2xl p-10 max-w-xl w-full mx-4 shadow-2xl border-[#FFBC2B] border-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-6">
-                <div className="p-3 mx-auto flex items-center justify-center h-15 w-15 rounded-full bg-[#FFE7B4] mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="34"
-                    height="35"
-                    viewBox="0 0 34 35"
-                    fill="none"
-                  >
-                    <path
-                      d="M1.57861 30.0413L16.8044 3.74219L32.0303 30.0413H1.57861ZM16.8044 25.8888C17.1966 25.8888 17.5256 25.756 17.7914 25.4902C18.0571 25.2244 18.1895 24.8959 18.1886 24.5047C18.1877 24.1134 18.0548 23.7849 17.79 23.5192C17.5251 23.2534 17.1966 23.1205 16.8044 23.1205C16.4123 23.1205 16.0838 23.2534 15.8189 23.5192C15.5541 23.7849 15.4212 24.1134 15.4203 24.5047C15.4194 24.8959 15.5522 25.2249 15.8189 25.4916C16.0856 25.7583 16.4141 25.8907 16.8044 25.8888ZM15.4203 21.7364H18.1886V14.8155H15.4203V21.7364Z"
-                      fill="#CE9823"
-                    />
-                  </svg>
-                </div>
-                <div className="flex flex-col items-start text-left">
-                  <h3 className="text-xl font-inter font-bold text-[#CE9823]">
-                    Confirm Interview Schedule
-                  </h3>
-                  <p className="font-inter text-sm text-black mb-6">
-                    Are you sure you want to schedule your interview for{" "}
-                    {(() => {
-                      const selectedSlotData = availableSlots.find(
-                        (slot) => slot.id === selectedSlot
-                      );
-                      if (selectedSlotData) {
-                        const date = new Date(selectedSlotData.date);
-                        const formattedDate = date.toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        });
-                        return (
-                          <>
-                            <span className="font-semibold">
-                              {formattedDate}
-                            </span>{" "}
-                            at{" "}
-                            <span className="font-semibold">
-                              {(() => {
-                                // Assume selectedSlotData.time is in "HH:mm" 24-hour format
-                                const [hourStr, minute] =
-                                  selectedSlotData.time.split(":");
-                                let hour = parseInt(hourStr, 10);
-                                const ampm = hour >= 12 ? "pm" : "am";
-                                hour = hour % 12;
-                                if (hour === 0) hour = 12;
-                                return `${hour}:${minute} ${ampm}`;
-                              })()}
-                            </span>
-                          </>
-                        );
-                      }
-                      return (
-                        <span className="font-semibold">
-                          Selected time slot
-                        </span>
-                      );
-                    })()}
-                    ?
-                  </p>
-                </div>
-              </div>
-              <div className="bg-[#ECECEC] border-[#C8C5C5] border-1 rounded-lg px-14 py-9 mb-6 text-justify">
-                <p className="font-inter text-sm text-[#CE9823] font-bold mb-2">
-                  Note:
-                </p>
-                <ul className="list-disc pl-5 space-y-1 text-sm text-black font-inter">
-                  <li>
-                    Once confirmed, this schedule will be final and cannot be
-                    changed.
-                  </li>
-                  <li>Failure to attend may affect your application status.</li>
-                  <li>
-                    Please ensure you are available and prepared at the
-                    scheduled time.
-                  </li>
-                </ul>
-              </div>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={handleCancelSubmit}
-                  disabled={isSubmitting}
-                  className="px-9 py-2 bg-[#E7E3E3] text-black rounded-2xl font-inter font-semibold text-sm hover:bg-gray-400 transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleConfirmSchedule}
-                  disabled={isSubmitting}
-                  className="px-9 py-2 bg-[#FFBC2B] text-[#5B4515] rounded-full font-inter font-semibold text-sm hover:bg-[#D9A129] transition-colors disabled:opacity-50 flex items-center gap-2"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Submitting...
-                    </>
-                  ) : (
-                    "Confirm"
-                  )}
-                </button>
-              </div>
+            <div className="flex gap-4 justify-center">
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    `/user/apply/committee-staff/${committeeId}/application`
+                  )
+                }
+                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitClick}
+                disabled={!selectedSlot}
+                className={`whitespace-nowrap font-inter text-sm font-semibold px-15 py-3 rounded-lg border-2 transition-all duration-150 active:scale-95 ${
+                  selectedSlot
+                    ? "text-[#134687] border-[#134687] bg-white hover:bg-[#B1CDF0]"
+                    : "text-gray-400 border-gray-300 bg-gray-100 cursor-not-allowed"
+                }`}
+              >
+                {selectedSlot ? "Submit" : "Select a Time Slot"}
+              </button>
             </div>
           </div>
         </div>
-      )}
-      <Footer/>
-    </section>
+      </section>
+
+      <Footer />
+    </div>
   );
 }
