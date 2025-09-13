@@ -262,7 +262,7 @@ export default function Home() {
               <button
                 onClick={handleEnterClick}
                 disabled={isLoggingIn}
-                className="relative z-[60] bg-[#0077FF] shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] rounded-full font-family-inter text-white py-2 px-16 font-medium text-xl opacity-100 hover:bg-[#0056CC]"
+                className="cursor-pointer relative z-[60] bg-[#0077FF] shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] rounded-full font-family-inter text-white py-2 px-16 font-medium text-xl opacity-100 hover:bg-[#0056CC]"
               >
                 {isLoggingIn ? (
                   <div className="flex items-center justify-center">
@@ -740,16 +740,16 @@ export default function Home() {
               Join the Computer Science Society and turn your passion into
               impact.
             </div>
-            <div className="flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
-              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
+            <div className="cursor-pointer flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
+              <button className="cursor-pointer bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
                 Apply as Member
               </button>
 
-              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
+              <button className="cursor-pointer bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
                 Apply as Staff
               </button>
 
-              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
+              <button className="cursor-pointer bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
                 Apply as Executive Assistant
               </button>
             </div>
