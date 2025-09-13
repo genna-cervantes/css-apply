@@ -6,6 +6,8 @@ import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ConfirmationModal from "@/components/Modal";
+
 export default function SchedulePage() {
   const router = useRouter();
   const { committee: committeeId } = useParams<{ committee: string }>();
@@ -816,133 +818,51 @@ export default function SchedulePage() {
 
         {/* REF: lagay sa component */}
         {/* Confirmation Modal */}
-        {showModal && (
-          <div
-            className="fixed inset-0 flex items-center justify-center z-50"
-            style={{
-              backgroundColor: "rgba(0, 0, 0, 0.3)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-            }}
-            onClick={handleCancelSubmit}
-          >
-            <div
-              className="bg-white rounded-2xl p-10 max-w-xl w-full mx-4 shadow-2xl border-[#FFBC2B] border-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-6">
-                  <div className="p-3 mx-auto flex items-center justify-center h-15 w-15 rounded-full bg-[#FFE7B4] mb-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="34"
-                      height="35"
-                      viewBox="0 0 34 35"
-                      fill="none"
-                    >
-                      <path
-                        d="M1.57861 30.0413L16.8044 3.74219L32.0303 30.0413H1.57861ZM16.8044 25.8888C17.1966 25.8888 17.5256 25.756 17.7914 25.4902C18.0571 25.2244 18.1895 24.8959 18.1886 24.5047C18.1877 24.1134 18.0548 23.7849 17.79 23.5192C17.5251 23.2534 17.1966 23.1205 16.8044 23.1205C16.4123 23.1205 16.0838 23.2534 15.8189 23.5192C15.5541 23.7849 15.4212 24.1134 15.4203 24.5047C15.4194 24.8959 15.5522 25.2249 15.8189 25.4916C16.0856 25.7583 16.4141 25.8907 16.8044 25.8888ZM15.4203 21.7364H18.1886V14.8155H15.4203V21.7364Z"
-                        fill="#CE9823"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col items-start text-left">
-                    <h3 className="text-xl font-inter font-bold text-[#CE9823]">
-                      Confirm Interview Schedule
-                    </h3>
-                    <p className="font-inter text-sm text-black mb-6">
-                      Are you sure you want to schedule your interview for{" "}
-                      {(() => {
-                        const selectedSlotData = availableSlots.find(
-                          (slot) => slot.id === selectedSlot
-                        );
-                        if (selectedSlotData) {
-                          const date = new Date(selectedSlotData.date);
-                          const formattedDate = date.toLocaleDateString(
-                            "en-US",
-                            {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          );
-                          return (
-                            <>
-                              <span className="font-semibold">
-                                {formattedDate}
-                              </span>{" "}
-                              at{" "}
-                              <span className="font-semibold">
-                                {(() => {
-                                  // Assume selectedSlotData.time is in "HH:mm" 24-hour format
-                                  const [hourStr, minute] =
-                                    selectedSlotData.time.split(":");
-                                  let hour = parseInt(hourStr, 10);
-                                  const ampm = hour >= 12 ? "pm" : "am";
-                                  hour = hour % 12;
-                                  if (hour === 0) hour = 12;
-                                  return `${hour}:${minute} ${ampm}`;
-                                })()}
-                              </span>
-                            </>
-                          );
-                        }
-                        return (
-                          <span className="font-semibold">
-                            Selected time slot
-                          </span>
-                        );
-                      })()}
-                      ?
-                    </p>
-                  </div>
-                </div>
-                <div className="bg-[#ECECEC] border-[#C8C5C5] border-1 rounded-lg px-14 py-9 mb-6 text-justify">
-                  <p className="font-inter text-sm text-[#CE9823] font-bold mb-2">
-                    Note:
-                  </p>
-                  <ul className="list-disc pl-5 space-y-1 text-sm text-black font-inter">
-                    <li>
-                      Once confirmed, this schedule will be final and cannot be
-                      changed.
-                    </li>
-                    <li>
-                      Failure to attend may affect your application status.
-                    </li>
-                    <li>
-                      Please ensure you are available and prepared at the
-                      scheduled time.
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex gap-3 justify-center">
-                  <button
-                    onClick={handleCancelSubmit}
-                    disabled={isSubmitting}
-                    className="px-9 py-2 bg-[#E7E3E3] text-black rounded-2xl font-inter font-semibold text-sm hover:bg-gray-400 transition-colors disabled:opacity-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleConfirmSchedule}
-                    disabled={isSubmitting}
-                    className="px-9 py-2 bg-[#FFBC2B] text-[#5B4515] rounded-full font-inter font-semibold text-sm hover:bg-[#D9A129] transition-colors disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Submitting...
-                      </>
-                    ) : (
-                      "Confirm"
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmationModal
+          isOpen={showModal}
+          onClose={handleCancelSubmit}
+          onConfirm={handleConfirmSchedule}
+          message={
+            <p>
+              Are you sure you want to schedule your interview for{" "}
+              {(() => {
+                const selectedSlotData = availableSlots.find(
+                  (slot) => slot.id === selectedSlot
+                );
+                if (selectedSlotData) {
+                  const date = new Date(selectedSlotData.date);
+                  const formattedDate = date.toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  });
+                  return (
+                    <>
+                      <span className="font-semibold">{formattedDate}</span> at{" "}
+                      <span className="font-semibold">
+                        {(() => {
+                          const [hourStr, minute] =
+                            selectedSlotData.time.split(":");
+                          let hour = parseInt(hourStr, 10);
+                          const ampm = hour >= 12 ? "pm" : "am";
+                          hour = hour % 12;
+                          if (hour === 0) hour = 12;
+                          return `${hour}:${minute} ${ampm}`;
+                        })()}
+                      </span>
+                    </>
+                  );
+                }
+                return (
+                  <span className="font-semibold">Selected time slot</span>
+                );
+              })()}
+              ?
+            </p>
+          }
+          isLoading={isSubmitting}
+        />
       </section>
 
       <Footer />

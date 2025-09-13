@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import Header from "@/components/Header";
-import WarningModal from "@/components/WarningModal";
+import ConfirmationModal from "@/components/Modal";
 import Footer from "@/components/Footer";
 
 export default function SchedulePage() {
@@ -835,11 +835,12 @@ export default function SchedulePage() {
         </div>
 
         {/* Confirmation Modal */}
-        <WarningModal
+        <ConfirmationModal
           isOpen={showModal}
-          title="Confirm Interview Schedule"
+          onClose={handleCancelSubmit}
+          onConfirm={handleConfirmSchedule}
           message={
-            <p className="font-inter text-sm text-black">
+            <p>
               Are you sure you want to schedule your interview for{" "}
               {(() => {
                 const selectedSlotData = availableSlots.find(
@@ -853,16 +854,20 @@ export default function SchedulePage() {
                     month: "long",
                     day: "numeric",
                   });
-                  const [hourStr, minute] = selectedSlotData.time.split(":");
-                  let hour = parseInt(hourStr, 10);
-                  const ampm = hour >= 12 ? "pm" : "am";
-                  hour = hour % 12;
-                  if (hour === 0) hour = 12;
-                  const timeStr = `${hour}:${minute} ${ampm}`;
                   return (
                     <>
-                      <span className="font-semibold">{formattedDate}</span> at
-                      <span className="font-semibold"> {timeStr}</span>
+                      <span className="font-semibold">{formattedDate}</span> at{" "}
+                      <span className="font-semibold">
+                        {(() => {
+                          const [hourStr, minute] =
+                            selectedSlotData.time.split(":");
+                          let hour = parseInt(hourStr, 10);
+                          const ampm = hour >= 12 ? "pm" : "am";
+                          hour = hour % 12;
+                          if (hour === 0) hour = 12;
+                          return `${hour}:${minute} ${ampm}`;
+                        })()}
+                      </span>
                     </>
                   );
                 }
@@ -873,28 +878,7 @@ export default function SchedulePage() {
               ?
             </p>
           }
-          onCancel={handleCancelSubmit}
-          onConfirm={handleConfirmSchedule}
-          isSubmitting={isSubmitting}
-          borderColorClass="border-[#FFBC2B]"
-          accentBgClass="bg-[#FFE7B4]"
-          accentTextClass="text-[#CE9823]"
-          icon={
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="34"
-              height="35"
-              viewBox="0 0 34 35"
-              fill="none"
-            >
-              <path
-                d="M1.57861 30.0413L16.8044 3.74219L32.0303 30.0413H1.57861ZM16.8044 25.8888C17.1966 25.8888 17.5256 25.756 17.7914 25.4902C18.0571 25.2244 18.1895 24.8959 18.1886 24.5047C18.1877 24.1134 18.0548 23.7849 17.79 23.5192C17.5251 23.2534 17.1966 23.1205 16.8044 23.1205C16.4123 23.1205 16.0838 23.2534 15.8189 23.5192C15.5541 23.7849 15.4212 24.1134 15.4203 24.5047C15.4194 24.8959 15.5522 25.2249 15.8189 25.4916C16.0856 25.7583 16.4141 25.8907 16.8044 25.8888ZM15.4203 21.7364H18.1886V14.8155H15.4203V21.7364Z"
-                fill="#CE9823"
-              />
-            </svg>
-          }
-          confirmLabel="Confirm"
-          cancelLabel="Cancel"
+          isLoading={isSubmitting}
         />
       </section>
 
