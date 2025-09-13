@@ -1,7 +1,6 @@
 import { Question, CommitteeName } from '@/types/quiz';
 
 // All your constants (COMMITTEES, questions, committeeFitReasons, etc.) go here.
-// I've typed them for you.
 
 export const COMMITTEES: CommitteeName[] = [
   'Academics', 'Community Development', 'Creatives & Technical', 'Documentation',
@@ -119,7 +118,7 @@ export const committeeDescriptions: Record<CommitteeName, string[]> = {
 };
 
 export const committeeImagePaths: Record<CommitteeName, string> = {
-    // IMPORTANT: Paths now start with a slash '/' to reference the public directory
+
     'Academics': '/assets/committee_test/CSAR_ACADEMICS.png',
     'Community Development': '/assets/committee_test/CSAR_COMMDEV.png',
     'Creatives & Technical': '/assets/committee_test/CSAR_CREATIVES.png',
@@ -132,7 +131,6 @@ export const committeeImagePaths: Record<CommitteeName, string> = {
     'Technology Development': '/assets/committee_test/CSAR_TECHDEV.png'
 };
 
-// ... copy the rest of your constants like OPTIONS, SCORE_MAP, etc.
 export const OPTIONS = [
   { value: 5 }, { value: 4 }, { value: 3 }, { value: 2 }, { value: 1 }
 ];

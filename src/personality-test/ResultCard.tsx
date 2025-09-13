@@ -2,7 +2,7 @@
 
 // STEP 1: Correct the import to use the .module.css file
 import styles from './quiz-styles.module.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import { 
     committeeImagePaths, 
@@ -23,10 +23,37 @@ interface ResultCardProps {
 
 const ResultCard: React.FC<ResultCardProps> = ({ committee, isPrimary = false }) => {
     const [view, setView] = useState<'fit' | 'duties'>('fit');
+    const bodyRef = useRef<HTMLDivElement | null>(null);
+    const fitRef = useRef<HTMLDivElement | null>(null);
+    const dutiesRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         setView('fit');
     }, [committee]);
+
+    // Helper to update container height based on current view
+    const updateHeight = () => {
+        const active = view === 'fit' ? fitRef.current : dutiesRef.current;
+        if (!active) return;
+        const next = active.getBoundingClientRect().height;
+        if (bodyRef.current) {
+            bodyRef.current.style.setProperty('--rc-body-h', `${next}px`);
+        }
+    };
+
+    // Update height after mount and when view changes
+    useLayoutEffect(() => {
+        updateHeight();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [view]);
+
+    // Update on window resize
+    useEffect(() => {
+        const onResize = () => updateHeight();
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [view]);
 
     if (!committee) {
         return null;
@@ -51,13 +78,12 @@ const ResultCard: React.FC<ResultCardProps> = ({ committee, isPrimary = false })
                     <h1 className={isPrimary ? styles['result-title-main'] : styles['result-title-other']}>{committeeName}</h1>
                 </div>
             </div>
-            <div className={styles['result-card-body']}>
-                {view === 'fit' ? (
-                    // The CSS provided doesn't have a 'fit-reason-text' class, so I'm omitting it. 
-                    // If you have it, you can add it back as className={styles.fitReasonText}
-                    <p>{committeeFitReasons[committeeName]}</p>
-                ) : (
-                    <div className={styles['committee-duties']}>
+            <div ref={bodyRef} className={`${styles['result-card-body']} ${isPrimary ? styles['is-primary'] : ''}`}>
+                <div className={`${styles['result-card-slider']} ${view === 'fit' ? styles['show-fit'] : styles['show-duties']}`}>
+                    <div ref={fitRef} className={styles['result-card-slide']}>
+                        <p>{committeeFitReasons[committeeName]}</p>
+                    </div>
+                    <div ref={dutiesRef} className={`${styles['result-card-slide']} ${styles['committee-duties']}`}>
                         <h4>Key Responsibilities:</h4>
                         <ul>
                             {committeeDescriptions[committeeName].map((duty, index) => (
@@ -65,7 +91,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ committee, isPrimary = false })
                             ))}
                         </ul>
                     </div>
-                )}
+                </div>
             </div>
             <div className={styles['result-card-nav']}>
                 <button onClick={() => setView('fit')} disabled={view === 'fit'} aria-label="Show fit reason">

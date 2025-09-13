@@ -23,9 +23,8 @@ export default function PersonalityTestPage() {
     return (
       <div className={styles['pt-theme']}>
         <AppHeader page={page} onTakeTest={handleStartQuiz} onGoHome={handleGoHome} />
-        {/* STEP 2: Update the dynamic className on the <main> tag */}
-        {/* REF: is this safe?? why are we overwriting the main tag? */}
-        <main className={`${styles['app-container']} ${page === 'home' ? styles['home-main-container'] : ''}`}>
+        {/* Main content area for the personality test route */}
+       <section role="main" className={`${styles['app-container']} ${page === 'home' ? styles['home-main-container'] : ''}`}>
          {page === 'home' ? (
             <>
                 <HomePage onStartQuiz={handleStartQuiz} />
@@ -34,7 +33,7 @@ export default function PersonalityTestPage() {
          ) : (
             <QuizApp onGoHome={handleGoHome} />
          )}
-        </main>
+        </section>
         <Footer />
       </div>
     );
