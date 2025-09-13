@@ -2,7 +2,6 @@
 
 import styles from './quiz-styles.module.css';
 import React, { useMemo, useEffect, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { Answers, CommitteeName } from './types/quiz';
 import { COMMITTEES, questions, SCORE_MAP } from './data/quizData';
 import ResultCard from './ResultCard';
@@ -54,7 +53,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ answers, onRetake }) => {
 
             // Prevent duplicate inserts (Strict Mode double effect or re-renders)
             if (didSubmitRef.current) return;
-            didSubmitRef.current = true; // set immediately to avoid race before await
+            didSubmitRef.current = true; 
             if (!sortedResults || sortedResults.length < 3) {
                 console.error('Not enough results to submit.');
                 return;
@@ -67,7 +66,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ answers, onRetake }) => {
                     console.warn('Supabase env not configured (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY). Skipping submission.');
                     return;
                 }
-                const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
                 const formatColumnName = (name: string) =>
                     `score_${name.toLowerCase().replace(/ & /g, '_and_').replace(/ /g, '_')}`;
@@ -84,13 +82,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ answers, onRetake }) => {
                     ...scoresForDb,
                 } as Record<string, unknown>;
 
-                const { data, error } = await supabase
-                    .from('quiz_submissions')
-                    .insert([submissionData])
-                    .select(); // request returning row to avoid minimal return edge cases
-
-                if (error) throw error;
-                console.log('Submitted quiz results to Supabase:', data);
+                // Send to a server API that uses service role to bypass RLS safely
+                const resp = await fetch('/api/quiz-submissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ submission: submissionData }),
+                });
+                if (!resp.ok) {
+                    const payload = await resp.json().catch(() => ({}));
+                    throw new Error(payload?.error || `API error (${resp.status})`);
+                }
+                const payload = await resp.json();
+                // console.log('Submitted quiz results to Supabase:', payload?.data);
             } catch (error: unknown) {
                 const errObj = (error as { name?: string; message?: string }) || {};
                 const name = errObj.name ?? '';
