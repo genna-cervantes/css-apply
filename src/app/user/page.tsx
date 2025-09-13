@@ -19,24 +19,27 @@ export default function UserDashboard() {
       // REF: you dont need useEffect for this, this would work the same kahit nasa same level ng states ung if (status) just make sure to use useserversession instead of usesession
       if (status === "authenticated") {
         try {
-          const response = await fetch('/api/applications/check-existing');
+          const response = await fetch("/api/applications/check-existing");
           if (response.ok) {
             const data = await response.json();
-            
+
             // Redirect based on existing applications
             if (data.hasMemberApplication) {
-              router.push('/user/member/application/progress');
+              router.push("/user/member/application/progress");
             } else if (data.hasCommitteeApplication) {
-              const committeeId = data.applications.committee?.firstOptionCommittee;
+              const committeeId =
+                data.applications.committee?.firstOptionCommittee;
               if (committeeId) {
-                router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+                router.push(
+                  `/user/apply/committee-staff/${committeeId}/progress`
+                );
               }
             } else if (data.hasEAApplication) {
-              router.push('/user/ea/application/progress');
+              router.push("/user/ea/application/progress");
             }
           }
         } catch (error) {
-          console.error('Error checking applications:', error);
+          console.error("Error checking applications:", error);
         } finally {
           setHasCheckedApplications(true);
         }
@@ -60,7 +63,11 @@ export default function UserDashboard() {
   }, [session, status, router]);
 
   // Show loading screen while checking authentication
-  if (isLoading || status === "loading" || (status === "authenticated" && !hasCheckedApplications)) {
+  if (
+    isLoading ||
+    status === "loading" ||
+    (status === "authenticated" && !hasCheckedApplications)
+  ) {
     return <LoadingScreen />;
   }
 
