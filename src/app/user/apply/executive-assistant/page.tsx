@@ -5,125 +5,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { roles } from "@/data/ebRoles";
 
 export default function AssistantApplication() {
   const [selectedRole, setSelectedRole] = useState<string | null>("president");
   const router = useRouter();
-
-  const committeeRoles = [
-    {
-      id: "president",
-      title: "President",
-      description:
-        "Serves as the leader and representative of the Computer Science Society. They guide the organization’s vision, oversee all operations, and ensure that every project and initiative aligns with the org’s goals. The President also represents CSS in college and university-wide councils, making sure the voices of members are heard at every level.",
-      ebName: "Genna Cervantes",
-    },
-    {
-      id: "internal-vice-president",
-      title: "Internal Vice President",
-      description:
-        "Manages the internal structure and daily operations of CSS. They coordinate with committees, monitor staff performance, and provide support to ensure smooth execution of events and projects. Acting as the President’s right hand, the Internal VP ensures that the organization runs efficiently from the inside.",
-      ebName: "Mar Vincent De Guzman",
-    },
-    {
-      id: "external-vice-president",
-      title: "External Vice President",
-      description:
-        "Handles the org’s outreach and partnerships. They build and maintain relationships with external organizations, other student groups, and industry partners. Their role strengthens CSS’s network beyond the society itself, creating opportunities for collaboration, exposure, and growth.",
-      ebName: "Christian Bhernan Buenagua",
-    },
-    {
-      id: "secretary",
-      title: "Secretary",
-      description:
-        "Serves as the custodian of records and communication. They document meetings, handle correspondences, and maintain the official files of the organization. With attention to detail and organization, the Secretary ensures that the society’s operations are well-documented and transparent.",
-      ebName: "Joevanni Paulo Gumban",
-    },
-    {
-      id: "assistant-secretary",
-      title: "Assistant Secretary",
-      description:
-        "Helps and supports the Secretary with paperwork, logistics, and record-keeping. They often manage attendance records, assist in preparing documents, and ensure that no detail is overlooked in the org’s administrative work.",
-      ebName: "Marian Therese Pineza",
-    },
-    {
-      id: "treasurer",
-      title: "Treasurer",
-      description:
-        "In charge of the society’s financial health. They manage funds, prepare budgets, collect dues, and make financial reports. By ensuring transparency and accountability, the Treasurer helps sustain CSS activities while maximizing resources for its members.",
-      ebName: "Braven Rei Goodwin",
-    },
-    {
-      id: "auditor",
-      title: "Auditor",
-      description:
-        "Acts as the org’s financial watchdog. They review reports, check transactions, and ensure that all financial activities are ethical and accurate. Their role keeps the organization’s operations transparent and trustworthy.",
-      ebName: "Kendrick Beau Calvo",
-    },
-    {
-      id: "public-relations-officer",
-      title: "Public Relations Officer (PRO)",
-      description:
-        "Takes charge of publicity, branding, and communications. They create captions, manage social media presence, and oversee promotional campaigns to keep CSS visible and engaging. With creativity and consistency, the PRO ensures that every announcement and publication reflects the identity of the society.",
-      ebName: "Nigel Roland Anunciacion",
-    },
-    {
-      id: "representative-4th-year",
-      title: "4th Year Level Representative",
-      description:
-        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student’s voice is heard. Through active engagement, they represent their year level’s interests while strengthening unity across all batches.",
-      ebName: "Alexandra Antonette Palanog",
-    },
-    {
-      id: "representative-3rd-year",
-      title: "3rd Year Level Representative",
-      description:
-        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student’s voice is heard. Through active engagement, they represent their year level’s interests while strengthening unity across all batches.",
-      ebName: "Nikolas Josef Dalisay",
-    },
-    {
-      id: "representative-2nd-year",
-      title: "2nd Year Level Representative",
-      description:
-        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student’s voice is heard. Through active engagement, they represent their year level’s interests while strengthening unity across all batches.",
-      ebName: "Chrisry Clerry Hermoso",
-    },
-    {
-      id: "representative-1st-year",
-      title: "1st Year Level Representative",
-      description:
-        "Acts as the bridge between their batchmates and the org. They gather feedback, address concerns, and ensure that every student’s voice is heard. Through active engagement, they represent their year level’s interests while strengthening unity across all batches.",
-      ebName: "John Carlo Benter",
-    },
-    {
-      id: "chief-of-staff",
-      title: "Chief of Staff",
-      description:
-        "Leads the pool of staff and executive assistants, making sure manpower is allocated properly during events and projects. They coordinate with the EB to deliver logistical support and ensure that every mission is carried out smoothly.",
-      ebName: "Carylle Keona Ilano",
-    },
-    {
-      id: "director-digital-productions",
-      title: "Director for Digital Productions",
-      description:
-        "Oversees the creative and multimedia output of CSS. From posters to videos, they ensure that the society’s visuals are engaging, professional, and aligned with its branding.",
-      ebName: "Charmaine Chesca Villalobos",
-    },
-    {
-      id: "director-community-development",
-      title: "Director for Community Development",
-      description:
-        "Leads the org’s outreach and social responsibility initiatives. They plan and execute projects that extend beyond academics, nurturing compassion, empathy, and service within the CSS community.",
-      ebName: "Zeandarra Gaile Giva",
-    },
-    {
-      id: "thomasian-wellness-advocate",
-      title: "Thomasian Wellness Advocate (TWA)",
-      description:
-        "Champions the holistic well-being of members and students. They promote mental health, wellness programs, and activities that help balance academic life with personal growth. By fostering a supportive environment, the TWA ensures that the CSS community thrives not just academically, but also in well-being.",
-      ebName: "Andrea Pauline Tan",
-    },
-  ];
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -199,9 +85,7 @@ export default function AssistantApplication() {
                   >
                     <span className="font-inter text-xs text-[#7a7a7a]">
                       {selectedRole
-                        ? committeeRoles.find(
-                            (role) => role.id === selectedRole
-                          )?.title
+                        ? roles.find((role) => role.id === selectedRole)?.title
                         : "Select an EB role"}
                     </span>
                     <span className="text-[#7a7a7a] text-xs font-extralight">
@@ -210,7 +94,7 @@ export default function AssistantApplication() {
                   </button>
                   {isDropdownOpen && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-y-auto">
-                      {committeeRoles.map((role) => (
+                      {roles.map((role) => (
                         <div
                           key={role.id}
                           onClick={() => {
@@ -230,7 +114,7 @@ export default function AssistantApplication() {
 
                 {/* Desktop Scrollable List (lg and above) */}
                 <div className="hidden lg:block max-h-80 overflow-y-auto">
-                  {committeeRoles.map((role) => (
+                  {roles.map((role) => (
                     <div
                       key={role.id}
                       onClick={() => setSelectedRole(role.id)}
@@ -256,9 +140,7 @@ export default function AssistantApplication() {
                       {/* Left side - Text content */}
                       <div className="lg:w-3/5  lg:p-4">
                         {(() => {
-                          const role = committeeRoles.find(
-                            (r) => r.id === selectedRole
-                          );
+                          const role = roles.find((r) => r.id === selectedRole);
                           return role ? (
                             <>
                               <div className="flex items-center gap-5 mt-5 lg:mt-0">
@@ -289,7 +171,7 @@ export default function AssistantApplication() {
                       <div className="hidden w-2/5 lg:flex lg:h-80 overflow-hidden border border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] items-center justify-center">
                         <span className="text-white font-poppins text-lg font-semibold text-center px-4">
                           {(() => {
-                            const role = committeeRoles.find(
+                            const role = roles.find(
                               (r) => r.id === selectedRole
                             );
                             return role?.title || "EB Role";
