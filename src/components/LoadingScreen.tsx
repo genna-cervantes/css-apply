@@ -69,13 +69,13 @@ export default function LoadingScreen() {
       <div className="fixed inset-0 bg-[#F6F6FE] bg-[url('/assets/pictures/loadingscreen_background.png')] bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center z-50">
         {/* Committee Image Animation */}
         <div className="mb-8 flex items-center justify-center transition-all duration-500 ease-in-out">
-          <div className="relative w-[120px] h-[120px] flex items-center justify-center group">
+          <div className="relative w-[150px] h-[150px] flex items-center justify-center group">
             <Image
               key={currentImageIndex}
               src={committeeImages[currentImageIndex]}
               alt={`Committee ${currentImageIndex + 1}`}
-              width={120}
-              height={120}
+              width={150}
+              height={150}
               className="transform transition-all duration-500 ease-in-out hover:scale-110 drop-shadow-lg group-hover:drop-shadow-xl"
               style={{
                 animation: "popOut 0.6s ease-in-out",
@@ -98,11 +98,11 @@ export default function LoadingScreen() {
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-full h-4 border border-white/30 shadow-inner">
             <div
-              className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-900 h-4 rounded-full transition-all duration-500 ease-out shadow-lg relative overflow-hidden"
+              className="bg-[#134687]  h-4 rounded-full transition-all duration-500 ease-out shadow-lg relative overflow-hidden"
               style={{ width: `${progress}%` }}
             >
               {/* Shimmer effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-600/60 to-transparent animate-pulse"></div>
             </div>
           </div>
         </div>
