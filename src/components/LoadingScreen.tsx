@@ -4,65 +4,137 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function LoadingScreen() {
-    const [progress, setProgress] = useState(0);
-    const [showText, setShowText] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [showText, setShowText] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setProgress((prev) => {
-                if (prev >= 100) {
-                    clearInterval(interval);
-                    return 100;
-                }
-                return prev + 10;
-            });
-        }, 200);
+  const committeeImages = [
+    "/assets/committee_test/CSAR_ACADEMICS.png",
+    "/assets/committee_test/CSAR_COMMDEV.png",
+    "/assets/committee_test/CSAR_CREATIVES.png",
+    "/assets/committee_test/CSAR_DOCU.png",
+    "/assets/committee_test/CSAR_EXTERNALS.png",
+    "/assets/committee_test/CSAR_FINANCE.png",
+    "/assets/committee_test/CSAR_LOGISTICS.png",
+    "/assets/committee_test/CSAR_PUBLICITY.png",
+    "/assets/committee_test/CSAR_SPOTA.png",
+    "/assets/committee_test/CSAR_TECHDEV.png",
+  ];
 
-        const textTimer = setTimeout(() => {
-            setShowText(true);
-        }, 500);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
 
-        return () => {
-            clearInterval(interval);
-            clearTimeout(textTimer);
-        };
-    }, []);
+    const textTimer = setTimeout(() => {
+      setShowText(true);
+    }, 500);
 
-    return (
-        <div className="fixed inset-0 bg-gradient-to-b from-[#000000] via-[rgb(1,124,238)] via-69% to-[#0054FF] flex flex-col items-center justify-center z-50">
-        <div className="mb-8">
+    // Cycle through committee images
+    const imageInterval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % committeeImages.length);
+    }, 800);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(textTimer);
+      clearInterval(imageInterval);
+    };
+  }, [committeeImages.length]);
+
+  return (
+    <>
+      <style jsx>{`
+        @keyframes popOut {
+          0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.2) rotate(5deg);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+          }
+        }
+      `}</style>
+      <div className="fixed inset-0 bg-[#F6F6FE] bg-[url('/assets/pictures/loadingscreen_background.png')] bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center z-50">
+        {/* Committee Image Animation */}
+        <div className="mb-8 flex items-center justify-center transition-all duration-500 ease-in-out">
+          <div className="relative w-[120px] h-[120px] flex items-center justify-center group">
             <Image
-            src="/assets/logos/cssapply_logo.png"
-            alt="CSS Apply Logo"
-            width={140}
-            height={80}
-            className="drop-shadow-md"
+              key={currentImageIndex}
+              src={committeeImages[currentImageIndex]}
+              alt={`Committee ${currentImageIndex + 1}`}
+              width={120}
+              height={120}
+              className="transform transition-all duration-500 ease-in-out hover:scale-110 drop-shadow-lg group-hover:drop-shadow-xl"
+              style={{
+                animation: "popOut 0.6s ease-in-out",
+              }}
             />
+            {/* Subtle glow effect */}
+            <div className="absolute inset-0 rounded-full bg-blue-400/20 blur-xl scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
         </div>
-        
-        <div className="w-80 bg-gray-200 rounded-full h-2.5 mb-4">
-            <div 
-            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-            ></div>
-        </div>
-        
-        {showText && (
-            <div className="text-white text-center">
-            <p className="text-lg font-semibold mb-2">Getting things ready...</p>
-            <p className="text-sm opacity-80">You'll be redirected in a moment</p>
-            </div>
-        )}
-        
-        <div className="mt-8 flex space-x-2">
-            {[1, 2, 3].map((i) => (
+
+        {/* Progress Bar */}
+        <div className="w-80 mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-[#134687] text-sm font-medium drop-shadow-md">
+              Processing...
+            </span>
+            <span className="text-[#134687] text-sm font-semibold drop-shadow-md">
+              {progress}%
+            </span>
+          </div>
+          <div className="bg-white/20 backdrop-blur-sm rounded-full h-4 border border-white/30 shadow-inner">
             <div
-                key={i}
-                className="w-2 h-2 bg-white rounded-full animate-bounce"
-                style={{ animationDelay: `${i * 0.2}s` }}
+              className="bg-gradient-to-r from-blue-500 via-blue-600 to-blue-900 h-4 rounded-full transition-all duration-500 ease-out shadow-lg relative overflow-hidden"
+              style={{ width: `${progress}%` }}
+            >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading Text */}
+        <div
+          className={`text-center mb-6 font-poppins transition-all duration-700 ease-in-out ${
+            showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <p className="text-[#134687] text-lg font-semibold mb-1 drop-shadow-lg">
+            Compiling your journey...
+          </p>
+          <p className="text-[#134687]/80 text-sm drop-shadow-md">
+            Initializing CSS Apply system
+          </p>
+        </div>
+
+        {/* Loading Dots */}
+        <div className="flex space-x-3 transition-all duration-500 ease-in-out">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-white rounded-full shadow-lg transition-all duration-300 ease-in-out hover:scale-125"
+              style={{
+                animation: `bounce 1.4s ease-in-out infinite ${i * 0.2}s`,
+                animationFillMode: "both",
+              }}
             ></div>
-            ))}
+          ))}
         </div>
-        </div>
-    );
+      </div>
+    </>
+  );
 }
