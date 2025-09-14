@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 export default function MemberApplication() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [error, setError] = useState(""); // REF: not used
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -55,6 +56,38 @@ export default function MemberApplication() {
 
     fetchApplicationData();
   }, [session, status]);
+
+  const checkApplications = async () => {
+    if (status === "authenticated") {
+      try {
+        const response = await fetch("/api/applications/check-existing");
+        if (response.ok) {
+          const data = await response.json();
+
+          // Redirect based on existing applications
+          if (data.hasMemberApplication) {
+            router.push("/user/apply/member/progress");
+          } else if (data.hasCommitteeApplication) {
+            const committeeId = data.applications.committee?.firstOptionCommittee;
+            if (committeeId) {
+              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+            }
+          } else if (data.hasEAApplication) {
+            const ebRole = data.applications.ea?.firstOptionEb;
+            if (ebRole) {
+              router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking applications:", error);
+      } finally {
+        setHasCheckedApplications(true);
+      }
+    }
+  };
+
+  checkApplications();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -132,6 +165,14 @@ export default function MemberApplication() {
             you'll gain access to exclusive workshops, events, and opportunities
             to grow alongside fellow students passionate about tech.
           </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
+              {error}
+            </div>
+          )}
+
           <hr className="my-8 border-t-1 border-[#717171]" />
           <div className="flex flex-col lg:flex-row gap-20">
             <div className="flex flex-col gap-6">
