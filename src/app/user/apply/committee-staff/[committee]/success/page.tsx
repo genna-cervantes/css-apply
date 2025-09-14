@@ -108,7 +108,7 @@ export default function SuccessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(243,243,253)]">
+    <div className="min-h-screen bg-[rgb(243,243,253)] bg-[url('/assets/pictures/background.png')] bg-cover  bg-no-repeat">
       <Header />
 
       <section>

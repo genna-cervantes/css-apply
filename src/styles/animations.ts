@@ -69,3 +69,26 @@ export const getStaggeredAnimationStyles = (
     willChange: "opacity, transform",
   };
 };
+
+// Image carousel scroll animation
+export const getImageScrollAnimationClasses = (
+  duration: number = 20,
+  direction: "left" | "right" = "left"
+) => {
+  const directionClass =
+    direction === "left" ? "animate-scroll-left" : "animate-scroll-right";
+  return `${directionClass} transition-transform duration-${
+    duration * 1000
+  } linear infinite`;
+};
+
+export const getImageScrollAnimationStyles = (
+  duration: number = 20,
+  direction: "left" | "right" = "left"
+) => {
+  const translateX = direction === "left" ? "-50%" : "50%";
+  return {
+    animation: `scroll-${direction} ${duration}s linear infinite`,
+    willChange: "transform",
+  };
+};

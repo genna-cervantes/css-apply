@@ -125,8 +125,24 @@ export default function StaffApplication() {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const getCommitteeImage = (committeeId: string) => {
+    const imageMap: { [key: string]: string } = {
+      academics: "/assets/committee_test/CSAR_ACADEMICS.png",
+      community: "/assets/committee_test/CSAR_COMMDEV.png",
+      creatives: "/assets/committee_test/CSAR_CREATIVES.png",
+      documentation: "/assets/committee_test/CSAR_DOCU.png",
+      external: "/assets/committee_test/CSAR_EXTERNALS.png",
+      finance: "/assets/committee_test/CSAR_FINANCE.png",
+      logistics: "/assets/committee_test/CSAR_LOGISTICS.png",
+      publicity: "/assets/committee_test/CSAR_PUBLICITY.png",
+      sports: "/assets/committee_test/CSAR_SPOTA.png",
+      technology: "/assets/committee_test/CSAR_TECHDEV.png",
+    };
+    return imageMap[committeeId] || "/assets/committee_test/Questions CSAR.png";
+  };
+
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat  flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
@@ -137,7 +153,7 @@ export default function StaffApplication() {
               <span className="text-[#134687]">Committee Staff</span>
             </div>
 
-            <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
+            <div className="text-black text-xs lg:text-[16px] font-Inter font-light text-justify">
               As a Committee Staff of the Computer Science Society, you will
               play a vital role in bringing our initiatives to life. From
               supporting events and managing logistics to collaborating with
@@ -212,10 +228,14 @@ export default function StaffApplication() {
                             setSelectedRole(role.id);
                             setIsDropdownOpen(false);
                           }}
-                          className="p-2 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-3 last:border-b-0"
+                          className="p-2 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-1 last:border-b-0"
                         >
-                          <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
-                            <span className="text-gray-500 text-xs">IMG</span>
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
+                            <img
+                              src={getCommitteeImage(role.id)}
+                              alt={role.title}
+                              className="w-6 h-6 object-cover"
+                            />
                           </div>
                           <h4 className="font-inter font-semibold text-xs text-black">
                             {role.title}
@@ -262,7 +282,7 @@ export default function StaffApplication() {
                               <h4 className="text-xl font-inter font-bold text-black mb-4">
                                 {role.title}
                               </h4>
-                              <p className="text-[10px] lg:text-[13px] font-normal font-inter text-black lg:mb-6 leading-relaxed text-justify max-h-48 overflow-y-auto p-2">
+                              <p className="text-[10px] lg:text-[13px] pr-4 font-normal font-inter text-black lg:mb-6 leading-relaxed text-justify max-h-48 overflow-y-auto">
                                 {role.description}
                               </p>
                             </>
@@ -270,8 +290,15 @@ export default function StaffApplication() {
                         })()}
                       </div>
                       {/* Right side - Committee picture */}
-                      <div className="hidden w-2/5 lg:block bg-gray-200 lg:h-80">
-                        is it here
+                      <div className="hidden w-2/5 lg:block lg:h-80 overflow-hidden border-1 border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] ">
+                        <img
+                          src={getCommitteeImage(selectedRole)}
+                          alt={
+                            committeeRoles.find((r) => r.id === selectedRole)
+                              ?.title || "Committee"
+                          }
+                          className="w-full h-full object-cover "
+                        />
                       </div>
                     </div>
                   </div>
@@ -283,7 +310,13 @@ export default function StaffApplication() {
                           Select a role to view details
                         </p>
                       </div>
-                      <div className="w-full lg:w-2/5 bg-gray-200 h-80"></div>
+                      <div className="w-full lg:w-2/5 h-80 overflow-hidden">
+                        <img
+                          src="/assets/committee_test/Questions CSAR.png"
+                          alt="Select a committee"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
                   </div>
                 )}
