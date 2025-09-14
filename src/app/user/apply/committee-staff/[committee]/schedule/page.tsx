@@ -2,16 +2,18 @@
 
 import {  useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ConfirmationModal from "@/components/Modal";
+import ApplicationGuard from "@/components/ApplicationGuard";
 import { committeeRoles } from "@/data/committeeRoles";
 import { adminSchedule } from "@/data/adminSchedule";
 
-export default function SchedulePage() {
+function SchedulePageContent() {
   const router = useRouter();
   const { committee: committeeId } = useParams<{ committee: string }>();
-
+  
   // State for scheduling
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<
@@ -586,5 +588,13 @@ export default function SchedulePage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SchedulePage() {
+  return (
+    <ApplicationGuard applicationType="committee">
+      <SchedulePageContent />
+    </ApplicationGuard>
   );
 }

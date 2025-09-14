@@ -4,29 +4,32 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ApplicationGuard from "@/components/ApplicationGuard";
 import { useSession } from "next-auth/react";
 
-export default function CommitteeProgressPage() {
+function MemberProgressPageContent() {
   const router = useRouter();
   const [applicationData, setApplicationData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
 
-  const fetchApplicationData = async () => {
-    try {
-      const response = await fetch("/api/applications/member");
-      if (response.ok) {
-        const data = await response.json();
-        setApplicationData(data);
+  useEffect(() => {
+    const fetchApplicationData = async () => {
+      try {
+        const response = await fetch("/api/applications/member");
+        if (response.ok) {
+          const data = await response.json();
+          setApplicationData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch application data:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch application data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchApplicationData();
+    fetchApplicationData();
+  }, []);
 
   if (loading) {
     return (
@@ -146,5 +149,13 @@ export default function CommitteeProgressPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function MemberProgressPage() {
+  return (
+    <ApplicationGuard applicationType="member">
+      <MemberProgressPageContent />
+    </ApplicationGuard>
   );
 }

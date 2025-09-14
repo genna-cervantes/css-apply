@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ApplicationGuard from "@/components/ApplicationGuard";
 import { committeeRolesSubmitted } from "@/data/committeeRoles";
 import { useSession } from "next-auth/react";
 
-export default function CommitteeProgressPage() {
+function CommitteeProgressPageContent() {
     const router = useRouter();
     const { data: session } = useSession();
     const { committee: committeeId } = useParams<{ committee: string }>();
@@ -374,5 +375,13 @@ export default function CommitteeProgressPage() {
         <Footer />
         {renderDeleteConfirmation()}
         </div>
+    );
+}
+
+export default function CommitteeProgressPage() {
+    return (
+        <ApplicationGuard applicationType="committee">
+            <CommitteeProgressPageContent />
+        </ApplicationGuard>
     );
 }

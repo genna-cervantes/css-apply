@@ -11,7 +11,7 @@ export default function MemberApplication() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
-  const [error, setError] = useState(""); // REF: not used
+  const [error, setError] = useState("");
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -57,8 +57,8 @@ export default function MemberApplication() {
     fetchApplicationData();
   }, [session, status]);
 
-  const checkApplications = async () => {
-    if (status === "authenticated") {
+  if (status === "authenticated" && !hasCheckedApplications) {
+    const checkApplications = async () => {
       try {
         const response = await fetch("/api/applications/check-existing");
         if (response.ok) {
@@ -84,10 +84,10 @@ export default function MemberApplication() {
       } finally {
         setHasCheckedApplications(true);
       }
-    }
-  };
+    };
 
-  checkApplications();
+    checkApplications();
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

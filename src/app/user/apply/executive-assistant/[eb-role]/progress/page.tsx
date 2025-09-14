@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ApplicationGuard from "@/components/ApplicationGuard";
 import { roles } from "@/data/ebRoles";
 import { useSession } from "next-auth/react";
 
-export default function EAProgressPage() {
+function EAProgressPageContent() {
     const router = useRouter();
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
     
     const [applicationData, setApplicationData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -60,7 +61,7 @@ export default function EAProgressPage() {
 
         fetchApplicationData();
     }, []);
-
+    
     const handleDeleteApplication = async () => {
         setIsDeleting(true);
         try {
@@ -372,5 +373,13 @@ export default function EAProgressPage() {
         <Footer />
         {renderDeleteConfirmation()}
         </div>
+    );
+}
+
+export default function EAProgressPage() {
+    return (
+        <ApplicationGuard applicationType="ea">
+            <EAProgressPageContent />
+        </ApplicationGuard>
     );
 }
