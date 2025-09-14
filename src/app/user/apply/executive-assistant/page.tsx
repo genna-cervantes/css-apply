@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
@@ -9,9 +8,8 @@ import { roles } from "@/data/ebRoles";
 
 export default function AssistantApplication() {
   const [selectedRole, setSelectedRole] = useState<string | null>("president");
-  const router = useRouter();
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">

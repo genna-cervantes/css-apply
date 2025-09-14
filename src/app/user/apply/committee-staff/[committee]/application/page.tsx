@@ -117,7 +117,6 @@ export default function CommitteeApplication() {
     }
   };
 
-  // Update the handleSubmit function in your committee-staff application page.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -170,17 +169,6 @@ export default function CommitteeApplication() {
     }
 
     try {
-      console.log("Submitting application data:", {
-        studentNumber: formData.studentNumber,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        section: formData.section,
-        firstOptionCommittee: committeeId,
-        secondOptionCommittee: formData.secondChoice,
-        cv: formData.cv,
-        portfolio: formData.portfolioLink,
-      });
-
       const response = await fetch("/api/applications/committee-staff", {
         method: "POST",
         headers: {
@@ -236,7 +224,7 @@ export default function CommitteeApplication() {
     }
 
     // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       setUploadError((prev) => ({
         ...prev,
@@ -250,10 +238,11 @@ export default function CommitteeApplication() {
 
     try {
       const uploadFormData = new FormData();
-      uploadFormData.append("file", file);
-      uploadFormData.append("studentNumber", formData.studentNumber);
-      uploadFormData.append("section", formData.section);
-      uploadFormData.append("fileType", type);
+      uploadFormData.append('file', file);
+      uploadFormData.append('studentNumber', formData.studentNumber);
+      uploadFormData.append('section', formData.section);
+      uploadFormData.append('fileType', type);
+      uploadFormData.append('applicationType', 'committee');
 
       const response = await fetch("/api/files/upload", {
         method: "POST",
