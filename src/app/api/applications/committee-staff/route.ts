@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
 
         if (!session || !session?.user?.email) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const {
@@ -20,6 +21,7 @@ export async function POST(request: NextRequest) {
             secondOptionCommittee,
             cv,
             portfolio,
+            supabaseFilePath
         } = await request.json();
 
         if (
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
             data: {
                 studentNumber,
                 section,
-                name: `${firstName} ${lastName}`.trim(), // Sync full name
+                name: `${firstName} ${lastName}`.trim(),
             },
         });
 
@@ -74,6 +76,7 @@ export async function POST(request: NextRequest) {
                     secondOptionCommittee,
                     cv,
                     portfolioLink: portfolio || null,
+                    supabaseFilePath: supabaseFilePath || cv,
                     interviewSlotDay: "",
                     interviewSlotTimeStart: "",
                     interviewSlotTimeEnd: "",
@@ -91,16 +94,17 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-        // Update existing non-accepted application
-        await prisma.committeeApplication.update({
-            where: { studentNumber },
-            data: {
-            firstOptionCommittee,
-            secondOptionCommittee,
-            cv,
-            portfolioLink: portfolio || null,
-            },
-        });
+            // Update existing non-accepted application
+            await prisma.committeeApplication.update({
+                where: { studentNumber },
+                data: {
+                    firstOptionCommittee,
+                    secondOptionCommittee,
+                    cv,
+                    portfolioLink: portfolio || null, 
+                    supabaseFilePath: supabaseFilePath || cv,
+                },
+            });
         }
 
         return NextResponse.json({
@@ -111,15 +115,15 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Committee application error:', error);
         if (error instanceof Error && error.message.includes('Unique constraint')) {
-        return NextResponse.json(
-            { error: 'This student number already has an application' },
-            { status: 400 }
-        );
+            return NextResponse.json(
+                { error: 'This student number already has an application' },
+                { status: 400 }
+            );
         }
 
         return NextResponse.json(
-        { error: 'Internal server error' },
-        { status: 500 }
+            { error: 'Internal server error' },
+            { status: 500 }
         );
     }
 }
@@ -157,6 +161,76 @@ export async function GET(request: NextRequest) {
         
     } catch (error) {
         console.error('Get Committee Application error:', error);
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}
+
+export async function DELETE(request: NextRequest) {
+    try {
+        const session = await getServerSession(authOptions);
+        
+        if (!session || !session?.user?.email) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Get user data
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+            include: { committeeApplication: true }
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        if (!user.committeeApplication) {
+            return NextResponse.json({ error: 'No application found' }, { status: 404 });
+        }
+
+        // Delete files from Supabase storage if they exist
+        try {
+            if (user.committeeApplication.supabaseFilePath) {
+                await supabase.storage
+                .from('committee-applications')
+                .remove([user.committeeApplication.supabaseFilePath]);
+            }
+
+            // Also check if there's a portfolio file to delete
+            if (user.committeeApplication.portfolioLink) {
+                const portfolioPath = user.committeeApplication.portfolioLink.split('/').slice(-2).join('/');
+                await supabase.storage
+                .from('committee-applications')
+                .remove([portfolioPath]);
+            }
+        } catch (storageError) {
+            console.error('Error deleting files from storage:', storageError);
+        // Continue with application deletion even if file deletion fails
+        }
+
+        // Delete the committee application
+        await prisma.committeeApplication.delete({
+            where: { studentNumber: user.studentNumber! }
+        });
+
+        // Reset user's application-related fields (optional)
+        await prisma.user.update({
+            where: { email: session.user.email },
+            data: {
+                studentNumber: null,
+                section: null
+            }
+        });
+
+        return NextResponse.json({
+            success: true,
+            message: 'Application deleted successfully'
+        });
+
+    } catch (error) {
+        console.error('Delete application error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

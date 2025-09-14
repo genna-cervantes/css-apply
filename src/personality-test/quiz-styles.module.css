@@ -12,6 +12,11 @@
   --light-blue: #e6f0ff;
   --white: #ffffff;
 
+  /* Layout to keep footer at the bottom */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
   /* Grays */
   --dark-gray: #333;
   --medium-gray: #666;
@@ -47,7 +52,7 @@
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  flex-grow: 1;
+  flex-grow: 1; /* allow main to take remaining space */
 }
 
 .home-main-container {
@@ -138,6 +143,45 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+/* Responsive header controls */
+@media (max-width: 640px) {
+  /* Reduce horizontal padding in header */
+  .app-header {
+    padding: 0.875rem 4vw;
+  }
+
+  /* Slightly smaller logo on mobile */
+  .header-logo {
+    width: 96px;
+  }
+
+  /* Tighter spacing between actions */
+  .header-actions {
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  }
+
+  /* Hide Take Test on small screens */
+  .btn-take-test {
+    display: none !important;
+  }
+
+  /* Make Join CSS the primary, more compact button */
+  .btn-join {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.95rem !important;
+    border-radius: 6px;
+  }
+
+  /* Guard against tiny devices */
+  @media (max-width: 380px) {
+    .btn-join {
+      padding: 0.45rem 0.9rem !important;
+      font-size: 0.9rem !important;
+    }
+  }
 }
 
 /* Home Page Styles */
@@ -632,6 +676,29 @@
   text-align: left;
 }
 
+/* Fixed-height sliding content area inside ResultCard */
+.result-card-body {
+  position: relative;
+  overflow: hidden;
+  height: var(--rc-body-h, auto); /* height controlled via CSS variable set from JS */
+  transition: height 300ms ease-in-out;
+}
+.result-card-slider {
+  display: flex;
+  width: 200%;
+  transition: transform 300ms ease-in-out;
+}
+.result-card-slide {
+  width: 50%;
+  padding-right: 8px;
+}
+.result-card-slider.show-fit {
+  transform: translateX(0%);
+}
+.result-card-slider.show-duties {
+  transform: translateX(-50%);
+}
+
 .committee-duties h4 {
   font-size: 1.1rem;
   text-align: left;
@@ -639,8 +706,10 @@
   margin-bottom: 0.75rem;
 }
 .committee-duties ul {
-  list-style-position: inside;
-  padding-left: 0;
+  list-style-type: disc;
+  list-style-position: outside;
+  padding-left: 1.25rem;
+  margin: 0.25rem 0 0.5rem 0;
 }
 .committee-duties li {
   margin-bottom: 0.5rem;
