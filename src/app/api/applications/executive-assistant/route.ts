@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
+import { sendEmail, emailTemplates } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
     try {
@@ -106,6 +107,22 @@ export async function POST(request: NextRequest) {
                     supabaseFilePath: supabaseFilePath || cv,
                 },
             });
+        }
+
+        // Send confirmation email
+        try {
+            const emailTemplate = emailTemplates.executiveAssistantApplication(
+                updatedUser.name, 
+                studentNumber, 
+                ebRole, 
+                firstOptionEb, 
+                secondOptionEb
+            );
+            await sendEmail(updatedUser.email, emailTemplate.subject, emailTemplate.html);
+            console.log('Executive Assistant application confirmation email sent to:', updatedUser.email);
+        } catch (emailError) {
+            console.error('Failed to send executive assistant application confirmation email:', emailError);
+            // Don't fail the application submission if email fails
         }
 
         return NextResponse.json({
