@@ -144,7 +144,8 @@ export default function CommitteeApplication() {
     }
 
     if (
-      (selectedCommittee?.id === "creatives" || selectedCommittee?.id === "technology") &&
+      (selectedCommittee?.id === "creatives" ||
+        selectedCommittee?.id === "technology") &&
       !formData.portfolioLink
     ) {
       setError("Please upload or wait for your Portfolio to finish uploading");
@@ -153,7 +154,7 @@ export default function CommitteeApplication() {
     }
 
     try {
-      console.log('Submitting application data:', {
+      console.log("Submitting application data:", {
         studentNumber: formData.studentNumber,
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -182,15 +183,19 @@ export default function CommitteeApplication() {
       });
 
       const responseData = await response.json();
-      console.log('API response:', responseData);
+      console.log("API response:", responseData);
 
       if (response.ok) {
         router.push(`/user/apply/committee-staff/${committeeId}/schedule`);
       } else {
-        setError(responseData.error || responseData.details || "Application submission failed");
+        setError(
+          responseData.error ||
+            responseData.details ||
+            "Application submission failed"
+        );
       }
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
       setError("An error occurred while submitting your application");
     } finally {
       setLoading(false);
@@ -277,7 +282,7 @@ export default function CommitteeApplication() {
   }
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
@@ -293,7 +298,7 @@ export default function CommitteeApplication() {
               </span>
             </div>
 
-            <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
+            <div className="text-black text-xs lg:text-[16px] font-Inter font-light text-justify">
               {selectedCommittee.description}
             </div>
 

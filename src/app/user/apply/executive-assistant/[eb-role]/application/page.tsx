@@ -16,6 +16,7 @@ export default function ExecutiveAssistantApplication() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+
   const selectedRole = roles.find((r) => r.id === ebId);
 
   const [isChecked, setIsChecked] = useState(false);
@@ -87,7 +88,7 @@ export default function ExecutiveAssistantApplication() {
   }
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
@@ -98,7 +99,7 @@ export default function ExecutiveAssistantApplication() {
               <span className="text-[#134687]">{selectedRole.title}</span>
             </div>
 
-            <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
+            <div className="text-black text-xs lg:text-[16px] font-Inter font-light text-justify">
               Executive Assistants work closely with the CSS Executive Boards to
               help them with their tasks in events and committees. This role
               requires responsibility, attention to detail, and strong
