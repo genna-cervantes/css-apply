@@ -115,7 +115,7 @@ export default function MemberApplication() {
   };
 
   return (
-    <div className="min-h-screen md:bg-[rgb(243,243,253)] flex flex-col justify-between">
+    <div className="min-h-screen md:bg-[rgb(243,243,253)] md:bg-[url('/assets/pictures/background.png')] flex flex-col justify-between bg-cover bg-repeat">
       <Header />
 
       <section className="flex flex-col justify-between items-center px-20 py-10 lg:px-50 lg:py-20">

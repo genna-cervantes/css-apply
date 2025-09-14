@@ -555,7 +555,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center my-12 lg:my-28">
@@ -567,8 +567,11 @@ export default function SchedulePage() {
             <span className="text-[#134687]">{selectedEB.title}</span>
           </div>
 
-          <div className="text-black text-xs lg:text-lg font-Inter font-light text-justify">
-            {selectedEB.description}
+          <div className="text-black text-xs lg:text-[16px] font-Inter font-light text-justify">
+            Executive Assistants work closely with the CSS Executive Boards to
+            help them with their tasks in events and committees. This role
+            requires responsibility, attention to detail, and strong
+            communication skills.
           </div>
 
           <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />

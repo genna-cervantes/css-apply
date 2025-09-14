@@ -83,43 +83,55 @@ export default function Home() {
     },
   ];
 
-  const partnerLogos = [
+  const partnerLogos: Array<{
+    src: string;
+    alt: string;
+    size: string;
+    facebookUrl: string;
+    shape?: string;
+  }> = [
     {
       src: "/assets/partners/BiteSlice.jpg",
       alt: "BiteSlice",
       size: "h-20 w-20",
+      facebookUrl: "https://www.facebook.com/profile.php?id=100064060713967",
     },
     {
       src: "/assets/partners/HomeRoom.jpg",
       alt: "HomeRoom",
       size: "h-20 w-20",
+      facebookUrl: "https://www.facebook.com/homeroomcoworkingph",
     },
     {
       src: "/assets/partners/MindZone.jpg",
       alt: "MindZone",
       size: "h-20 w-20",
+      facebookUrl: "https://www.facebook.com/mindzoneespanaph",
     },
     {
       src: "/assets/partners/NomuCafe.png",
       alt: "NomuCafe",
       size: "h-20 w-20",
+      facebookUrl: "https://www.facebook.com/nomuPH",
     },
-    { src: "/assets/partners/Sumu.jpg", alt: "Sumu", size: "h-20 w-20" },
+
     {
       src: "/assets/partners/TheCatalyst.jpg",
       alt: "TheCatalyst",
       size: "h-28 w-28",
+      facebookUrl: "https://www.facebook.com/coworking.thecatalyst",
     },
     {
       src: "/assets/partners/Yorokobi.jpg",
       alt: "Yorokobi",
       size: "h-20 w-20",
+      facebookUrl: "https://www.facebook.com/yorokobimnl",
     },
     {
       src: "/assets/partners/ZeroCafe.png",
       alt: "ZeroCafe",
       size: "h-20 w-20",
-      shape: "rounded-lg",
+      facebookUrl: "https://www.facebook.com/ZeroCafePH",
     },
   ];
 
@@ -135,7 +147,10 @@ export default function Home() {
       <section className="min-h-screen w-full bg-gradient-to-b from-[#000000] via-[rgb(1,124,238)] via-69% to-[#0054FF] relative overflow-hidden">
         {/* Header */}
         <header className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/90 via-black/50 to-transparent flex justify-center sm:justify-start p-6 z-30">
-          <div className="inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded cursor-pointer">
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded cursor-pointer hover:scale-105 transition-all duration-300"
+          >
             <div className="w-16 h-12 md:w-28 md:h-20  flex items-center justify-center">
               <img
                 src="/assets/logos/Logo_CSS Apply.svg"
@@ -143,14 +158,13 @@ export default function Home() {
                 className="w-full h-full object-contain brightness-0 invert"
               />
             </div>
-          </div>
+          </Link>
         </header>
 
-        {/* Middle Layer with Three Rows */}
-        <div className="absolute inset-0 z-20 grid grid-rows-[1fr_auto_1fr] isolate">
+        <div className="absolute inset-0 z-20 grid grid-rows-[2fr_auto_2fr] gap-8 isolate">
           {/* Row 1: Top Images */}
           <div className="w-full relative overflow-hidden z-10">
-            <div className="absolute top-0 left-0 w-[200%] h-full flex">
+            <div className="absolute top-0 left-0 w-[200%] h-full flex animate-[scroll-right_30s_linear_infinite]">
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
                   {/* REF: Use next image instead of img */}
@@ -245,24 +259,29 @@ export default function Home() {
           </div>
 
           {/* Row 2: Text Content */}
-          <div className="w-full flex flex-col items-center z-50 relative py-6 min-h-[240px]">
-            <div className="relative z-30 flex flex-col items-center text-center font-inter">
-              <h3 className="text-blue-200 text-sm md:text-base font-light tracking-wide uppercase leading-tight drop-shadow-[0_0_12px_rgba(59,130,246,0.8)]">
+          <div className="w-full h-[320px] flex flex-col items-center justify-center text-center font-inter relative z-50">
+            <div className="h-8 flex items-center mb-2">
+              <h3 className="text-blue-200 text-sm md:text-base font-light tracking-wide uppercase leading-tight drop-shadow-[0_0_12px_rgba(59,130,246,0.8)] animate-fade-in-up">
                 Your journey in tech starts here
               </h3>
+            </div>
+            <div className="h-32 flex items-center justify-center mb-6">
               <h1
                 key={heroPhraseIndex}
-                className={`relative z-30 ${heroTitleSizeClass} font-bold bg-gradient-to-b from-white from-20% to-[#0768c3] to-70% bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_18px_rgba(59,130,246,0.75)]`}
+                className={`${heroTitleSizeClass} font-bold bg-gradient-to-b from-white from-20% to-[#0768c3] to-70% bg-clip-text text-transparent tracking-tight leading-tight drop-shadow-[0_0_18px_rgba(59,130,246,0.75)] animate-fade-in-up animate-delay-200`}
                 aria-live="polite"
               >
                 {currentHeroPhrase}
               </h1>
-
+            </div>
+            <div className="h-16 flex items-center">
               {/* Enter Button */}
               <button
                 onClick={handleEnterClick}
                 disabled={isLoggingIn}
-                className="cursor-pointer relative z-[60] bg-[#0077FF] shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] rounded-full font-family-inter text-white py-2 px-16 font-medium text-xl opacity-100 hover:bg-[#0056CC]"
+
+                className="bg-[#0077FF] shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] rounded-full font-inter text-white py-2 px-16 font-medium text-xl hover:bg-[#0056CC] hover:scale-105 hover:shadow-[inset_0_4px_15px_rgba(255,255,255,0.8),0_10px_24px_rgba(0,0,0,0.18)] transition-all duration-300 animate-fade-in-up animate-delay-400 hover:animate-pulse cursor-pointer"
+
               >
                 {isLoggingIn ? (
                   <div className="flex items-center justify-center">
@@ -278,7 +297,7 @@ export default function Home() {
 
           {/* Row 3: Bottom Images */}
           <div className="w-full relative overflow-hidden z-10">
-            <div className="absolute bottom-0 left-0 w-[200%] h-full flex">
+            <div className="absolute bottom-0 left-0 w-[200%] h-full flex animate-[scroll-left_30s_linear_infinite]">
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <img
@@ -362,10 +381,13 @@ export default function Home() {
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 flex flex-col items-center">
           <button
             onClick={scrollToNextSection}
-            className="group flex flex-col items-center space-y-2"
+            className="group flex flex-col items-center space-y-2 hover:scale-110 hover:animate-pulse transition-all duration-300 cursor-pointer"
           >
-            <Icon icon="mdi:chevron-down" className="text-2xl text-white" />
-            <span className="font-light font-poppins text-white text-xs md:text-sm group-hover:opacity-100 whitespace-nowrap">
+            <Icon
+              icon="mdi:chevron-down"
+              className="text-2xl text-white animate-bounce"
+            />
+            <span className="font-light font-poppins text-white text-xs md:text-sm group-hover:opacity-100 whitespace-nowrap animate-pulse">
               Get to know more about CSS
             </span>
           </button>
@@ -406,15 +428,45 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Image */}
+          {/* Image Slideshow */}
           <div className="flex-shrink-0 flex justify-center items-center">
-            <Image
-              src="/assets/pictures/sec2_pic.png"
-              alt=""
-              width={450}
-              height={450}
-              className=""
-            />
+            <div className="relative w-[450px] h-[450px] overflow-hidden rounded-lg shadow-lg">
+              <Image
+                src="/assets/pictures/sec2_pic1.jpg"
+                alt="Slideshow image 1"
+                width={450}
+                height={450}
+                className="absolute inset-0 w-full h-full object-cover animate-slideshow"
+              />
+              <Image
+                src="/assets/pictures/sec2_pic2.jpg"
+                alt="Slideshow image 2"
+                width={450}
+                height={450}
+                className="absolute inset-0 w-full h-full object-cover animate-slideshow animation-delay-2s"
+              />
+              <Image
+                src="/assets/pictures/sec2_pic3.jpg"
+                alt="Slideshow image 3"
+                width={450}
+                height={450}
+                className="absolute inset-0 w-full h-full object-cover animate-slideshow animation-delay-4s"
+              />
+              <Image
+                src="/assets/pictures/sec2_pic4.jpg"
+                alt="Slideshow image 4"
+                width={450}
+                height={450}
+                className="absolute inset-0 w-full h-full object-cover animate-slideshow animation-delay-6s"
+              />
+              <Image
+                src="/assets/pictures/sec2_pic5.jpg"
+                alt="Slideshow image 5"
+                width={450}
+                height={450}
+                className="absolute inset-0 w-full h-full object-cover animate-slideshow animation-delay-8s"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -431,11 +483,14 @@ export default function Home() {
         <div className="flex justify-center mt-8">
           <div className="w-[90%] flex justify-center items-center overflow-x-auto gap-4 md:gap-6 lg:gap-8 pb-3">
             {partnerLogos.map((partner) => (
-              <div
+              <a
                 key={partner.alt}
+                href={partner.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`${partner.size} ${
                   partner.shape || "rounded-full"
-                } flex-shrink-0 overflow-hidden bg-white cursor-pointer ${
+                } flex-shrink-0 overflow-hidden bg-white cursor-pointer transition-all duration-300 ease-in-out hover:scale-110 hover:shadow-lg hover:shadow-blue-500/25 ${
                   partner.shape === "rounded-lg"
                     ? "p-2 flex items-center justify-center"
                     : ""
@@ -446,13 +501,15 @@ export default function Home() {
                   alt={partner.alt}
                   width={partner.size.includes("h-28") ? 100 : 80}
                   height={partner.size.includes("h-28") ? 100 : 80}
-                  className={`w-full h-full ${
-                    partner.shape === "rounded-lg"
+                  className={`w-full h-full transition-transform duration-300 ease-in-out hover:scale-105 ${
+                    partner.alt === "ZeroCafe"
+                      ? "object-contain"
+                      : partner.shape === "rounded-lg"
                       ? "object-contain"
                       : "object-cover"
                   }`}
                 />
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -711,7 +768,7 @@ export default function Home() {
               {/* CTA Button */}
               <Link
                 href="/personality-test"
-                className="text-[#1C4D8C] bg-white text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 font-semibold lg:ml-5 shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] inline-block"
+                className="text-[#1C4D8C] bg-white hover:bg-[#d5d5d5] text-sm sm:text-base lg:text-lg rounded-2xl px-6 py-1 sm:px-8 sm:py-2 font-semibold lg:ml-5 shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:scale-105 transition-all duration-300 inline-block"
               >
                 <div className="flex items-center justify-center gap-2">
                   <p className="font-inter">Take the Test</p>
@@ -740,16 +797,18 @@ export default function Home() {
               Join the Computer Science Society and turn your passion into
               impact.
             </div>
-            <div className="cursor-pointer flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
-              <button className="cursor-pointer bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
+
+            <div className="flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer">
                 Apply as Member
               </button>
 
-              <button className="cursor-pointer bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer">
                 Apply as Staff
               </button>
 
-              <button className="cursor-pointer bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)]">
+              <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer">
+
                 Apply as Executive Assistant
               </button>
             </div>
