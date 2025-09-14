@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { sendEmail, emailTemplates } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
     try {
@@ -68,6 +69,15 @@ export async function POST(request: NextRequest) {
             })
         } else {
             application = existingApplication;
+        }
+
+        // Send confirmation email
+        try {
+            const emailTemplate = emailTemplates.memberApplication(updatedUser.name, studentNumber);
+            await sendEmail(updatedUser.email, emailTemplate.subject, emailTemplate.html);
+            console.log('Member application confirmation email sent to:', updatedUser.email);
+        } catch (emailError) {
+            console.error('Failed to send member application confirmation email:', emailError);
         }
 
         return NextResponse.json({ 
