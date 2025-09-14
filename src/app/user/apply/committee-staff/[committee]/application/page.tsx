@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { committeeRoles } from "@/data/committeeRoles";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -16,6 +17,9 @@ export default function CommitteeApplication() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [uploading, setUploading] = useState({ cv: false, portfolio: false });
+  const [uploadError, setUploadError] = useState({ cv: '', portfolio: '' });
 
   const [formData, setFormData] = useState({
     studentNumber: "",
@@ -54,6 +58,8 @@ export default function CommitteeApplication() {
             ...prev,
             studentNumber: data.user?.studentNumber || "",
             section: data.user?.section || "",
+            cv: data.application?.cv || "",
+            portfolioLink: data.application?.portfolioLink || "",
           }));
         }
       } catch (err) {
@@ -63,69 +69,6 @@ export default function CommitteeApplication() {
 
     fetchApplicationData();
   }, [session, status]);
-
-  const committeeRoles = [
-    {
-      id: "academics",
-      title: "Academics",
-      description:
-        "This committee is dedicated to enhancing the academic environment within the CSS organization. It provides reviewers and organizes tutorials to support CSS students. Additionally, the committee organizes academic-related events, such as quiz bees and programming contests, fostering a vibrant intellectual community.",
-    },
-    {
-      id: "community",
-      title: "Community Development",
-      description:
-        "This committee works towards improving and sustaining the well-being of the local community. They devise and implement community-based projects and events that foster social interaction, civic engagement, and community empowerment. It may focus on areas such as housing, employment, health services, or environmental initiatives.",
-    },
-    {
-      id: "creatives",
-      title: "Creatives & Technical",
-      description:
-        "This committee oversees the design and production of all creative outputs of the organization, including digital graphics, promotional materials, and event decoration. The technical side of the committee ensures that all technical needs for events and operations, like sound and lighting systems, are catered for.",
-    },
-    {
-      id: "documentation",
-      title: "Documentation",
-      description:
-        "This committee is responsible for photojournalism, documenting all the activities and events of the organization. Their work ensures that the organization's achievements and memorable moments are captured and preserved for posterity.",
-    },
-    {
-      id: "external",
-      title: "External Affairs",
-      description:
-        "This committee manages relationships and communications with entities outside the organization. This includes liaising with other organizations, government bodies, sponsors, and the media. It also handles public relations, partnership development, and conflict resolution.",
-    },
-    {
-      id: "finance",
-      title: "Finance",
-      description:
-        "This committee oversees the organization's budgeting, expenditure, and revenue generation. It also provides financial advice to the organization, ensures fiscal responsibility, and conducts regular audits for transparency and accountability.",
-    },
-    {
-      id: "logistics",
-      title: "Logistics",
-      description:
-        "This committee manages and maintains all properties owned by the organization. It keeps a thorough record of all expenses related to CSS activities and properties, ensuring transparency and accountability in the organization's financial operations.",
-    },
-    {
-      id: "publicity",
-      title: "Publicity",
-      description:
-        "This committee manages all promotional activities for the organization. It is responsible for creating and implementing marketing strategies, managing social media platforms, and publicizing events and activities to target audiences.",
-    },
-    {
-      id: "sports",
-      title: "Sports & Talent",
-      description:
-        "This committee organizes and oversees all sports-related and talent activities within the organization. It may coordinate sporting events, talent shows, or workshops and ensure the organization's members have opportunities to develop and showcase their talents.",
-    },
-    {
-      id: "technology",
-      title: "Technology Development",
-      description:
-        "This committee is responsible for spearheading all technology-related projects and events within the organization. Key tasks include creating and maintaining the CSS website, implementing new technologies to streamline organizational operations, and organizing tech-focused workshops or seminars to enhance the digital skills of the members.",
-    },
-  ];
 
   const selectedCommittee = committeeRoles.find(
     (role) => role.id === committeeId
@@ -195,7 +138,7 @@ export default function CommitteeApplication() {
     }
 
     if (!formData.cv) {
-      setError("Please upload your CV");
+      setError("Please upload or wait for your CV to finish uploading");
       setLoading(false);
       return;
     }
@@ -205,7 +148,7 @@ export default function CommitteeApplication() {
         selectedCommittee?.id === "technology") &&
       !formData.portfolioLink
     ) {
-      setError("Please upload your portfolio");
+      setError("Please upload or wait for your Portfolio to finish uploading");
       setLoading(false);
       return;
     }
@@ -256,6 +199,63 @@ export default function CommitteeApplication() {
       setError("An error occurred while submitting your application");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (file: File, type: 'cv' | 'portfolio') => {
+    if (!file || !formData.studentNumber || !formData.section) {
+      setUploadError(prev => ({ ...prev, [type]: 'Student number and section are required' }));
+      return;
+    }
+
+    if (file.type !== 'application/pdf') {
+      setUploadError(prev => ({ ...prev, [type]: 'Only PDF files are allowed' }));
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setUploadError(prev => ({ ...prev, [type]: 'File size must be less than 10MB' }));
+      return;
+    }
+
+    setUploading(prev => ({ ...prev, [type]: true }));
+    setUploadError(prev => ({ ...prev, [type]: '' }));
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('studentNumber', formData.studentNumber);
+      uploadFormData.append('section', formData.section);
+      uploadFormData.append('fileType', type);
+
+      const response = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Update form data with the new file URL
+        if (type === 'cv') {
+          setFormData(prev => ({ ...prev, cv: result.url }));
+        } else {
+          setFormData(prev => ({ ...prev, portfolioLink: result.url }));
+        }
+      } else {
+        setUploadError(prev => ({ ...prev, [type]: result.error || 'Upload failed' }));
+      }
+    } catch (error) {
+      setUploadError(prev => ({ ...prev, [type]: 'Upload failed. Please try again.' }));
+      if (type === 'cv') {
+        setFormData(prev => ({ ...prev, cv: file.name }));
+      } else {
+        setFormData(prev => ({ ...prev, portfolioLink: file.name }));
+      }
+    } finally {
+      setUploading(prev => ({ ...prev, [type]: false }));
     }
   };
 
@@ -379,9 +379,10 @@ export default function CommitteeApplication() {
                       onChange={(e) =>
                         setFormData({ ...formData, firstName: e.target.value })
                       }
-                      className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
-                      placeholder="e.g. Juan"
-                      required
+                      readOnly
+                      disabled
+                      aria-readonly
+                      className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] bg-gray-100 text-gray-700 px-4 py-3 text-sm lg:text-base"
                     />
                   </div>
                 </div>
@@ -397,9 +398,10 @@ export default function CommitteeApplication() {
                       onChange={(e) =>
                         setFormData({ ...formData, lastName: e.target.value })
                       }
-                      className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
-                      placeholder="e.g. Dela Cruz"
-                      required
+                      readOnly
+                      disabled
+                      aria-readonly
+                      className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] bg-gray-100 text-gray-700 px-4 py-3 text-sm lg:text-base"
                     />
                   </div>
                 </div>
@@ -489,7 +491,7 @@ export default function CommitteeApplication() {
                     {formData.cv ? (
                       <div className="flex items-center justify-between bg-gray-100 p-2 lg:px-3 lg:py-2 rounded-md">
                         <span className="lg:text-sm text-black truncate">
-                          {formData.cv}
+                          {formData.cv.includes('http') ? 'CV Uploaded ✓' : formData.cv}
                         </span>
                         <button
                           type="button"
@@ -507,17 +509,24 @@ export default function CommitteeApplication() {
                           accept=".pdf"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file) {
-                              setFormData({ ...formData, cv: file.name });
-                            }
+                              if (file) {
+                                if (file.size > 10 * 1024 * 1024) {
+                                  setUploadError(prev => ({ ...prev, cv: 'File size must be less than 10MB' }));
+                                  return;
+                                }
+                                handleFileUpload(file, 'cv');
+                              }
                           }}
                           className="hidden"
                           required
                         />
                         <div className="bg-[#044FAF] text-white text-xs lg:text-sm lg:font-semibold py-1 px-3 lg:px-2 lg:py-2 rounded-md hover:bg-[#04387B] transition-all duration-150 active:scale-95 text-center w-20">
-                          Upload
+                          {uploading.cv ? '...' : 'Upload'}
                         </div>
                       </label>
+                    )}
+                    {uploadError.cv && (
+                      <div className="text-red-500 text-xs mt-1">{uploadError.cv}</div>
                     )}
                   </div>
                 </div>
@@ -531,7 +540,7 @@ export default function CommitteeApplication() {
                       {formData.portfolioLink ? (
                         <div className="flex items-center justify-between bg-gray-100 p-2 lg:px-3 lg:py-2 rounded-md">
                           <span className="lg:text-sm text-black truncate">
-                            {formData.portfolioLink}
+                            {formData.portfolioLink.includes('http') ? 'Portfolio Uploaded ✓' : formData.portfolioLink}
                           </span>
                           <button
                             type="button"
@@ -555,19 +564,23 @@ export default function CommitteeApplication() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                setFormData({
-                                  ...formData,
-                                  portfolioLink: file.name,
-                                });
+                                if (file.size > 10 * 1024 * 1024) {
+                                  setUploadError(prev => ({ ...prev, cv: 'File size must be less than 10MB' }));
+                                  return;
+                                }
+                                handleFileUpload(file, 'portfolio');
                               }
                             }}
                             className="hidden"
                             required
                           />
                           <div className="bg-[#044FAF] text-white text-xs lg:text-sm lg:font-semibold py-1 px-3 lg:px-2 lg:py-2 rounded-md hover:bg-[#04387B] transition-all duration-150 active:scale-95 text-center w-20">
-                            Upload
+                            {uploading.portfolio ? '...' : 'Upload'}
                           </div>
                         </label>
+                      )}
+                      {uploadError.portfolio && (
+                        <div className="text-red-500 text-xs mt-1">{uploadError.portfolio}</div>
                       )}
                     </div>
                   </div>
