@@ -9,6 +9,7 @@ import ConfirmationModal from "@/components/Modal";
 import ApplicationGuard from "@/components/ApplicationGuard";
 import { committeeRoles } from "@/data/committeeRoles";
 import { adminSchedule } from "@/data/adminSchedule";
+import { unavailableSlots } from "@/data/unavailableSlots";
 
 function SchedulePageContent() {
   const router = useRouter();
@@ -62,10 +63,9 @@ function SchedulePageContent() {
     };
   }, [showModal]);
 
-  // Generate sample admin-created available slots
-  // REF: connect sa BE
+  // Generate hardcoded available slots (same as admin)
   useEffect(() => {
-    const generateAdminSlots = () => {
+    const generateHardcodedSlots = () => {
       const slots: Array<{
         id: string;
         start: string;
@@ -74,34 +74,56 @@ function SchedulePageContent() {
         time: string;
         isBooked: boolean;
       }> = [];
-      const today = new Date();
 
-      adminSchedule.forEach((daySchedule) => {
-        // Ensure we get the correct date string regardless of timezone
-        const year = daySchedule.date.getFullYear();
-        const month = String(daySchedule.date.getMonth() + 1).padStart(2, "0");
-        const day = String(daySchedule.date.getDate()).padStart(2, "0");
+      // Hardcoded dates: September 16-26, 2025 (same as admin)
+      const hardcodedDates = [
+        new Date(2025, 8, 16), // September 16
+        new Date(2025, 8, 17), // September 17
+        new Date(2025, 8, 18), // September 18
+        new Date(2025, 8, 19), // September 19
+        new Date(2025, 8, 20), // September 20
+        new Date(2025, 8, 21), // September 21
+        new Date(2025, 8, 22), // September 22
+        new Date(2025, 8, 23), // September 23
+        new Date(2025, 8, 24), // September 24
+        new Date(2025, 8, 25), // September 25
+        new Date(2025, 8, 26), // September 26
+      ];
+
+      // Use shared unavailable slots from admin settings
+
+      hardcodedDates.forEach((date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
         const dateStr = `${year}-${month}-${day}`;
 
-        daySchedule.availableTimes.forEach((timeStr) => {
-          const [hour, minute] = timeStr.split(":").map(Number);
-          const startTime = new Date(daySchedule.date);
-          startTime.setHours(hour, minute, 0, 0);
+        // Generate time slots from 7 AM to 9 PM in 30-minute increments
+        for (let hour = 7; hour < 21; hour++) {
+          for (let minute = 0; minute < 60; minute += 30) {
+            const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+            const startTime = new Date(date);
+            startTime.setHours(hour, minute, 0, 0);
 
-          const endTime = new Date(startTime);
-          endTime.setMinutes(startTime.getMinutes() + 30);
+            const endTime = new Date(startTime);
+            endTime.setMinutes(startTime.getMinutes() + 30);
 
-          const isBooked = daySchedule.bookedSlots.includes(timeStr);
+            const slotId = `${dateStr}-${timeStr}`;
+            const isUnavailable = unavailableSlots.has(slotId);
 
-          slots.push({
-            id: `${dateStr}-${timeStr}`,
-            start: startTime.toISOString(),
-            end: endTime.toISOString(),
-            date: dateStr,
-            time: timeStr,
-            isBooked: isBooked,
-          });
-        });
+            // Only add available slots (not unavailable ones)
+            if (!isUnavailable) {
+              slots.push({
+                id: slotId,
+                start: startTime.toISOString(),
+                end: endTime.toISOString(),
+                date: dateStr,
+                time: timeStr,
+                isBooked: false, // All slots start as available
+              });
+            }
+          }
+        }
       });
 
       setAvailableSlots(slots);
@@ -132,7 +154,7 @@ function SchedulePageContent() {
       setIsLoading(false);
     };
 
-    generateAdminSlots();
+    generateHardcodedSlots();
   }, []);
 
   const handleSlotSelect = (slotId: string) => {
