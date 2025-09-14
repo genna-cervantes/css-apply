@@ -279,9 +279,7 @@ export default function Home() {
               <button
                 onClick={handleEnterClick}
                 disabled={isLoggingIn}
-
                 className="bg-[#0077FF] shadow-[inset_0_4px_15px_rgba(255,255,255,0.8)] rounded-full font-inter text-white py-2 px-16 font-medium text-xl hover:bg-[#0056CC] hover:scale-105 hover:shadow-[inset_0_4px_15px_rgba(255,255,255,0.8),0_10px_24px_rgba(0,0,0,0.18)] transition-all duration-300 animate-fade-in-up animate-delay-400 hover:animate-pulse cursor-pointer"
-
               >
                 {isLoggingIn ? (
                   <div className="flex items-center justify-center">
@@ -471,7 +469,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="perks-section" className="h-50 overflow-hidden">
+      <section id="perks-section" className="h-60 overflow-hidden">
         {/* Title */}
         <div className="flex justify-center">
           <p className="font-inter font-bold text-lg md:text-2xl xl:text-3xl">
@@ -512,6 +510,9 @@ export default function Home() {
               </a>
             ))}
           </div>
+        </div>
+        <div className="flex justify-center">
+          <p className="font-inter font-semibold text-sm  ">and many more!</p>
         </div>
       </section>
 
@@ -808,7 +809,6 @@ export default function Home() {
               </button>
 
               <button className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer">
-
                 Apply as Executive Assistant
               </button>
             </div>

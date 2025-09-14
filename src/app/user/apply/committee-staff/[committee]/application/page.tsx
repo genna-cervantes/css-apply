@@ -19,7 +19,7 @@ export default function CommitteeApplication() {
   const [error, setError] = useState("");
 
   const [uploading, setUploading] = useState({ cv: false, portfolio: false });
-  const [uploadError, setUploadError] = useState({ cv: '', portfolio: '' });
+  const [uploadError, setUploadError] = useState({ cv: "", portfolio: "" });
 
   const [formData, setFormData] = useState({
     studentNumber: "",
@@ -73,6 +73,22 @@ export default function CommitteeApplication() {
   const selectedCommittee = committeeRoles.find(
     (role) => role.id === committeeId
   );
+
+  const getCommitteeImage = (committeeId: string) => {
+    const imageMap: { [key: string]: string } = {
+      academics: "/assets/committee_test/CSAR_ACADEMICS.png",
+      community: "/assets/committee_test/CSAR_COMMDEV.png",
+      creatives: "/assets/committee_test/CSAR_CREATIVES.png",
+      documentation: "/assets/committee_test/CSAR_DOCU.png",
+      external: "/assets/committee_test/CSAR_EXTERNALS.png",
+      finance: "/assets/committee_test/CSAR_FINANCE.png",
+      logistics: "/assets/committee_test/CSAR_LOGISTICS.png",
+      publicity: "/assets/committee_test/CSAR_PUBLICITY.png",
+      sports: "/assets/committee_test/CSAR_SPOTA.png",
+      technology: "/assets/committee_test/CSAR_TECHDEV.png",
+    };
+    return imageMap[committeeId] || "/assets/committee_test/Questions CSAR.png";
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -202,36 +218,45 @@ export default function CommitteeApplication() {
     }
   };
 
-  const handleFileUpload = async (file: File, type: 'cv' | 'portfolio') => {
+  const handleFileUpload = async (file: File, type: "cv" | "portfolio") => {
     if (!file || !formData.studentNumber || !formData.section) {
-      setUploadError(prev => ({ ...prev, [type]: 'Student number and section are required' }));
+      setUploadError((prev) => ({
+        ...prev,
+        [type]: "Student number and section are required",
+      }));
       return;
     }
 
-    if (file.type !== 'application/pdf') {
-      setUploadError(prev => ({ ...prev, [type]: 'Only PDF files are allowed' }));
+    if (file.type !== "application/pdf") {
+      setUploadError((prev) => ({
+        ...prev,
+        [type]: "Only PDF files are allowed",
+      }));
       return;
     }
 
     // Validate file size (max 10MB)
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      setUploadError(prev => ({ ...prev, [type]: 'File size must be less than 10MB' }));
+      setUploadError((prev) => ({
+        ...prev,
+        [type]: "File size must be less than 10MB",
+      }));
       return;
     }
 
-    setUploading(prev => ({ ...prev, [type]: true }));
-    setUploadError(prev => ({ ...prev, [type]: '' }));
+    setUploading((prev) => ({ ...prev, [type]: true }));
+    setUploadError((prev) => ({ ...prev, [type]: "" }));
 
     try {
       const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-      uploadFormData.append('studentNumber', formData.studentNumber);
-      uploadFormData.append('section', formData.section);
-      uploadFormData.append('fileType', type);
+      uploadFormData.append("file", file);
+      uploadFormData.append("studentNumber", formData.studentNumber);
+      uploadFormData.append("section", formData.section);
+      uploadFormData.append("fileType", type);
 
-      const response = await fetch('/api/files/upload', {
-        method: 'POST',
+      const response = await fetch("/api/files/upload", {
+        method: "POST",
         body: uploadFormData,
       });
 
@@ -239,23 +264,29 @@ export default function CommitteeApplication() {
 
       if (response.ok) {
         // Update form data with the new file URL
-        if (type === 'cv') {
-          setFormData(prev => ({ ...prev, cv: result.url }));
+        if (type === "cv") {
+          setFormData((prev) => ({ ...prev, cv: result.url }));
         } else {
-          setFormData(prev => ({ ...prev, portfolioLink: result.url }));
+          setFormData((prev) => ({ ...prev, portfolioLink: result.url }));
         }
       } else {
-        setUploadError(prev => ({ ...prev, [type]: result.error || 'Upload failed' }));
+        setUploadError((prev) => ({
+          ...prev,
+          [type]: result.error || "Upload failed",
+        }));
       }
     } catch (error) {
-      setUploadError(prev => ({ ...prev, [type]: 'Upload failed. Please try again.' }));
-      if (type === 'cv') {
-        setFormData(prev => ({ ...prev, cv: file.name }));
+      setUploadError((prev) => ({
+        ...prev,
+        [type]: "Upload failed. Please try again.",
+      }));
+      if (type === "cv") {
+        setFormData((prev) => ({ ...prev, cv: file.name }));
       } else {
-        setFormData(prev => ({ ...prev, portfolioLink: file.name }));
+        setFormData((prev) => ({ ...prev, portfolioLink: file.name }));
       }
     } finally {
-      setUploading(prev => ({ ...prev, [type]: false }));
+      setUploading((prev) => ({ ...prev, [type]: false }));
     }
   };
 
@@ -361,7 +392,7 @@ export default function CommitteeApplication() {
                       name="studentNumber"
                       value={formData.studentNumber}
                       onChange={handleInputChange}
-                      className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
+                      className="w-full h-9 lg:h-12 rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
                       placeholder="e.g. 2019131907"
                       required
                     />
@@ -491,7 +522,9 @@ export default function CommitteeApplication() {
                     {formData.cv ? (
                       <div className="flex items-center justify-between bg-gray-100 p-2 lg:px-3 lg:py-2 rounded-md">
                         <span className="lg:text-sm text-black truncate">
-                          {formData.cv.includes('http') ? 'CV Uploaded ✓' : formData.cv}
+                          {formData.cv.includes("http")
+                            ? "CV Uploaded ✓"
+                            : formData.cv}
                         </span>
                         <button
                           type="button"
@@ -509,24 +542,29 @@ export default function CommitteeApplication() {
                           accept=".pdf"
                           onChange={(e) => {
                             const file = e.target.files?.[0];
-                              if (file) {
-                                if (file.size > 10 * 1024 * 1024) {
-                                  setUploadError(prev => ({ ...prev, cv: 'File size must be less than 10MB' }));
-                                  return;
-                                }
-                                handleFileUpload(file, 'cv');
+                            if (file) {
+                              if (file.size > 10 * 1024 * 1024) {
+                                setUploadError((prev) => ({
+                                  ...prev,
+                                  cv: "File size must be less than 10MB",
+                                }));
+                                return;
                               }
+                              handleFileUpload(file, "cv");
+                            }
                           }}
                           className="hidden"
                           required
                         />
                         <div className="bg-[#044FAF] text-white text-xs lg:text-sm lg:font-semibold py-1 px-3 lg:px-2 lg:py-2 rounded-md hover:bg-[#04387B] transition-all duration-150 active:scale-95 text-center w-20">
-                          {uploading.cv ? '...' : 'Upload'}
+                          {uploading.cv ? "..." : "Upload"}
                         </div>
                       </label>
                     )}
                     {uploadError.cv && (
-                      <div className="text-red-500 text-xs mt-1">{uploadError.cv}</div>
+                      <div className="text-red-500 text-xs mt-1">
+                        {uploadError.cv}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -540,7 +578,9 @@ export default function CommitteeApplication() {
                       {formData.portfolioLink ? (
                         <div className="flex items-center justify-between bg-gray-100 p-2 lg:px-3 lg:py-2 rounded-md">
                           <span className="lg:text-sm text-black truncate">
-                            {formData.portfolioLink.includes('http') ? 'Portfolio Uploaded ✓' : formData.portfolioLink}
+                            {formData.portfolioLink.includes("http")
+                              ? "Portfolio Uploaded ✓"
+                              : formData.portfolioLink}
                           </span>
                           <button
                             type="button"
@@ -565,22 +605,27 @@ export default function CommitteeApplication() {
                               const file = e.target.files?.[0];
                               if (file) {
                                 if (file.size > 10 * 1024 * 1024) {
-                                  setUploadError(prev => ({ ...prev, cv: 'File size must be less than 10MB' }));
+                                  setUploadError((prev) => ({
+                                    ...prev,
+                                    cv: "File size must be less than 10MB",
+                                  }));
                                   return;
                                 }
-                                handleFileUpload(file, 'portfolio');
+                                handleFileUpload(file, "portfolio");
                               }
                             }}
                             className="hidden"
                             required
                           />
                           <div className="bg-[#044FAF] text-white text-xs lg:text-sm lg:font-semibold py-1 px-3 lg:px-2 lg:py-2 rounded-md hover:bg-[#04387B] transition-all duration-150 active:scale-95 text-center w-20">
-                            {uploading.portfolio ? '...' : 'Upload'}
+                            {uploading.portfolio ? "..." : "Upload"}
                           </div>
                         </label>
                       )}
                       {uploadError.portfolio && (
-                        <div className="text-red-500 text-xs mt-1">{uploadError.portfolio}</div>
+                        <div className="text-red-500 text-xs mt-1">
+                          {uploadError.portfolio}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -618,16 +663,21 @@ export default function CommitteeApplication() {
                     htmlFor="agreement-checkbox"
                     className="text-black text-xs lg:text-sm font-normal select-none cursor-pointer text-justify"
                   >
-                    The information you provide will be kept confidential and
-                    used only for academic purposes. It will not be shared with
-                    third parties and will be handled responsibly and ethically.
+                    I agree that the information I provide will be kept
+                    confidential and used only for academic purposes. It will
+                    not be shared with third parties and will be handled
+                    responsibly and ethically.
                   </label>
                 </div>
               </div>
 
               <div className="hidden lg:flex justify-center">
-                <div className="w-80 h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">Committee Image</span>
+                <div className="w-80 h-96 rounded-lg overflow-hidden border border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3]">
+                  <img
+                    src={getCommitteeImage(committeeId || "")}
+                    alt={selectedCommittee?.title || "Committee"}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>

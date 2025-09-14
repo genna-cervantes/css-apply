@@ -217,11 +217,8 @@ export default function AssistantApplication() {
                             setSelectedRole(role.id);
                             setIsDropdownOpen(false);
                           }}
-                          className="p-2 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-3 last:border-b-0"
+                          className="p-5 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-3 last:border-b-0"
                         >
-                          <div className="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center">
-                            <span className="text-gray-500 text-xs">IMG</span>
-                          </div>
                           <h4 className="font-inter font-semibold text-xs text-black">
                             {role.title}
                           </h4>
@@ -265,9 +262,6 @@ export default function AssistantApplication() {
                           return role ? (
                             <>
                               <div className="flex items-center gap-5 mt-5 lg:mt-0">
-                                <div className="lg:hidden w-14 h-14 min-w-14 min-h-14 rounded-full overflow-hidden bg-[#7a7a7a]">
-                                  img
-                                </div>
                                 <div>
                                   <div className="text-[10px] lg:text-xs font-inter text-[#7a7a7a] lg:mb-1">
                                     <p>Be an Executive Assistant of</p>
@@ -291,9 +285,16 @@ export default function AssistantApplication() {
                         })()}
                       </div>
 
-                      {/* Right side - Committee picture */}
-                      <div className="hidden w-2/5 lg:block bg-gray-200 lg:h-80">
-                        is it here
+                      {/* Right side - EB picture */}
+                      <div className="hidden w-2/5 lg:flex lg:h-80 overflow-hidden border border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] items-center justify-center">
+                        <span className="text-white font-poppins text-lg font-semibold text-center px-4">
+                          {(() => {
+                            const role = committeeRoles.find(
+                              (r) => r.id === selectedRole
+                            );
+                            return role?.title || "EB Role";
+                          })()}
+                        </span>
                       </div>
                     </div>
                   </div>
