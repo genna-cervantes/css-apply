@@ -21,9 +21,8 @@ export default function UserDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
 
-  const checkApplications = async () => {
-    // REF: you dont need useEffect for this, this would work the same kahit nasa same level ng states ung if (status) just make sure to use useserversession instead of usesession
-    if (status === "authenticated") {
+  if (status === "authenticated" && !hasCheckedApplications) {
+    const checkApplications = async () => {
       try {
         const response = await fetch("/api/applications/check-existing");
         if (response.ok) {
@@ -49,12 +48,11 @@ export default function UserDashboard() {
       } finally {
         setHasCheckedApplications(true);
       }
-    }
-  };
+    };
 
-  checkApplications();
+    checkApplications();
+  }
 
-  // Check authentication status
   // REF: this too does not need useEffect
   useEffect(() => {
     if (status === "loading") return;

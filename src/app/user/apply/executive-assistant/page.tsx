@@ -2,14 +2,49 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { roles } from "@/data/ebRoles";
 
 export default function AssistantApplication() {
   const [selectedRole, setSelectedRole] = useState<string | null>("president");
+  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { status } = useSession();
   const router = useRouter();
+
+  if (status === "authenticated" && !hasCheckedApplications) {
+    const checkApplications = async () => {
+      try {
+        const response = await fetch("/api/applications/check-existing");
+        if (response.ok) {
+          const data = await response.json();
+
+          // Redirect based on existing applications
+          if (data.hasMemberApplication) {
+            router.push("/user/apply/member/progress");
+          } else if (data.hasCommitteeApplication) {
+            const committeeId = data.applications.committee?.firstOptionCommittee;
+            if (committeeId) {
+              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+            }
+          } else if (data.hasEAApplication) {
+            const ebRole = data.applications.ea?.firstOptionEb;
+            if (ebRole) {
+              router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking applications:", error);
+      } finally {
+        setHasCheckedApplications(true);
+      }
+    };
+
+    checkApplications();
+  }
 
   return (
     <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">

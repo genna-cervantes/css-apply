@@ -14,6 +14,7 @@ export default function CommitteeApplication() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -69,6 +70,39 @@ export default function CommitteeApplication() {
 
     fetchApplicationData();
   }, [session, status]);
+
+  // Check for if there are applications present
+  if (status === "authenticated" && !hasCheckedApplications) {
+    const checkApplications = async () => {
+      try {
+        const response = await fetch("/api/applications/check-existing");
+        if (response.ok) {
+          const data = await response.json();
+
+          // Redirect based on existing applications
+          if (data.hasMemberApplication) {
+            router.push("/user/apply/member/progress");
+          } else if (data.hasCommitteeApplication) {
+            const committeeId = data.applications.committee?.firstOptionCommittee;
+            if (committeeId) {
+              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+            }
+          } else if (data.hasEAApplication) {
+            const ebRole = data.applications.ea?.firstOptionEb;
+            if (ebRole) {
+              router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking applications:", error);
+      } finally {
+        setHasCheckedApplications(true);
+      }
+    };
+
+    checkApplications();
+  }
 
   const selectedCommittee = committeeRoles.find(
     (role) => role.id === committeeId

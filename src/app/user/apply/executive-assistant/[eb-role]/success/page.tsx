@@ -3,14 +3,17 @@
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ApplicationGuard from "@/components/ApplicationGuard";
 import { roles } from "@/data/ebRoles";
 
-export default function SuccessPage() {
+function SuccessPageContent() {
   const router = useRouter();
   const { "eb-role": ebRole } = useParams<{ "eb-role": string }>();
   const [scheduledTime, setScheduledTime] = useState<string>("");
+  const { status } = useSession();
 
   useEffect(() => {
     const time = localStorage.getItem("scheduledTime");
@@ -166,5 +169,13 @@ export default function SuccessPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <ApplicationGuard applicationType="ea">
+      <SuccessPageContent />
+    </ApplicationGuard>
   );
 }

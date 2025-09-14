@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { adminSchedule } from "@/data/adminSchedule";
 import Header from "@/components/Header";
 import ConfirmationModal from "@/components/Modal";
 import Footer from "@/components/Footer";
+import ApplicationGuard from "@/components/ApplicationGuard";
 import { roles } from "@/data/ebRoles";
 
-export default function SchedulePage() {
+function SchedulePageContent() {
   const router = useRouter();
   const { "eb-role": ebId } = useParams<{ "eb-role": string }>();
 
@@ -579,5 +581,13 @@ export default function SchedulePage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SchedulePage() {
+  return (
+    <ApplicationGuard applicationType="ea">
+      <SchedulePageContent />
+    </ApplicationGuard>
   );
 }

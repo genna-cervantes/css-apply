@@ -5,9 +5,10 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ApplicationGuard from "@/components/ApplicationGuard";
 import { committeeRoles } from "@/data/committeeRoles";
 
-export default function SuccessPage() {
+function SuccessPageContent() {
   const router = useRouter();
   const { committee: committeeId } = useParams<{ committee: string }>();
   const [scheduledTime, setScheduledTime] = useState<string>("");
@@ -166,5 +167,13 @@ export default function SuccessPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <ApplicationGuard applicationType="committee">
+      <SuccessPageContent />
+    </ApplicationGuard>
   );
 }
