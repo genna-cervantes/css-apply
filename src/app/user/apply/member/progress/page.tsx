@@ -12,23 +12,21 @@ export default function CommitteeProgressPage() {
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
 
-  useEffect(() => {
-    const fetchApplicationData = async () => {
-      try {
-        const response = await fetch("/api/applications/member");
-        if (response.ok) {
-          const data = await response.json();
-          setApplicationData(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch application data:", error);
-      } finally {
-        setLoading(false);
+  const fetchApplicationData = async () => {
+    try {
+      const response = await fetch("/api/applications/member");
+      if (response.ok) {
+        const data = await response.json();
+        setApplicationData(data);
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch application data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchApplicationData();
-  }, []);
+  fetchApplicationData();
 
   if (loading) {
     return (
@@ -49,10 +47,10 @@ export default function CommitteeProgressPage() {
         <div className="flex-grow flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
             <h1 className="text-2xl font-bold text-gray-800 mb-4">
-              No Application Found
+              No Member Application Found
             </h1>
             <p className="text-gray-600 mb-6">
-              You don't have an active committee application.
+              You don't have an active member application.
             </p>
             <button
               onClick={() => router.push("/user/apply/member")}

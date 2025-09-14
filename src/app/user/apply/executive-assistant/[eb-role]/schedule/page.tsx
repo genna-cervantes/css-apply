@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { adminSchedule } from "@/data/adminSchedule";
-import { ebRolesWithNames } from "@/data/ebRoles";
 import Header from "@/components/Header";
 import ConfirmationModal from "@/components/Modal";
 import Footer from "@/components/Footer";
@@ -92,10 +91,14 @@ export default function SchedulePage() {
           const slotId = `${dateStr}-${timeStr}`;
           const isBooked = daySchedule.bookedSlots.includes(timeStr);
 
+          const endHour = endTime.getHours().toString().padStart(2, '0');
+          const endMinute = endTime.getMinutes().toString().padStart(2, '0');
+          const endTimeStr = `${endHour}:${endMinute}`;
+
           slots.push({
             id: slotId,
             start: startTime.toISOString(),
-            end: endTime.toISOString(),
+            end: endTimeStr,
             date: dateStr,
             time: timeStr,
             isBooked: isBooked,

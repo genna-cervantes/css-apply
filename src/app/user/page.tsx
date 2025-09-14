@@ -21,40 +21,38 @@ export default function UserDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
 
-  useEffect(() => {
-    const checkApplications = async () => {
-      // REF: you dont need useEffect for this, this would work the same kahit nasa same level ng states ung if (status) just make sure to use useserversession instead of usesession
-      if (status === "authenticated") {
-        try {
-          const response = await fetch("/api/applications/check-existing");
-          if (response.ok) {
-            const data = await response.json();
+  const checkApplications = async () => {
+    // REF: you dont need useEffect for this, this would work the same kahit nasa same level ng states ung if (status) just make sure to use useserversession instead of usesession
+    if (status === "authenticated") {
+      try {
+        const response = await fetch("/api/applications/check-existing");
+        if (response.ok) {
+          const data = await response.json();
 
-            // Redirect based on existing applications
-            if (data.hasMemberApplication) {
-              router.push("/user/member/application/progress");
-            } else if (data.hasCommitteeApplication) {
-              const committeeId =
-                data.applications.committee?.firstOptionCommittee;
-              if (committeeId) {
-                router.push(
-                  `/user/apply/committee-staff/${committeeId}/progress`
-                );
-              }
-            } else if (data.hasEAApplication) {
-              router.push("/user/ea/application/progress");
+          // Redirect based on existing applications
+          if (data.hasMemberApplication) {
+            router.push("/user/apply/member/progress");
+          } else if (data.hasCommitteeApplication) {
+            const committeeId = data.applications.committee?.firstOptionCommittee;
+            if (committeeId) {
+              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+            }
+          } else if (data.hasEAApplication) {
+            const ebRole = data.applications.ea?.firstOptionEb;
+            if (ebRole) {
+              router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
             }
           }
-        } catch (error) {
-          console.error("Error checking applications:", error);
-        } finally {
-          setHasCheckedApplications(true);
         }
+      } catch (error) {
+        console.error("Error checking applications:", error);
+      } finally {
+        setHasCheckedApplications(true);
       }
-    };
+    }
+  };
 
-    checkApplications();
-  }, [status, router]);
+  checkApplications();
 
   // Check authentication status
   // REF: this too does not need useEffect
