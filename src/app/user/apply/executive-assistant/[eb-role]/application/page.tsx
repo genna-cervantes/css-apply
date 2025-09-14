@@ -16,7 +16,6 @@ export default function ExecutiveAssistantApplication() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-
   const selectedRole = roles.find((r) => r.id === ebId);
 
   const [isChecked, setIsChecked] = useState(false);
@@ -162,7 +161,7 @@ export default function ExecutiveAssistantApplication() {
                           studentNumber: e.target.value,
                         })
                       }
-                      className="w-full h-9 lg:h-12  rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
+                      className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base"
                       placeholder="e.g. 2019131907"
                       required
                     />
@@ -183,7 +182,7 @@ export default function ExecutiveAssistantApplication() {
                           firstName: e.target.value,
                         })
                       }
-                      className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
+                      className="w-full h-9 lg:h-12 rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
                       placeholder="e.g. Juan"
                       required
                     />
@@ -201,7 +200,7 @@ export default function ExecutiveAssistantApplication() {
                       onChange={(e) =>
                         setFormData({ ...formData, lastName: e.target.value })
                       }
-                      className="w-full h-9 lg:h-12  rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
+                      className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] focus:border-2 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
                       placeholder="e.g. Dela Cruz"
                       required
                     />
@@ -357,16 +356,19 @@ export default function ExecutiveAssistantApplication() {
                     htmlFor="agreement-checkbox"
                     className="text-black text-xs lg:text-sm font-normal select-none cursor-pointer text-justify"
                   >
-                    The information you provide will be kept confidential and
-                    used only for academic purposes. It will not be shared with
-                    third parties and will be handled responsibly and ethically.
+                    I agree that the information I provide will be kept
+                    confidential and used only for academic purposes. It will
+                    not be shared with third parties and will be handled
+                    responsibly and ethically.
                   </label>
                 </div>
               </div>
 
               <div className="hidden lg:flex justify-center">
-                <div className="w-80 h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">EB Image</span>
+                <div className="w-80 h-96 rounded-lg overflow-hidden border border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] flex items-center justify-center">
+                  <span className="text-white text-lg font-semibold text-center px-4">
+                    {selectedRole?.title || "EB Role"}
+                  </span>
                 </div>
               </div>
             </div>
