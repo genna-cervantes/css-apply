@@ -44,19 +44,21 @@ model EAApplication {
   id                     String   @id @default(cuid())
   studentNumber          String   @unique
   user                   User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  ebRole                 String   
   firstOptionEb          String
   secondOptionEb         String
-  portfolioLink          String
   cv                     String
+  supabaseFilePath       String?
   interviewSlotDay       String?
   interviewSlotTimeStart String?
   interviewSlotTimeEnd   String?
   hasFinishedInterview   Boolean  @default(false)
-  status                 String? // passed, failed, redirected
+  status                 String?  // passed, failed, redirected
   redirection            String?
   hasAccepted            Boolean  @default(false)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+
 }
 
 model CommitteeApplication {
@@ -72,11 +74,12 @@ model CommitteeApplication {
   interviewSlotTimeStart String?
   interviewSlotTimeEnd   String?
   hasFinishedInterview   Boolean  @default(false)
-  status                 String? // passed, failed, redirected
+  status                 String?  // passed, failed, redirected
   redirection            String?
   hasAccepted            Boolean  @default(false)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+
 }
 
 model AvailableEBInterviewTime {

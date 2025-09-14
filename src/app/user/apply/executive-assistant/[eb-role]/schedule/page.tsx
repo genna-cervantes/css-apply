@@ -1,7 +1,9 @@
 "use client";
-import { useMemo, useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Image from "next/image";
+import { adminSchedule } from "@/data/adminSchedule";
+import { ebRolesWithNames } from "@/data/ebRoles";
 import Header from "@/components/Header";
 import ConfirmationModal from "@/components/Modal";
 import Footer from "@/components/Footer";
@@ -9,8 +11,7 @@ import { roles } from "@/data/ebRoles";
 
 export default function SchedulePage() {
   const router = useRouter();
-  const { "eb-role": ebRole } = useParams<{ "eb-role": string }>();
-  const ebId = ebRole;
+  const { "eb-role": ebId } = useParams<{ "eb-role": string }>();
 
   // State for scheduling
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -73,221 +74,6 @@ export default function SchedulePage() {
       }> = [];
       const today = new Date();
 
-      // Admin has set up specific available times for September 15-26, 2024 (including weekends)
-      const adminSchedule = [
-        // September 16 (Tuesday)
-        {
-          date: new Date(2025, 8, 16),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-          ],
-          bookedSlots: ["09:30", "13:00", "15:00"],
-        },
-        // September 17 (Wednesday)
-        {
-          date: new Date(2025, 8, 17),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "12:00",
-            "12:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-            "16:00",
-            "16:30",
-          ],
-          bookedSlots: ["10:30", "12:00", "14:00", "16:30"],
-        },
-        // September 18 (Thursday)
-        {
-          date: new Date(2025, 8, 18),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-          ],
-          bookedSlots: ["09:00", "11:00", "15:30"],
-        },
-        // September 19 (Friday)
-        {
-          date: new Date(2025, 8, 19),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "12:00",
-            "12:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-            "16:00",
-            "16:30",
-          ],
-          bookedSlots: ["09:30", "11:30", "13:00", "15:00"],
-        },
-        // September 20 (Saturday)
-        {
-          date: new Date(2025, 8, 20),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-          ],
-          bookedSlots: ["10:00", "14:30"],
-        },
-        // September 21 (Sunday)
-        {
-          date: new Date(2025, 8, 21),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-          ],
-          bookedSlots: ["10:00", "14:30"],
-        },
-        // September 22 (Monday)
-        {
-          date: new Date(2025, 8, 22),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-            "16:00",
-            "16:30",
-          ],
-          bookedSlots: ["10:00", "14:30", "16:00"],
-        },
-        // September 23 (Tuesday)
-        {
-          date: new Date(2025, 8, 23),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-          ],
-          bookedSlots: ["09:30", "13:00", "15:00"],
-        },
-        // September 24 (Wednesday)
-        {
-          date: new Date(2025, 8, 24),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "12:00",
-            "12:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-            "16:00",
-            "16:30",
-          ],
-          bookedSlots: ["10:30", "12:00", "14:00", "16:30"],
-        },
-        // September 25 (Thursday)
-        {
-          date: new Date(2025, 8, 25),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-          ],
-          bookedSlots: ["09:00", "11:00", "15:30"],
-        },
-        // September 26 (Friday)
-        {
-          date: new Date(2025, 8, 26),
-          availableTimes: [
-            "09:00",
-            "09:30",
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-          ],
-          bookedSlots: ["10:00", "14:30"],
-        },
-      ];
-
       adminSchedule.forEach((daySchedule) => {
         // Ensure we get the correct date string regardless of timezone
         const year = daySchedule.date.getFullYear();
@@ -337,7 +123,11 @@ export default function SchedulePage() {
   }, []);
 
   const handleSlotSelect = (slotId: string) => {
-    setSelectedSlot(slotId);
+    if (selectedSlot === slotId) {
+      setSelectedSlot(null);
+    } else {
+      setSelectedSlot(slotId);
+    }
   };
 
   const handleSubmitClick = () => {
@@ -348,66 +138,79 @@ export default function SchedulePage() {
 
   const handleConfirmSchedule = async () => {
     if (selectedSlot) {
-      setIsSubmitting(true);
-      try {
-        // TODO: Re-enable API call when backend is ready
-        // const response = await fetch("/api/schedule-interview", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({
-        //     slotId: selectedSlot,
-        //     ebId: ebId,
-        //     applicationType: "executive-assistant",
-        //   }),
-        // });
+      const selectedSlotData = availableSlots.find(
+        (slot) => slot.id === selectedSlot
+      );
 
-        // Mock successful response for frontend development
-        const mockResponse = {
-          ok: true,
-          json: () => Promise.resolve({ success: true, error: null }),
-        };
-        const response = mockResponse;
+      if (!selectedSlotData) {
+        alert("Selected slot not found");
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      try {
+        const userResponse = await fetch("/api/applications/executive-assistant");
+        let studentNumber = "";
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          studentNumber = userData.user?.studentNumber || "";
+        }
+
+        if (!studentNumber) {
+          throw new Error("Student number not found");
+        }
+
+        const response = await fetch(
+          "/api/applications/executive-assistant/schedule",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              studentNumber,
+              interviewSlotDay: selectedSlotData.date,
+              interviewSlotTimeStart: selectedSlotData.time,
+              interviewSlotTimeEnd: selectedSlotData.end,
+              ebRole: ebId,
+            }),
+          }
+        );
+
+        const result = await response.json();
 
         if (response.ok) {
-          const result = await response.json();
           setShowModal(false);
 
           // Store scheduled time for success page
-          const selectedSlotData = availableSlots.find(
-            (slot) => slot.id === selectedSlot
-          );
-          if (selectedSlotData) {
-            const date = new Date(selectedSlotData.date);
-            const formattedDate = date.toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            });
-            const [hourStr, minute] = selectedSlotData.time.split(":");
-            let hour = parseInt(hourStr, 10);
-            const ampm = hour >= 12 ? "pm" : "am";
-            hour = hour % 12;
-            if (hour === 0) hour = 12;
-            const formattedTime = `${hour}:${minute} ${ampm}`;
+          const date = new Date(selectedSlotData.date);
+          const formattedDate = date.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+          const [hourStr, minute] = selectedSlotData.time.split(":");
+          let hour = parseInt(hourStr, 10);
+          const ampm = hour >= 12 ? "pm" : "am";
+          hour = hour % 12;
+          if (hour === 0) hour = 12;
+          const formattedTime = `${hour}:${minute} ${ampm}`;
 
-            // REF: for what ung localStorage
-            localStorage.setItem(
-              "scheduledTime",
-              `${formattedDate} at ${formattedTime}`
-            );
-          }
+          localStorage.setItem(
+            "scheduledTime",
+            `${formattedDate} at ${formattedTime}`
+          );
 
           router.push(`/user/apply/executive-assistant/${ebId}/success`);
         } else {
-          const error = await response.json();
-          alert(`Error: ${error.error}`);
+          alert(`Error: ${result.error}`);
         }
       } catch (error) {
-        console.error("Error submitting application:", error);
-        alert("Failed to submit application. Please try again.");
+        console.error("Error scheduling interview:", error);
+        alert("Failed to schedule interview. Please try again.");
       } finally {
         setIsSubmitting(false);
       }
@@ -419,7 +222,7 @@ export default function SchedulePage() {
   };
 
   const selectedEB = roles.find((role) => role.id === ebId);
-
+  
   if (!selectedEB) {
     return (
       <section className="min-h-screen bg-[rgb(243,243,253)]">

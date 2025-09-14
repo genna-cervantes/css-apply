@@ -13,7 +13,6 @@ export default function SuccessPage() {
   const [scheduledTime, setScheduledTime] = useState<string>("");
 
   useEffect(() => {
-    // Get scheduled time from localStorage or URL params
     const time = localStorage.getItem("scheduledTime");
     if (time) {
       setScheduledTime(time);

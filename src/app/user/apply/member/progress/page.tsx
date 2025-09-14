@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,6 +11,24 @@ export default function CommitteeProgressPage() {
   const [applicationData, setApplicationData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
+
+  useEffect(() => {
+    const fetchApplicationData = async () => {
+      try {
+        const response = await fetch("/api/applications/member");
+        if (response.ok) {
+          const data = await response.json();
+          setApplicationData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch application data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplicationData();
+  }, []);
 
   if (loading) {
     return (
@@ -37,7 +55,7 @@ export default function CommitteeProgressPage() {
               You don't have an active committee application.
             </p>
             <button
-              onClick={() => router.push("/user/apply/committee-staff")}
+              onClick={() => router.push("/user/apply/member")}
               className="bg-[#134687] hover:bg-[#0d3569] text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
               Apply Now

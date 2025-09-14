@@ -1,17 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { committeeRolesSubmitted } from "@/data/committeeRoles";
+import { roles } from "@/data/ebRoles";
 import { useSession } from "next-auth/react";
 
-export default function CommitteeProgressPage() {
+export default function EAProgressPage() {
     const router = useRouter();
     const { data: session } = useSession();
-    const { committee: committeeId } = useParams<{ committee: string }>();
-
+    
     const [applicationData, setApplicationData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [scheduledTime, setScheduledTime] = useState("");
@@ -21,7 +20,7 @@ export default function CommitteeProgressPage() {
     useEffect(() => {
         const fetchApplicationData = async () => {
             try {
-                const response = await fetch("/api/applications/committee-staff");
+                const response = await fetch("/api/applications/executive-assistant");
                 if (response.ok) {
                     const data = await response.json();
                     setApplicationData(data);
@@ -65,15 +64,14 @@ export default function CommitteeProgressPage() {
     const handleDeleteApplication = async () => {
         setIsDeleting(true);
         try {
-            const response = await fetch('/api/applications/committee-staff', {
+            const response = await fetch('/api/applications/executive-assistant', {
                 method: 'DELETE',
             });
 
             const result = await response.json();
 
             if (response.ok) {
-                // Redirect to application page after successful deletion
-                router.push('/user/apply/committee-staff');
+                router.push('/user/apply/executive-assistant');
             } else {
                 alert(result.error || 'Failed to delete application');
             }
@@ -103,7 +101,7 @@ export default function CommitteeProgressPage() {
                 <div className="flex items-center justify-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
                     <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 011.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                 </div>
                 </div>
@@ -171,10 +169,10 @@ export default function CommitteeProgressPage() {
                 No Application Found
                 </h1>
                 <p className="text-gray-600 mb-6">
-                You don't have an active committee application.
+                You don't have an active EA application.
                 </p>
                 <button
-                onClick={() => router.push("/user/apply/committee-staff")}
+                onClick={() => router.push("/user/apply/executive-assistant")}
                 className="bg-[#134687] hover:bg-[#0d3569] text-white font-medium py-2 px-4 rounded-lg transition-colors"
                 >
                 Apply Now
@@ -187,11 +185,11 @@ export default function CommitteeProgressPage() {
     }
 
     const application = applicationData.application;
-    const firstCommittee = committeeRolesSubmitted.find(
-        (role) => role.id === application.firstOptionCommittee
+    const firstEB = roles.find(
+        (role) => role.id === application.firstOptionEb
     );
-    const secondCommittee = committeeRolesSubmitted.find(
-        (role) => role.id === application.secondOptionCommittee
+    const secondEB = roles.find(
+        (role) => role.id === application.secondOptionEb
     );
 
     // Get user name from session
@@ -212,7 +210,7 @@ export default function CommitteeProgressPage() {
                 Welcome, {firstName} 👋
                 </div>
                 <div className="text-black text-sm sm:text-base lg:text-lg font-light text-center px-3 w-full leading-5 sm:leading-6 italic">
-                Track your journey with the Computer Science Society.
+                Track your Executive Assistant application journey.
                 </div>
             </div>
 
@@ -322,7 +320,7 @@ export default function CommitteeProgressPage() {
                         First Choice:
                         </span>
                         <span className="text-sm sm:text-base break-words">
-                        {firstCommittee?.title}
+                        {firstEB?.title}
                         </span>
                     </div>
 
@@ -331,7 +329,7 @@ export default function CommitteeProgressPage() {
                         Second Choice:
                         </span>
                         <span className="text-sm sm:text-base break-words">
-                        {secondCommittee?.title}
+                        {secondEB?.title}
                         </span>
                     </div>
                     </div>
@@ -351,7 +349,7 @@ export default function CommitteeProgressPage() {
                     <button
                     onClick={() =>
                         router.push(
-                        `/user/apply/committee-staff/${committeeId}/schedule`
+                        `/user/apply/executive-assistant/${application.firstOptionEb}/schedule` // ← Use firstOptionEb
                         )
                     }
                     className="bg-[#134687] text-white px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#0d3569] transition-all duration-150 active:scale-95"

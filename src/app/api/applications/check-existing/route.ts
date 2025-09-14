@@ -1,4 +1,3 @@
-// src/app/api/applications/check-existing/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
@@ -33,7 +32,10 @@ export async function GET(request: NextRequest) {
                 member: user.memberApplication,
                 committee: user.committeeApplication,
                 ea: user.eaApplication
-            }
+            },
+            // ADD these for proper redirects
+            ebRole: user.eaApplication?.firstOptionEb,
+            committeeId: user.committeeApplication?.firstOptionCommittee
         };
 
         return NextResponse.json(existingApplications);

@@ -102,7 +102,7 @@ export default function MemberApplication() {
       });
 
       if (response.ok) {
-        router.push("/user/member/application/payment");
+        router.push("/user/apply/member/progress");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Application submission failed");

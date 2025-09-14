@@ -1,4 +1,4 @@
-// src/app/api/upload/route.ts
+// src/app/api/files/upload/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { supabase } from '@/lib/supabase'
@@ -11,23 +11,25 @@ export async function POST(request: NextRequest) {
         const session = await getServerSession(authOptions);
         
         if (!session || !session?.user?.email) {
-        console.error('Unauthorized: No session or email');
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            console.error('Unauthorized: No session or email');
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        console.log('Session found for user:', session.user.email);
 
         // Parse the form data
         const formData = await request.formData();
         const file = formData.get('file') as File;
         const studentNumber = formData.get('studentNumber') as string;
         const fileType = formData.get('fileType') as string;
-        const section = formData.get('section') as string; // Get section from form data
+        const section = formData.get('section') as string;
+        const applicationType = formData.get('applicationType') as string; // 'ea' or 'committee'
         
-        console.log('Parsed data:', { studentNumber, fileType, section, file: file ? file.name : 'none' });
-
-        if (!file || !studentNumber || !fileType) {
-            console.error('Missing required fields:', { file: !!file, studentNumber: !!studentNumber, fileType: !!fileType });
+        if (!file || !studentNumber || !fileType || !applicationType) {
+            console.error('Missing required fields:', { 
+                file: !!file, 
+                studentNumber: !!studentNumber, 
+                fileType: !!fileType,
+                applicationType: !!applicationType
+            });
             return NextResponse.json(
                 { error: 'Missing required fields' },
                 { status: 400 }
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
 
         // Validate file size (max 10MB)
         const maxSize = 10 * 1024 * 1024;
-            if (file.size > maxSize) {
+        if (file.size > maxSize) {
             console.error('File too large:', file.size);
             return NextResponse.json(
                 { error: 'File size must be less than 10MB' },
@@ -53,13 +55,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if user exists by email (not student number)
+        // Check if user exists by email
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
             select: { id: true, email: true, studentNumber: true, section: true }
         });
-
-        console.log('User found:', user);
 
         if (!user) {
             console.error('User not found for email:', session.user.email);
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
         // Update the user with the student number and section if they're not already set
         const updateData: any = {};
-            if (!user.studentNumber) {
+        if (!user.studentNumber) {
             updateData.studentNumber = studentNumber;
         }
         if (section && !user.section) {
@@ -79,7 +79,6 @@ export async function POST(request: NextRequest) {
         }
 
         if (Object.keys(updateData).length > 0) {
-            console.log('Updating user with:', updateData);
             await prisma.user.update({
                 where: { email: session.user.email },
                 data: updateData
@@ -92,46 +91,61 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if user already has a file of this type
-        const application = await prisma.committeeApplication.findUnique({
-            where: { studentNumber },
-            select: { 
-                supabaseFilePath: true, 
-                portfolioLink: true 
-            }
-        });
-
-        console.log('Existing application:', application);
-
+        // Determine the bucket and application type
+        const bucketName = applicationType === 'ea' ? 'ea-applications' : 'committee-applications';
+        
+        // Check if user already has an application of this type
+        let existingApplication = null;
         let oldFilePath = '';
-            if (application) {
-            oldFilePath = fileType === 'cv' 
-                ? (application.supabaseFilePath || '')
-                : (application.portfolioLink || '');
-        }
 
-        console.log('Old file path to delete:', oldFilePath);
+        if (applicationType === 'ea') {
+            existingApplication = await prisma.eAApplication.findUnique({
+                where: { studentNumber },
+                select: { 
+                    supabaseFilePath: true,
+                    cv: true
+                }
+            });
+            
+            if (existingApplication) {
+                oldFilePath = fileType === 'cv' 
+                    ? (existingApplication.supabaseFilePath || '')
+                    : '';
+            }
+        } else {
+            existingApplication = await prisma.committeeApplication.findUnique({
+                where: { studentNumber },
+                select: { 
+                    supabaseFilePath: true, 
+                    cv: true,
+                    portfolioLink: true 
+                }
+            });
+            
+            if (existingApplication) {
+                oldFilePath = fileType === 'cv' 
+                    ? (existingApplication.supabaseFilePath || '')
+                    : (existingApplication.portfolioLink || '');
+            }
+        }
 
         // Generate unique file name
         const timestamp = Date.now();
         const fileName = `${studentNumber}_${fileType}_${timestamp}.pdf`;
         const filePath = `applications/${studentNumber}/${fileName}`;
 
-        console.log('New file path:', filePath);
-
         // Convert File to ArrayBuffer for Supabase upload
         const arrayBuffer = await file.arrayBuffer();
         const uint8Array = new Uint8Array(arrayBuffer);
 
         // Upload file to Supabase
-        console.log('Uploading to Supabase...');
         const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('committee-applications')
+            .from(bucketName)
             .upload(filePath, uint8Array, {
                 cacheControl: '3600',
                 upsert: false,
                 contentType: 'application/pdf'
-        });
+            });
 
         if (uploadError) {
             console.error('Supabase upload error:', uploadError);
@@ -141,100 +155,84 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log('Supabase upload successful:', uploadData);
-
         // Get public URL
         const { data: urlData } = supabase.storage
-            .from('committee-applications')
+            .from(bucketName)
             .getPublicUrl(filePath);
-
-        console.log('Public URL:', urlData.publicUrl);
 
         // Delete old file if it exists
         if (oldFilePath) {
             try {
                 // Extract the file path from the stored path
                 const oldPath = oldFilePath.includes('applications/') 
-                ? oldFilePath
-                : `applications/${studentNumber}/${oldFilePath}`;
+                    ? oldFilePath
+                    : `applications/${studentNumber}/${oldFilePath}`;
                 
-                console.log('Deleting old file:', oldPath);
                 const { error: deleteError } = await supabase.storage
-                .from('committee-applications')
-                .remove([oldPath]);
+                    .from(bucketName)
+                    .remove([oldPath]);
                 
                 if (deleteError) {
-                console.error('Error deleting old file:', deleteError);
+                    console.error('Error deleting old file:', deleteError);
                 } else {
-                console.log('Old file deleted successfully');
+                    console.log('Old file deleted successfully');
                 }
             } catch (deleteError) {
                 console.error('Error deleting old file:', deleteError);
-                // Continue even if deletion fails
             }
         }
 
-        // Check if committee application already exists
-        const existingApplication = await prisma.committeeApplication.findUnique({
-            where: { studentNumber }
-        });
-
-        let updatedApplication;
+        // Update existing application if it exists
         if (existingApplication) {
-        // Update existing application
-        const updateAppData = fileType === 'cv' 
-            ? { 
-                cv: urlData.publicUrl,
-                supabaseFilePath: filePath
+            if (applicationType === 'ea') {
+                // Update EA application - only CV is supported for EA
+                const updateAppData = {
+                    cv: urlData.publicUrl,
+                    supabaseFilePath: filePath
+                };
+
+                console.log('Updating existing EA application with:', updateAppData);
+
+                await prisma.eAApplication.update({
+                    where: { studentNumber },
+                    data: updateAppData
+                });
+            } else {
+                // Update committee application - supports both CV and portfolio
+                const updateAppData = fileType === 'cv' 
+                    ? { 
+                        cv: urlData.publicUrl,
+                        supabaseFilePath: filePath
+                    }
+                    : {
+                        portfolioLink: urlData.publicUrl,
+                        supabaseFilePath: filePath
+                    };
+
+                console.log('Updating existing committee application with:', updateAppData);
+
+                await prisma.committeeApplication.update({
+                    where: { studentNumber },
+                    data: updateAppData
+                });
             }
-            : {
-                portfolioLink: urlData.publicUrl,
-                supabaseFilePath: filePath
-            };
-
-        console.log('Updating application with:', updateAppData);
-
-        updatedApplication = await prisma.committeeApplication.update({
-            where: { studentNumber },
-            data: updateAppData
-        });
         } else {
-        // Create new application with minimal data
-        const createData = {
-            studentNumber,
-            cv: fileType === 'cv' ? urlData.publicUrl : '',
-            portfolioLink: fileType === 'portfolio' ? urlData.publicUrl : '',
-            supabaseFilePath: filePath,
-            firstOptionCommittee: '', // Will be filled in later
-            secondOptionCommittee: '', // Will be filled in later
-            interviewSlotDay: '',
-            interviewSlotTimeStart: '',
-            interviewSlotTimeEnd: '',
-            hasAccepted: false,
-            hasFinishedInterview: false,
-        };
-
-        console.log('Creating new application with:', createData);
-
-        updatedApplication = await prisma.committeeApplication.create({
-            data: createData
-        });
+            // Don't create a new application here - just return the file URL
+            console.log('No existing application found - file uploaded but no application record created yet');
         }
-
-        console.log('Application updated successfully:', updatedApplication);
 
         return NextResponse.json({
-        success: true,
-        url: urlData.publicUrl,
-        filePath: filePath,
-        message: 'File uploaded successfully'
+            success: true,
+            url: urlData.publicUrl,
+            filePath: filePath,
+            message: 'File uploaded successfully'
         });
 
     } catch (error) {
         console.error('Upload error:', error);
         return NextResponse.json(
-        { error: 'Internal server error' },
-        { status: 500 }
+            { error: 'Internal server error' },
+            { status: 500 }
         );
     }
 }

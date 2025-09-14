@@ -1,4 +1,3 @@
-// src/app/api/applications/member/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { prisma } from '@/lib/prisma'
@@ -39,7 +38,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check for existing application
         const existingApplication = await prisma.memberApplication.findUnique({
             where: { studentNumber },
         })
@@ -51,18 +49,14 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Update the User record with the latest info
-        // This saves their progress even if they don't complete payment
         const updatedUser = await prisma.user.update({
             where: { email: session.user.email },
             data: {
                 studentNumber,
                 section,
-                // We do not update the name here, as it comes from Google
             },
         })
 
-        // If no application exists or the existing one is not accepted, create/update it
         let application;
         if (!existingApplication) {
             application = await prisma.memberApplication.create({
@@ -73,8 +67,6 @@ export async function POST(request: NextRequest) {
                 },
             })
         } else {
-            // If application exists but is not accepted, we can update it (e.g., reset paymentProof if needed)
-            // For now, we'll just return the existing one
             application = existingApplication;
         }
 
