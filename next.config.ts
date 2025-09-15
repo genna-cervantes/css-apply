@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
     // Handle large images better
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Disable optimization for deployment issues
+    unoptimized: true,
   },
 };
 
