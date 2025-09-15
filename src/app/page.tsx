@@ -158,8 +158,6 @@ function HomeContent() {
                 width={112}
                 height={80}
                 className="w-full h-full object-contain brightness-0 invert"
-                width={100}
-                height={100}
               />
             </div>
           </Link>
@@ -178,8 +176,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -189,8 +185,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -200,8 +194,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -211,8 +203,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -221,9 +211,7 @@ function HomeContent() {
                     alt="Landing page image"
                     width={400}
                     height={300}
-                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
+                    className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md" 
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -233,8 +221,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
               </div>
@@ -247,8 +233,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -258,8 +242,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -269,8 +251,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -280,8 +260,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -291,8 +269,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -302,8 +278,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
               </div>
@@ -356,8 +330,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -367,8 +339,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -378,8 +348,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -389,8 +357,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -400,8 +366,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
               </div>
@@ -414,8 +378,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -425,8 +387,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -436,8 +396,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -447,8 +405,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
@@ -458,8 +414,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    width={100}
-                    height={100}
                   />
                 </div>
               </div>
