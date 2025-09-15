@@ -60,12 +60,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ answers, onRetake }) => {
             }
 
             try {
-                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-                if (!supabaseUrl || !supabaseAnonKey) {
-                    console.warn('Supabase env not configured (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY). Skipping submission.');
-                    return;
-                }
 
                 const formatColumnName = (name: string) =>
                     `score_${name.toLowerCase().replace(/ & /g, '_and_').replace(/ /g, '_')}`;

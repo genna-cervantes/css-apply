@@ -57,12 +57,14 @@ export default function UserDashboard() {
   useEffect(() => {
     if (status === "loading") return;
 
-    if (!session) {
+    if (status === "unauthenticated") {
       router.push("/");
       return;
     }
 
-    setIsLoading(false);
+    if (status === "authenticated" && session) {
+      setIsLoading(false);
+    }
   }, [session, status, router]);
 
   // Show loading screen while checking authentication
