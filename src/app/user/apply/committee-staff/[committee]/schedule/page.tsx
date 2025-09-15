@@ -9,7 +9,7 @@ import ConfirmationModal from "@/components/Modal";
 import ApplicationGuard from "@/components/ApplicationGuard";
 import { committeeRoles } from "@/data/committeeRoles";
 import { adminSchedule } from "@/data/adminSchedule";
-import { unavailableSlots } from "@/data/unavailableSlots";
+// import { unavailableSlots } from "@/data/unavailableSlots";
 
 function SchedulePageContent() {
   const router = useRouter();
@@ -25,6 +25,7 @@ function SchedulePageContent() {
       date: string;
       time: string;
       isBooked: boolean;
+      assignedEB: string;
     }>
   >([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,11 +39,13 @@ function SchedulePageContent() {
         date: string;
         time: string;
         isBooked: boolean;
+        assignedEB: string;
       }>
     >
   >({});
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   // Handle escape key to close modal
   useEffect(() => {
@@ -63,9 +66,45 @@ function SchedulePageContent() {
     };
   }, [showModal]);
 
+  const fetchUnavailableSlots = async () => {
+
+    const ebForInterview = await fetch(`/api/applications/committee-staff/eb/${committeeId}`);
+    const ebRes = await ebForInterview.json();
+    const ebForInterviewData = ebRes.ebs;
+
+    const ebUnavailabilityMap = await Promise.all(ebForInterviewData.map(async (eb: any) => {
+      // Fetch unavailable slots
+      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${eb.position}`);
+      const unavailableData = await unavailableResponse.json();
+      const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: any) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
+      
+      // Fetch existing interview bookings
+      const interviewSlotsResponse = await fetch(`/api/admin/interview-slots/${eb.position}`);
+      const interviewSlotsData = await interviewSlotsResponse.json();
+      const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: any) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
+      
+      return {
+        eb: eb.position,
+        unavailableSlots: new Set(unavailableSlots),
+        bookedSlots: new Set(bookedSlots)
+      };
+    }));
+
+    // Create a flattened set for backward compatibility
+    const flattenedSlots = ebUnavailabilityMap.flatMap(item => Array.from(item.unavailableSlots));
+    
+    return {
+      unavailableSlots: new Set(flattenedSlots),
+      ebUnavailabilityMap,
+      allEbs: ebForInterviewData.map((eb: any) => eb.position)
+    };
+  };
+
   // Generate hardcoded available slots (same as admin)
   useEffect(() => {
-    const generateHardcodedSlots = () => {
+    const generateHardcodedSlots = async () => {
+      const { unavailableSlots, ebUnavailabilityMap, allEbs } = await fetchUnavailableSlots();
+
       const slots: Array<{
         id: string;
         start: string;
@@ -73,6 +112,7 @@ function SchedulePageContent() {
         date: string;
         time: string;
         isBooked: boolean;
+        assignedEB: string;
       }> = [];
 
       // Hardcoded dates: September 16-26, 2025 (same as admin)
@@ -107,12 +147,54 @@ function SchedulePageContent() {
 
             const endTime = new Date(startTime);
             endTime.setMinutes(startTime.getMinutes() + 30);
-
+            
             const slotId = `${dateStr}-${timeStr}`;
-            const isUnavailable = unavailableSlots.has(slotId);
+            
+            // Find which EBs are available for this time slot
+            const availableEBsForSlot = allEbs.filter((eb: string) => {
+              const ebData = ebUnavailabilityMap.find(item => item.eb === eb);
+              if (!ebData) return true; // If no data, assume available
+              
+              const endTime = new Date(startTime);
+              endTime.setMinutes(startTime.getMinutes() + 30);
+              const endTimeStr = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`;
+              
+              // Check if this time slot is already booked for this EB
+              const slotKey = `${dateStr}-${timeStr}-${endTimeStr}`;
+              if (ebData.bookedSlots.has(slotKey)) {
+                return false; // EB is already booked at this time
+              }
+              
+              // Check if this EB is unavailable at this time slot
+              return !(Array.from(ebData.unavailableSlots) as string[]).some((unavailableSlot: string) => {
+                const parts = unavailableSlot.split('-');
+                if (parts.length >= 4) {
+                  const unavailableDate = `${parts[0]}-${parts[1]}-${parts[2]}`;
+                  const unavailableStartTime = parts[3];
+                  const unavailableEndTime = parts[4];
+                  
+                  // Check if the date matches and the time is within the range
+                  if (unavailableDate === dateStr) {
+                    const slotTimeMinutes = hour * 60 + minute;
+                    const [startHour, startMinute] = unavailableStartTime.split(':').map(Number);
+                    const [endHour, endMinute] = unavailableEndTime.split(':').map(Number);
+                    const startTimeMinutes = startHour * 60 + startMinute;
+                    const endTimeMinutes = endHour * 60 + endMinute;
+                    
+                    // Check if slot time is within the unavailable range
+                    return slotTimeMinutes >= startTimeMinutes && slotTimeMinutes < endTimeMinutes;
+                  }
+                }
+                return false;
+              });
+            });
 
-            // Only add available slots (not unavailable ones)
-            if (!isUnavailable) {
+            // Only add slots if at least one EB is available
+            if (availableEBsForSlot.length > 0) {
+              // Randomly assign one EB from the available EBs
+              const randomIndex = Math.floor(Math.random() * availableEBsForSlot.length);
+              const assignedEB = availableEBsForSlot[randomIndex];
+              
               slots.push({
                 id: slotId,
                 start: startTime.toISOString(),
@@ -120,6 +202,7 @@ function SchedulePageContent() {
                 date: dateStr,
                 time: timeStr,
                 isBooked: false, // All slots start as available
+                assignedEB: assignedEB,
               });
             }
           }
@@ -146,6 +229,7 @@ function SchedulePageContent() {
             date: string;
             time: string;
             isBooked: boolean;
+            assignedEB: string;
           }>
         >
       );
@@ -209,6 +293,7 @@ function SchedulePageContent() {
               interviewSlotDay: selectedSlotData.date,
               interviewSlotTimeStart: selectedSlotData.time,
               interviewSlotTimeEnd: selectedSlotData.end,
+              interviewBy: selectedSlotData.assignedEB
             }),
           }
         );
@@ -351,7 +436,7 @@ function SchedulePageContent() {
             {/* Scheduling Section */}
             <div className="lg:mb-8 mt-5 lg:mt-8 flex flex-col items-center justify-center w-full">
               <p className="text-black text-xs lg:text-md font-bold text-center mb-3 lg:mb-6 font-inter">
-                Click on any colorless slot to reserve your interview schedule.
+                Click on any available slot to reserve your interview schedule. Each slot shows the EB who will conduct your interview.
               </p>
 
               {isLoading ? (
@@ -493,7 +578,7 @@ function SchedulePageContent() {
                                                 : null
                                             }
                                             disabled={!isAvailable}
-                                            className={`w-full h-full transition-all duration-200 ${
+                                            className={`w-full h-full transition-all duration-200 p-1 flex flex-col items-center justify-center ${
                                               !isAvailable
                                                 ? "bg-[#164E96] cursor-not-allowed"
                                                 : isSelected
@@ -501,9 +586,13 @@ function SchedulePageContent() {
                                                 : "bg-white hover:bg-blue-50 cursor-pointer"
                                             }`}
                                           >
-                                            {isSelected && (
-                                              <div className="font-inter text-xs font-semibold">
+                                            {isSelected ? (
+                                              <div className="font-inter text-xs font-semibold text-center">
                                                 Selected
+                                              </div>
+                                            ) : (
+                                              <div className="font-inter text-xs text-center break-words">
+                                                {/* {slotForThisTime.assignedEB} */}
                                               </div>
                                             )}
                                           </button>

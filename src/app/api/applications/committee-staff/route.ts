@@ -165,6 +165,20 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
+        let meetingLink = null;
+        if (user.committeeApplication?.interviewBy) {
+            const { getPositionTitle } = await import('@/lib/eb-mapping');
+            
+            const positionTitle = getPositionTitle(user.committeeApplication.interviewBy);
+            
+            const ebProfile = await prisma.eBProfile.findFirst({
+                where: { 
+                    position: positionTitle 
+                }
+            });
+            meetingLink = ebProfile?.meetingLink || null;
+        }
+
         return NextResponse.json({ 
             hasApplication: !!user.committeeApplication,
             application: user.committeeApplication,
@@ -172,7 +186,8 @@ export async function GET(request: NextRequest) {
                 studentNumber: user.studentNumber,
                 name: user.name,
                 section: user.section
-            }
+            },
+            meetingLink: meetingLink
         });
         
     } catch (error) {

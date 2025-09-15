@@ -302,7 +302,7 @@ export default function MemberApplication() {
               }
               className="whitespace-nowrap font-inter text-sm font-semibold text-white px-12 py-3 rounded-lg bg-[#134687] hover:bg-[#0d3569] disabled:opacity-50"
             >
-              {loading ? "Submitting..." : "Pay Now"}
+              {loading ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>

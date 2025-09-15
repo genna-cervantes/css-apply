@@ -9,7 +9,7 @@ import ConfirmationModal from "@/components/Modal";
 import Footer from "@/components/Footer";
 import ApplicationGuard from "@/components/ApplicationGuard";
 import { roles } from "@/data/ebRoles";
-import { unavailableSlots } from "@/data/unavailableSlots";
+// import { unavailableSlots } from "@/data/unavailableSlots";
 
 function SchedulePageContent() {
   const router = useRouter();
@@ -25,6 +25,7 @@ function SchedulePageContent() {
       date: string;
       time: string;
       isBooked: boolean;
+      assignedEB: string;
     }>
   >([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +39,7 @@ function SchedulePageContent() {
         date: string;
         time: string;
         isBooked: boolean;
+        assignedEB: string;
       }>
     >
   >({});
@@ -63,9 +65,29 @@ function SchedulePageContent() {
     };
   }, [showModal]);
 
+  const fetchUnavailableSlots = async () => {
+    // Fetch unavailable slots
+    const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${ebId}`);
+    const unavailableData = await unavailableResponse.json();
+    const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: any) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
+    
+    // Fetch existing interview bookings
+    const interviewSlotsResponse = await fetch(`/api/admin/interview-slots/${ebId}`);
+    const interviewSlotsData = await interviewSlotsResponse.json();
+    const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: any) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
+    
+    return {
+      unavailableSlots: new Set(unavailableSlots),
+      bookedSlots: new Set(bookedSlots),
+      ebRole: ebId
+    };
+  };
+
   // Generate hardcoded available slots (same as admin and committee)
   useEffect(() => {
-    const generateHardcodedSlots = () => {
+    const generateHardcodedSlots = async () => {
+      const { unavailableSlots, bookedSlots } = await fetchUnavailableSlots();
+
       const slots: Array<{
         id: string;
         start: string;
@@ -73,6 +95,7 @@ function SchedulePageContent() {
         date: string;
         time: string;
         isBooked: boolean;
+        assignedEB: string;
       }> = [];
 
       // Hardcoded dates: September 16-26, 2025 (same as admin)
@@ -109,10 +132,38 @@ function SchedulePageContent() {
             endTime.setMinutes(startTime.getMinutes() + 30);
 
             const slotId = `${dateStr}-${timeStr}`;
-            const isUnavailable = unavailableSlots.has(slotId);
+            
+            const endTimeStr = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`;
+            
+            // Check if this time slot is already booked
+            const slotKey = `${dateStr}-${timeStr}-${endTimeStr}`;
+            const isBooked = bookedSlots.has(slotKey);
+            
+            // Check if this time slot is unavailable
+            const isUnavailable = (Array.from(unavailableSlots) as string[]).some((unavailableSlot: string) => {
+              const parts = unavailableSlot.split('-');
+              if (parts.length >= 4) {
+                const unavailableDate = `${parts[0]}-${parts[1]}-${parts[2]}`;
+                const unavailableStartTime = parts[3];
+                const unavailableEndTime = parts[4];
+                
+                // Check if the date matches and the time is within the range
+                if (unavailableDate === dateStr) {
+                  const slotTimeMinutes = hour * 60 + minute;
+                  const [startHour, startMinute] = unavailableStartTime.split(':').map(Number);
+                  const [endHour, endMinute] = unavailableEndTime.split(':').map(Number);
+                  const startTimeMinutes = startHour * 60 + startMinute;
+                  const endTimeMinutes = endHour * 60 + endMinute;
+                  
+                  // Check if slot time is within the unavailable range
+                  return slotTimeMinutes >= startTimeMinutes && slotTimeMinutes < endTimeMinutes;
+                }
+              }
+              return false;
+            });
 
-            // Only add available slots (not unavailable ones)
-            if (!isUnavailable) {
+            // Only add slot if it's not unavailable and not booked
+            if (!isUnavailable && !isBooked) {
               const endHour = endTime.getHours().toString().padStart(2, '0');
               const endMinute = endTime.getMinutes().toString().padStart(2, '0');
               const endTimeStr = `${endHour}:${endMinute}`;
@@ -124,29 +175,29 @@ function SchedulePageContent() {
                 date: dateStr,
                 time: timeStr,
                 isBooked: false, // All slots start as available
+                assignedEB: ebId, // Assign the current EB role
               });
             }
           }
         }
       });
 
-      return slots;
+      setAvailableSlots(slots);
+
+      // Group slots by date
+      const grouped = slots.reduce((acc, slot) => {
+        if (!acc[slot.date]) {
+          acc[slot.date] = [];
+        }
+        acc[slot.date].push(slot);
+        return acc;
+      }, {} as Record<string, typeof slots>);
+
+      setGroupedSlots(grouped);
+      setIsLoading(false);
     };
 
-    const slots = generateHardcodedSlots();
-    setAvailableSlots(slots);
-
-    // Group slots by date
-    const grouped = slots.reduce((acc, slot) => {
-      if (!acc[slot.date]) {
-        acc[slot.date] = [];
-      }
-      acc[slot.date].push(slot);
-      return acc;
-    }, {} as Record<string, typeof slots>);
-
-    setGroupedSlots(grouped);
-    setIsLoading(false);
+    generateHardcodedSlots();
   }, []);
 
   const handleSlotSelect = (slotId: string) => {
@@ -202,6 +253,7 @@ function SchedulePageContent() {
               interviewSlotTimeStart: selectedSlotData.time,
               interviewSlotTimeEnd: selectedSlotData.end,
               ebRole: ebId,
+              interviewBy: selectedSlotData.assignedEB,
             }),
           }
         );
