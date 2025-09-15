@@ -155,6 +155,8 @@ function HomeContent() {
               <Image
                 src="/assets/logos/Logo_CSS Apply.svg"
                 alt="CSS Apply Logo"
+                width={112}
+                height={80}
                 className="w-full h-full object-contain brightness-0 invert"
                 width={100}
                 height={100}
@@ -173,6 +175,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -182,6 +186,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -191,6 +197,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -200,6 +208,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -209,6 +219,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage5.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -218,6 +230,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage6.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -230,6 +244,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage7.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -239,6 +255,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage8.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -248,6 +266,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage9.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -257,6 +277,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage10.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -266,6 +288,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage11.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -275,6 +299,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage12.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -327,6 +353,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage13.png"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -336,6 +364,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage14.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -345,6 +375,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage15.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -354,6 +386,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage16.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -363,6 +397,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage17.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -375,6 +411,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage18.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -384,6 +422,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage19.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -393,6 +433,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage20.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -402,6 +444,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage21.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
@@ -411,6 +455,8 @@ function HomeContent() {
                   <Image
                     src="/assets/pictures/landingpage/landingpage22.jpg"
                     alt="Landing page image"
+                    width={400}
+                    height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                     width={100}
                     height={100}
