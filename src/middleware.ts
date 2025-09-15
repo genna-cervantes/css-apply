@@ -6,6 +6,11 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request })
   const pathname = request.nextUrl.pathname
 
+  // Skip middleware for auth-related paths
+  if (pathname.startsWith('/api/auth')) {
+    return NextResponse.next()
+  }
+
   // If user is authenticated and trying to access home page, redirect to appropriate dashboard
   if (token && (pathname === '/' || pathname === '')) {
     // Redirect based on role

@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
             token.dbId = dbUser.id;
             token.name = dbUser.name;
           } else {
-            console.log("No DB User found for email:", token.email);
+            // User not found in database
           }
         } catch (error) {
           console.error("JWT callback database error:", error);
