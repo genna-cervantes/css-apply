@@ -32,6 +32,13 @@ const Schedule = () => {
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [ebProfile, setEbProfile] = useState<{
+    userId: string;
+    position: string;
+    committees: string[];
+    isActive: boolean;
+} | null>(null);
+  const [scheduleIsLoading, setScheduleIsLoading] = useState(false);
   const calendarRef = useRef<FullCalendar>(null);
 
   // Helper function to format date and time for display
@@ -79,8 +86,28 @@ const Schedule = () => {
       return;
     }
 
+    setScheduleIsLoading(true);
+    getEBData(session?.user?.dbId);
     fetchSlots();
+    setScheduleIsLoading(false);
   }, [status, session, router]);
+
+  const getEBData = async (id: string) => {
+    try{
+      const ebData = await fetch(`/api/admin/eb-profiles/${id}`, {
+        method: "GET",
+      });
+      const parsedEBData = await ebData.json();      
+      setEbProfile({
+        userId: parsedEBData.ebProfile.userId,
+        position: parsedEBData.ebProfile.position,
+        committees: parsedEBData.ebProfile.committees,
+        isActive: parsedEBData.ebProfile.isActive,
+      });
+    }catch(error){
+      console.error("Error getting EB data:", error);
+    }
+  }
 
   // FullCalendar event handlers
   const handleDateSelect = (selectInfo: any) => {
@@ -203,8 +230,18 @@ const Schedule = () => {
 
   const fetchSlots = async () => {
     try {
+      if (!ebProfile) return;
+
       setLoading(true);
-      // Initialize with empty slots for now
+      
+      const response = await fetch(`/api/admin/unavailable-slots/${ebProfile?.position}`, {
+        method: "GET",
+      });
+      const res = await response.json();
+      console.log('res', res);
+      setUnavailableTimeSlots(res.unavailableSlotsData);
+      setCalendarEvents(unavailableTimeSlots);
+      setShowCalendar(true);
     } catch (error) {
       console.error("Error generating slots:", error);
     } finally {
@@ -212,11 +249,14 @@ const Schedule = () => {
     }
   };
 
-  const handleCreateSlot = () => {
+  const handleCreateSlot = async () => {
+    if (!ebProfile) return;
+    
     if (unavailableTimeSlots.length === 0) {
       alert("Please select time slots to mark as unavailable");
       return;
     }
+
     setShowConfirmModal(true);
   };
 
@@ -224,19 +264,29 @@ const Schedule = () => {
     try {
       setIsSaving(true);
 
-      // Mark selected time slots as unavailable
-      for (const slot of unavailableTimeSlots) {
-        // Create a unique slot ID that includes the date and time range
-        const slotId = `${slot.date}-${slot.startTime}-${slot.endTime}`;
-
-        // Add to unavailable slots
-        addUnavailableSlot(slotId);
+      const unavailableSlots = unavailableTimeSlots.map((slot) => ({
+        id: `${slot.date}-${slot.startTime}-${slot.endTime}`,
+        eb: ebProfile?.position,
+        day: slot.date,
+        timeStart: slot.startTime,
+        timeEnd: slot.endTime,
+      }));
+      const response = await fetch("/api/admin/unavailable-slots", {
+        method: "POST",
+        body: JSON.stringify(unavailableSlots),
+      });
+      
+      const res = await response.json();
+      if (!res.success){
+        console.error("Error creating unavailable slots:", res.error);
+        alert(res.message);
+        throw new Error(res.message);
       }
-
+  
       // Reset form and close calendar
       setShowCalendar(false);
-      setUnavailableTimeSlots([]);
-      setCalendarEvents([]);
+      // setUnavailableTimeSlots([]);
+      // setCalendarEvents([]);
       setShowConfirmModal(false);
       await fetchSlots();
       alert("Unavailable time slots saved successfully!");
@@ -248,7 +298,7 @@ const Schedule = () => {
     }
   };
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || loading || !ebProfile || scheduleIsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center">
@@ -277,7 +327,7 @@ const Schedule = () => {
             className="text-xl md:text-4xl font-bold text-gray-800 mb-2 flex items-center justify-center md:justify-start"
             style={{ fontFamily: "var(--font-raleway)" }}
           >
-            Welcome, {"{replace with name}"} 👋
+            Welcome, {ebProfile?.position} 👋
           </h1>
           <p className="text-xs md:text-base text-gray-600 italic mb-4 md:mb-6">
             Stay organized and guide applicants through their journey.
@@ -535,7 +585,6 @@ const Schedule = () => {
                   Note:
                 </p>
                 <ul className="list-disc pl-4 sm:pl-5 space-y-1 text-xs sm:text-sm text-black font-inter">
-                  <li>Once confirmed, your schedule cannot be edited.</li>
                   <li>Double-check your selected time slots before saving.</li>
                   <li>Ensure availability to avoid missed interviews.</li>
                 </ul>
