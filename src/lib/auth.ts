@@ -239,4 +239,8 @@ export const authOptions: NextAuthOptions = {
       },
     },
   },
+  debug: true,
+  logger: {
+    error(code, meta) { console.error('NextAuth error', code, meta) },
+  },
 };

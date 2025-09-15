@@ -91,19 +91,19 @@ function HomeContent() {
     shape?: string;
   }> = [
     {
-      src: "assets/partners/BiteSlice.jpg",
+      src: "/assets/partners/BiteSlice.jpg",
       alt: "BiteSlice",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/profile.php?id=100064060713967",
     },
     {
-      src: "public/assets/partners/HomeRoom.jpg",
+      src: "/assets/partners/HomeRoom.jpg",
       alt: "HomeRoom",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/homeroomcoworkingph",
     },
     {
-      src: "/public/assets/partners/MindZone.jpg",
+      src: "/assets/partners/MindZone.jpg",
       alt: "MindZone",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/mindzoneespanaph",
