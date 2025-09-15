@@ -88,9 +88,15 @@ const Schedule = () => {
 
     setScheduleIsLoading(true);
     getEBData(session?.user?.dbId);
-    fetchSlots();
-    setScheduleIsLoading(false);
   }, [status, session, router]);
+
+  // Separate useEffect for fetching slots when ebProfile is available
+  useEffect(() => {
+    if (ebProfile) {
+      fetchSlots();
+      setScheduleIsLoading(false);
+    }
+  }, [ebProfile]);
 
   const getEBData = async (id: string) => {
     try{
@@ -229,12 +235,12 @@ const Schedule = () => {
   }, [unavailableTimeSlots]);
 
   const fetchSlots = async () => {
+    if (!ebProfile) return;
+    
     try {
-      if (!ebProfile) return;
-
       setLoading(true);
       
-      const response = await fetch(`/api/admin/unavailable-slots/${ebProfile?.position}`, {
+      const response = await fetch(`/api/admin/unavailable-slots/${ebProfile.position}`, {
         method: "GET",
       });
       const res = await response.json();
@@ -250,8 +256,6 @@ const Schedule = () => {
   };
 
   const handleCreateSlot = async () => {
-    if (!ebProfile) return;
-    
     if (unavailableTimeSlots.length === 0) {
       alert("Please select time slots to mark as unavailable");
       return;
@@ -261,12 +265,14 @@ const Schedule = () => {
   };
 
   const handleConfirmSave = async () => {
+    if (!ebProfile) return;
+    
     try {
       setIsSaving(true);
 
       const unavailableSlots = unavailableTimeSlots.map((slot) => ({
         id: `${slot.date}-${slot.startTime}-${slot.endTime}`,
-        eb: ebProfile?.position,
+        eb: ebProfile.position,
         day: slot.date,
         timeStart: slot.startTime,
         timeEnd: slot.endTime,

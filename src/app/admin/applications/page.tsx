@@ -64,8 +64,14 @@ const Applications = () => {
     }
 
     getEBData(session?.user?.dbId);
-    fetchApplications();
-  }, [status, session, router, selectedType, selectedStatus]);
+  }, [status, session, router]);
+
+  // Separate useEffect for fetching applications when ebData is available
+  useEffect(() => {
+    if (ebData) {
+      fetchApplications();
+    }
+  }, [ebData, selectedType, selectedStatus]);
 
   const getEBData = async (id: string) => {
     const response = await fetch(`/api/admin/eb-profiles/${id}`);
@@ -74,8 +80,6 @@ const Applications = () => {
   };
 
   const fetchApplications = async () => {
-    if (!ebData) return;
-
     try {
       setLoading(true);
       
@@ -84,7 +88,6 @@ const Applications = () => {
         const data = await response.json();
         setApplications(data.applications);
       }
-      setLoading(false)
     } catch (error) {
       console.error('Error fetching applications:', error);
     } finally {
