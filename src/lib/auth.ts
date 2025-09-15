@@ -35,6 +35,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user }) {
       try {
+        console.log('signIn')
+        console.log(user)
         // Check if user exists in database
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email! },
@@ -61,6 +63,9 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ token, user }) {
+      console.log('jwt')
+      console.log('token')
+      console.log(token)
       if (user) {
         token.role = "user";
       }
@@ -92,6 +97,10 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
+      console.log('session')
+      console.log(session)
+      console.log('token')
+      console.log(token)
       if (session?.user && token) {
         (session.user as UserSession).role = token.role as string;
         (session.user as UserSession).dbId = token.dbId as string;
@@ -207,6 +216,8 @@ export const authOptions: NextAuthOptions = {
     },
 
     async redirect({ url }) {
+      console.log('redirect')
+      console.log(url)
       if (url.startsWith("/api/auth")) {
         return url;
       }
