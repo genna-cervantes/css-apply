@@ -253,10 +253,16 @@ function CommitteeProgressPageContent() {
                 </span>
                 </div>
                 {scheduledTime && (
-                <p className="text-[10px] text-center lg:text-xs font-inter mt-6 text-gray-600">
-                    Interview scheduled for: <br className="lg:hidden" />
-                    <span className="font-semibold">{scheduledTime}</span>
-                </p>
+                    <div className="flex flex-col">
+                        <p className="text-[10px] text-center lg:text-xs font-inter mt-6 text-gray-600">
+                            Interview scheduled for: <br className="lg:hidden" />
+                            <span className="font-semibold">{scheduledTime}</span>
+                        </p>
+                        <p className="text-[10px] text-center lg:text-xs font-inter mt-6 text-gray-600">
+                            Meeting Link: <br className="lg:hidden" />
+                            <span className="font-semibold">{applicationData.meetingLink}</span>
+                        </p>
+                    </div>
                 )}
             </div>
 
@@ -341,12 +347,12 @@ function CommitteeProgressPageContent() {
             </div>
 
                 <div className="flex justify-center gap-4">
-                <button
+                {/* <button
                     onClick={() => router.push("/user")}
                     className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
                 >
                     Back to Dashboard
-                </button>
+                </button> */}
 
                 {!application.interviewSlotDay && (
                     <button

@@ -15,10 +15,11 @@ export async function POST(request: NextRequest) {
             studentNumber,
             interviewSlotDay,
             interviewSlotTimeStart,
-            interviewSlotTimeEnd
+            interviewSlotTimeEnd,
+            interviewBy
         } = await request.json();
 
-        if (!studentNumber || !interviewSlotDay || !interviewSlotTimeStart || !interviewSlotTimeEnd) {
+        if (!studentNumber || !interviewSlotDay || !interviewSlotTimeStart || !interviewSlotTimeEnd || !interviewBy) {
             return NextResponse.json(
                 { error: 'All schedule fields are required' },
                 { status: 400 }
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
         const updatedApplication = await prisma.committeeApplication.update({
             where: { studentNumber },
             data: {
+                interviewBy,
                 interviewSlotDay,
                 interviewSlotTimeStart,
                 interviewSlotTimeEnd

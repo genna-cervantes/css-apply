@@ -29,6 +29,16 @@ const Schedule = () => {
       endTime: string;
     }>
   >([]);
+  const [interviewSlots, setInterviewSlots] = useState<
+    Array<{
+      id: string;
+      day: string;
+      timeStart: string;
+      timeEnd: string;
+      name: string;
+      meetingLink: string;
+    }>
+  >([]);
   const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -197,23 +207,33 @@ const Schedule = () => {
   };
 
   const handleEventClick = (clickInfo: any) => {
-    // Remove unavailable slot if clicked
+    // Only allow removal of unavailable slots, not interview slots
     const eventId = clickInfo.event.id;
 
+    // Check if this is an interview slot (starts with "interview-")
+    if (eventId.startsWith("interview-")) {
+      alert("Interview slots cannot be removed directly. They are managed through applications.");
+      return;
+    }
+
+    // Remove unavailable slot if clicked
+    const actualSlotId = eventId.replace("unavailable-", "");
     setCalendarEvents((prev) => prev.filter((event) => event.id !== eventId));
     setUnavailableTimeSlots((prev) =>
-      prev.filter((slot) => slot.id !== eventId)
+      prev.filter((slot) => slot.id !== actualSlotId)
     );
   };
 
   const generateCalendarEvents = () => {
+    const events = [];
+
     // Convert unavailable time slots to FullCalendar events
-    const events = unavailableTimeSlots.map((slot) => {
+    const unavailableEvents = unavailableTimeSlots.map((slot) => {
       const startDateTime = new Date(`${slot.date}T${slot.startTime}:00`);
       const endDateTime = new Date(`${slot.date}T${slot.endTime}:00`);
 
       return {
-        id: slot.id,
+        id: `unavailable-${slot.id}`,
         title: "Unavailable", // Show text
         start: startDateTime,
         end: endDateTime,
@@ -225,14 +245,33 @@ const Schedule = () => {
       };
     });
 
+    // Convert interview slots to FullCalendar events
+    const interviewEvents = interviewSlots.map((slot) => {
+      const startDateTime = new Date(`${slot.day}T${slot.timeStart}:00`);
+      const endDateTime = new Date(`${slot.day}T${slot.timeEnd}:00`);
+
+      return {
+        id: `interview-${slot.id}`,
+        title: `${slot.name}`, // Show text
+        start: startDateTime,
+        end: endDateTime,
+        backgroundColor: "#dc2626", // Red color for interviews
+        borderColor: "#b91c1c",
+        textColor: "white",
+        display: "block",
+        classNames: "interview-event", // Add custom class
+      };
+    });
+
+    events.push(...unavailableEvents, ...interviewEvents);
     setCalendarEvents(events);
   };
 
   useEffect(() => {
-    if (unavailableTimeSlots.length > 0) {
+    if (unavailableTimeSlots.length > 0 || interviewSlots.length > 0) {
       generateCalendarEvents();
     }
-  }, [unavailableTimeSlots]);
+  }, [unavailableTimeSlots, interviewSlots]);
 
   const fetchSlots = async () => {
     if (!ebProfile) return;
@@ -240,13 +279,24 @@ const Schedule = () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/api/admin/unavailable-slots/${ebProfile.position}`, {
+      // Fetch unavailable slots
+      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${ebProfile.position}`, {
         method: "GET",
       });
-      const res = await response.json();
-      console.log('res', res);
-      setUnavailableTimeSlots(res.unavailableSlotsData);
-      setCalendarEvents(unavailableTimeSlots);
+      const unavailableRes = await unavailableResponse.json();
+      console.log('unavailable slots:', unavailableRes);
+      setUnavailableTimeSlots(unavailableRes.unavailableSlotsData);
+
+      // Fetch interview slots
+      const interviewResponse = await fetch(`/api/admin/interview-slots/${ebProfile.position}`, {
+        method: "GET",
+      });
+      const interviewRes = await interviewResponse.json();
+      console.log('interview slots:', interviewRes);
+      if (interviewRes.success && interviewRes.slots) {
+        setInterviewSlots(interviewRes.slots);
+      }
+      
       setShowCalendar(true);
     } catch (error) {
       console.error("Error generating slots:", error);
@@ -382,6 +432,11 @@ const Schedule = () => {
               </div>
             ) : (
               <div className="space-y-4 md:space-y-6">
+                {interviewSlots.length > 0 && <div className="flex">
+                  <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">
+                    Meeting Link: {interviewSlots[0].meetingLink}
+                  </h4>
+                </div>}
                 {/* Guide Message */}
                 <div className="bg-white border border-gray-200 rounded-lg p-3 md:p-4">
                   <div className="flex items-start gap-2 md:gap-3">
@@ -394,26 +449,45 @@ const Schedule = () => {
                     </div>
                     <div className="flex-1">
                       <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">
-                        How to mark unavailable times:
+                        How to use the schedule calendar:
                       </h4>
                       <ul className="text-xs text-gray-700 space-y-1">
                         <li>
+                          • <strong>View:</strong> Blue blocks show unavailable times, red blocks show scheduled interviews
+                        </li>
+                        <li>
                           • <strong>Single day:</strong> Click and drag to
-                          select a time range
+                          select a time range as unavailable
                         </li>
                         <li>
                           • <strong>Multiple days:</strong> Drag from one day to
-                          another to mark entire days
+                          another to mark entire days as unavailable
                         </li>
                         <li>
-                          • <strong>Remove selection:</strong> Click on any
-                          selected time block to remove it
+                          • <strong>Remove unavailable times:</strong> Click on blue blocks to remove them
                         </li>
                         <li>
                           • <strong>Save:</strong> Click "Save Unavailable
                           Times" when done
                         </li>
                       </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="bg-white border border-gray-200 rounded-lg p-3 md:p-4 mb-4">
+                  <h4 className="text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    Calendar Legend:
+                  </h4>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-[#134687] rounded border border-[#0f3a6b]"></div>
+                      <span className="text-xs text-gray-600">Unavailable Times</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-[#dc2626] rounded border border-[#b91c1c]"></div>
+                      <span className="text-xs text-gray-600">Scheduled Interviews</span>
                     </div>
                   </div>
                 </div>

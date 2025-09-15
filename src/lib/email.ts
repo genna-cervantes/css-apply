@@ -96,7 +96,7 @@ export const emailTemplates = {
                 </div>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Our team will review your application and get back to you soon. Please keep an eye on your email for updates regarding your interview schedule.
+                    The meeting link for your interview is available in the application dashboard.
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
@@ -138,7 +138,7 @@ export const emailTemplates = {
                 </div>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Our team will review your application and get back to you soon. Please keep an eye on your email for updates regarding your interview schedule.
+                    The meeting link for your interview is available in the application dashboard.
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">

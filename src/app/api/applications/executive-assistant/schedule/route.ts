@@ -16,10 +16,11 @@ export async function POST(request: NextRequest) {
             interviewSlotDay,
             interviewSlotTimeStart,
             interviewSlotTimeEnd,
-            ebRole
+            ebRole,
+            interviewBy
         } = await request.json();
 
-        if (!studentNumber || !interviewSlotDay || !interviewSlotTimeStart || !interviewSlotTimeEnd || !ebRole) {
+        if (!studentNumber || !interviewSlotDay || !interviewSlotTimeStart || !interviewSlotTimeEnd || !ebRole || !interviewBy) {
             return NextResponse.json(
                 { error: 'All schedule fields are required' },
                 { status: 400 }
@@ -47,7 +48,8 @@ export async function POST(request: NextRequest) {
             data: {
                 interviewSlotDay,
                 interviewSlotTimeStart,
-                interviewSlotTimeEnd
+                interviewSlotTimeEnd,
+                interviewBy
             },
         });
 
