@@ -114,7 +114,12 @@ function HomeContent() {
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/nomuPH",
     },
-
+    {
+      src: "/assets/partners/Sumu.jpg",
+      alt: "Sumu",
+      size: "h-20 w-20",
+      facebookUrl: "https://www.facebook.com/sumuph",
+    },
     {
       src: "/assets/partners/TheCatalyst.jpg",
       alt: "TheCatalyst",
@@ -207,7 +212,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage5.png"
+                    src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -216,7 +221,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage6.png"
+                    src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -228,7 +233,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage7.png"
+                    src="/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -237,7 +242,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage8.png"
+                    src="/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -246,7 +251,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage9.jpg"
+                    src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -255,7 +260,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage10.png"
+                    src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -264,7 +269,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage11.png"
+                    src="/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -273,7 +278,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage12.png"
+                    src="/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -325,7 +330,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage13.png"
+                    src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -334,7 +339,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage14.jpg"
+                    src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -343,7 +348,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage15.jpg"
+                    src="/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -352,7 +357,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage16.jpg"
+                    src="/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -361,7 +366,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage17.jpg"
+                    src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -373,7 +378,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage18.jpg"
+                    src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -382,7 +387,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage19.jpg"
+                    src="/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -391,7 +396,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage20.jpg"
+                    src="/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -400,7 +405,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage21.jpg"
+                    src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -409,7 +414,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage22.jpg"
+                    src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
