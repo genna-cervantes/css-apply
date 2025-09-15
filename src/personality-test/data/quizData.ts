@@ -1,4 +1,4 @@
-import { Question, CommitteeName } from '@/types/quiz';
+import { Question, CommitteeName } from '../types/quiz';
 
 // All your constants (COMMITTEES, questions, committeeFitReasons, etc.) go here.
 

@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
 
 interface ApplicationGuardProps {
@@ -35,13 +33,7 @@ export default function ApplicationGuard({
     setIsLoading(false);
   }, [session, status, router]);
 
-  useEffect(() => {
-    if (status === "authenticated" && !isLoading) {
-      checkApplication();
-    }
-  }, [status, isLoading]);
-
-  const checkApplication = async () => {
+  const checkApplication = useCallback(async () => {
     try {
       const response = await fetch("/api/applications/check-existing");
       if (response.ok) {
@@ -81,7 +73,13 @@ export default function ApplicationGuard({
     } finally {
       setIsChecking(false);
     }
-  };
+  }, [applicationType, redirectPath, router]);
+
+  useEffect(() => {
+    if (status === "authenticated" && !isLoading) {
+      checkApplication();
+    }
+  }, [status, isLoading, checkApplication]);
 
   // Show loading screen while checking authentication or application
   if (isLoading || status === "loading" || isChecking) {

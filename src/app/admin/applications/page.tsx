@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
@@ -40,13 +40,13 @@ const Applications = () => {
   const router = useRouter();
   const [applications, setApplications] = useState<{committee: Application[], ea: Application[]}>({committee: [], ea: []});
   const [loading, setLoading] = useState(false);
-  const [selectedType, setSelectedType] = useState<'member' | 'committee' | 'ea'>('member');
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
+  const [selectedType] = useState<'member' | 'committee' | 'ea'>('member');
+  const [selectedStatus] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [showRedirectModal, setShowRedirectModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [redirectTo, setRedirectTo] = useState('');
-  const [ebData, setEbData] = useState<any>(null);
+  const [ebData, setEbData] = useState<{position: string} | null>(null);
   const [showCommitteeApplications, setShowCommitteeApplications] = useState(true);
   const [showEaApplications, setShowEaApplications] = useState(true);
 
@@ -66,24 +66,11 @@ const Applications = () => {
     getEBData(session?.user?.dbId);
   }, [status, session, router]);
 
-  // Separate useEffect for fetching applications when ebData is available
-  useEffect(() => {
-    if (ebData) {
-      fetchApplications();
-    }
-  }, [ebData, selectedType, selectedStatus]);
-
-  const getEBData = async (id: string) => {
-    const response = await fetch(`/api/admin/eb-profiles/${id}`);
-    const data = await response.json();
-    setEbData(data.ebProfile);
-  };
-
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/api/admin/applications/${ebData.position}`);
+      const response = await fetch(`/api/admin/applications/${ebData?.position}`);
       if (response.ok) {
         const data = await response.json();
         setApplications(data.applications);
@@ -93,13 +80,26 @@ const Applications = () => {
     } finally {
       setLoading(false);
     }
+  }, [ebData?.position]);
+
+  // Separate useEffect for fetching applications when ebData is available
+  useEffect(() => {
+    if (ebData) {
+      fetchApplications();
+    }
+  }, [ebData, selectedType, selectedStatus, fetchApplications]);
+
+  const getEBData = async (id: string) => {
+    const response = await fetch(`/api/admin/eb-profiles/${id}`);
+    const data = await response.json();
+    setEbData(data.ebProfile);
   };
 
   const handleApplicationAction = async (applicationId: string, type: 'committee' | 'ea' | 'member', action: 'accept' | 'reject' | 'redirect') => {
     try {
       setProcessingId(applicationId);
       
-      const body: any = {
+      const body: {applicationId: string; type: string; action: string; redirection?: string} = {
         applicationId,
         type,
         action
@@ -132,11 +132,6 @@ const Applications = () => {
     } finally {
       setProcessingId(null);
     }
-  };
-
-  const openRedirectModal = (application: Application) => {
-    setSelectedApplication(application);
-    setShowRedirectModal(true);
   };
 
   const getStatusBadge = (application: Application) => {
@@ -385,7 +380,7 @@ const Applications = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold mb-4">Redirect Application</h3>
             <p className="text-gray-600 mb-4">
-              Redirect {selectedApplication.user.name}'s application to:
+              Redirect {selectedApplication.user.name}&apos;s application to:
             </p>
             <select
               value={redirectTo}

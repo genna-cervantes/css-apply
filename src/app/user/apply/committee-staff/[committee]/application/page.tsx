@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { committeeRoles } from "@/data/committeeRoles";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -299,6 +300,7 @@ export default function CommitteeApplication() {
         }));
       }
     } catch (error) {
+      console.error("Upload error:", error);
       setUploadError((prev) => ({
         ...prev,
         [type]: "Upload failed. Please try again.",
@@ -695,11 +697,13 @@ export default function CommitteeApplication() {
               </div>
 
               <div className="hidden lg:flex justify-center">
-                <div className="w-80 h-96 rounded-lg overflow-hidden border border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3]">
-                  <img
+                <div className="w-80 h-96 rounded-lg overflow-hidden border border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] relative">
+                  <Image
                     src={getCommitteeImage(committeeId || "")}
                     alt={selectedCommittee?.title || "Committee"}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 320px, 0px"
                   />
                 </div>
               </div>

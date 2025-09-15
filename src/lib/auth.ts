@@ -1,4 +1,4 @@
-import NextAuth, { type NextAuthOptions } from "next-auth";
+import { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 
@@ -14,11 +14,15 @@ interface UserSession {
   createdAt?: Date;
   updatedAt?: Date;
   hasCompletedProfile?: boolean;
-  applicationStatus?: any;
+  applicationStatus?: {
+    member: {hasApplication: boolean; hasPayment?: boolean; isAccepted?: boolean; appliedAt?: Date};
+    ea: {hasApplication: boolean; status?: string; isAccepted?: boolean};
+    committee: {hasApplication: boolean; status?: string; isAccepted?: boolean};
+  };
   hasMemberApplication?: boolean;
   hasEAApplication?: boolean;
   hasCommitteeApplication?: boolean;
-  ebProfile?: any;
+  ebProfile?: {position: string; committees: string[]; isActive: boolean} | null;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -29,7 +33,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       try {
         // Check if user exists in database
         const existingUser = await prisma.user.findUnique({
@@ -56,7 +60,7 @@ export const authOptions: NextAuthOptions = {
       }
     },
 
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user }) {
       if (user) {
         token.role = "user";
       }
@@ -179,7 +183,7 @@ export const authOptions: NextAuthOptions = {
                 ea: dbUser.eaApplication
                   ? {
                       hasApplication: true,
-                      status: dbUser.eaApplication.status,
+                      status: dbUser.eaApplication.status ?? undefined,
                       isAccepted: dbUser.eaApplication.hasAccepted,
                     }
                   : { hasApplication: false },
@@ -187,7 +191,7 @@ export const authOptions: NextAuthOptions = {
                 committee: dbUser.committeeApplication
                   ? {
                       hasApplication: true,
-                      status: dbUser.committeeApplication.status,
+                      status: dbUser.committeeApplication.status ?? undefined,
                       isAccepted: dbUser.committeeApplication.hasAccepted,
                     }
                   : { hasApplication: false },

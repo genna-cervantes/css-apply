@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { NextRequest, NextResponse } from "next/server"
 
 // GET unavailable slots for admin view
-export async function GET(request: NextRequest, { params }: { params: Promise<{ eb: string }> }) {  
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {  
     try {
         const session = await getServerSession(authOptions)
         
@@ -12,11 +12,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { eb } = await params
+        const { id } = await params
 
         const unavailableSlots = await prisma.availableEBInterviewTime.findMany({
             where: {
-                ...(eb && { eb })
+                ...(id && { eb: id })
             },
             orderBy: [
                 { day: 'asc' },

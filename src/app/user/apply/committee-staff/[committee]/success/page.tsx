@@ -74,7 +74,7 @@ function SuccessPageContent() {
             <p className="text-sm sm:text-md font-inter text-gray-700 px-2 sm:px-4">
               Your application to the Computer Science Society has been
               successfully submitted. <br className="hidden sm:block" />
-              We're excited to have you take this step toward becoming part of
+              We&apos;re excited to have you take this step toward becoming part of
               our mission to inspire, innovate, and lead.
             </p>
           </div>

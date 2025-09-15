@@ -34,7 +34,7 @@ export async function GET(
         },
       });
   
-      let applications: {committee: {
+      const applications: {committee: {
           status: string | null;
           id: string;
           studentNumber: string;

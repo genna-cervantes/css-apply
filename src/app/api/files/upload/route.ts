@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Update the user with the student number and section if they're not already set
-        const updateData: any = {};
+        const updateData: {studentNumber?: string; section?: string} = {};
         if (!user.studentNumber) {
             updateData.studentNumber = studentNumber;
         }
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
         const uint8Array = new Uint8Array(arrayBuffer);
 
         // Upload file to Supabase
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
             .from(bucketName)
             .upload(filePath, uint8Array, {
                 cacheControl: '3600',

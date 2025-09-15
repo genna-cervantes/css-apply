@@ -69,7 +69,7 @@ export async function PUT(request: NextRequest) {
         });
       }
     } else if (type === "committee") {
-      const updateData: any = {};
+      const updateData: {hasAccepted?: boolean; status?: string; redirection?: string} = {};
 
       if (action === "accept") {
         updateData.hasAccepted = true;
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest) {
         },
       });
     } else if (type === "ea") {
-      const updateData: any = {};
+      const updateData: {hasAccepted?: boolean; status?: string; redirection?: string} = {};
 
       if (action === "accept") {
         updateData.hasAccepted = true;

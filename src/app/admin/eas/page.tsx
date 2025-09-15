@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
@@ -35,23 +35,7 @@ const EAs = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending' | 'rejected'>('all');
 
-  useEffect(() => {
-    if (status === 'loading') return;
-
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-      return;
-    }
-
-    if (session?.user?.role !== 'admin' && session?.user?.role !== 'super_admin') {
-      router.push('/user');
-      return;
-    }
-
-    fetchEAs();
-  }, [status, session, router, selectedStatus]);
-
-  const fetchEAs = async () => {
+  const fetchEAs = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -69,7 +53,23 @@ const EAs = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedStatus]);
+
+  useEffect(() => {
+    if (status === 'loading') return;
+
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (session?.user?.role !== 'admin' && session?.user?.role !== 'super_admin') {
+      router.push('/user');
+      return;
+    }
+
+    fetchEAs();
+  }, [status, session, router, selectedStatus, fetchEAs]);
 
   const getStatusBadge = (ea: EA) => {
     if (ea.hasAccepted) {

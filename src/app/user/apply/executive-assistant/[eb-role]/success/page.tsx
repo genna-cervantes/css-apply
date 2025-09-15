@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ApplicationGuard from "@/components/ApplicationGuard";
@@ -13,7 +12,6 @@ function SuccessPageContent() {
   const router = useRouter();
   const { "eb-role": ebRole } = useParams<{ "eb-role": string }>();
   const [scheduledTime, setScheduledTime] = useState<string>("");
-  const { status } = useSession();
 
   useEffect(() => {
     const time = localStorage.getItem("scheduledTime");
@@ -76,7 +74,7 @@ function SuccessPageContent() {
             <p className="text-sm sm:text-md font-inter text-gray-700 px-2 sm:px-4">
               Your application to the Computer Science Society has been
               successfully submitted. <br className="hidden sm:block" />
-              We're excited to have you take this step toward becoming part of
+              We&apos;re excited to have you take this step toward becoming part of
               our mission to inspire, innovate, and lead.
             </p>
           </div>

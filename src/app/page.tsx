@@ -6,11 +6,11 @@ import Footer from "@/components/Footer";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-export default function Home() {
+function HomeContent() {
   // Auth button state and handler (migrated from old LoginButton)
   const searchParams = useSearchParams();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -152,7 +152,7 @@ export default function Home() {
             className="inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded cursor-pointer hover:scale-105 transition-all duration-300"
           >
             <div className="w-16 h-12 md:w-28 md:h-20  flex items-center justify-center">
-              <img
+              <Image
                 src="/assets/logos/Logo_CSS Apply.svg"
                 alt="CSS Apply Logo"
                 className="w-full h-full object-contain brightness-0 invert"
@@ -168,42 +168,42 @@ export default function Home() {
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
                   {/* REF: Use next image instead of img */}
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage5.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage6.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
@@ -213,42 +213,42 @@ export default function Home() {
               {/* Duplicate for seamless loop */}
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage7.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage8.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage9.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage10.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage11.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage12.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
@@ -298,35 +298,35 @@ export default function Home() {
             <div className="absolute bottom-0 left-0 w-[200%] h-full flex animate-[scroll-left_30s_linear_infinite]">
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage13.png"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage14.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage15.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage16.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage17.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
@@ -336,35 +336,35 @@ export default function Home() {
               {/* Duplicate for seamless loop */}
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage18.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage19.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage20.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage21.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
                   />
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
-                  <img
+                  <Image
                     src="/assets/pictures/landingpage/landingpage22.jpg"
                     alt="Landing page image"
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
@@ -818,5 +818,13 @@ export default function Home() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

@@ -1,10 +1,11 @@
 import React from "react";
+import Image from "next/image";
 
 function Footer() {
   return (
     <footer className="w-full py-8 px-5 md:px-20 bg-[#044FAF] text-white flex flex-col md:flex-row gap-8 md:gap-24 items-start border-b-10 border-[#287FEB]">
       <div className="flex flex-col gap-1">
-        <img
+        <Image
           src="/assets/logos/Logo_CSS.svg"
           alt="A descriptive alt text for your image"
           width={60}

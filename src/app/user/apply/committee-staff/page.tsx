@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { committeeRolesRequirements } from "@/data/committeeRoles";
@@ -116,11 +117,13 @@ export default function StaffApplication() {
                           }}
                           className="p-2 border-b cursor-pointer hover:bg-gray-50 flex items-center gap-1 last:border-b-0"
                         >
-                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center">
-                            <img
+                          <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center relative">
+                            <Image
                               src={getCommitteeImage(role.id)}
                               alt={role.title}
-                              className="w-6 h-6 object-cover"
+                              fill
+                              sizes="24px"
+                              className="object-cover"
                             />
                           </div>
                           <h4 className="font-inter font-semibold text-xs text-black">
@@ -176,14 +179,16 @@ export default function StaffApplication() {
                         })()}
                       </div>
                       {/* Right side - Committee picture */}
-                      <div className="hidden w-2/5 lg:block lg:h-80 overflow-hidden border-1 border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] ">
-                        <img
+                      <div className="hidden w-2/5 lg:block lg:h-80 overflow-hidden border-1 border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] relative">
+                        <Image
                           src={getCommitteeImage(selectedRole)}
                           alt={
                             committeeRolesRequirements.find((r) => r.id === selectedRole)
                               ?.title || "Committee"
                           }
-                          className="w-full h-full object-cover "
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 40vw"
+                          className="object-cover"
                         />
                       </div>
                     </div>
@@ -196,11 +201,13 @@ export default function StaffApplication() {
                           Select a role to view details
                         </p>
                       </div>
-                      <div className="w-full lg:w-2/5 h-80 overflow-hidden">
-                        <img
+                      <div className="w-full lg:w-2/5 h-80 overflow-hidden relative">
+                        <Image
                           src="/assets/committee_test/Questions CSAR.png"
                           alt="Select a committee"
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 40vw"
+                          className="object-cover"
                         />
                       </div>
                     </div>

@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from "@/components/AdminMobileSB";
 import SidebarContent from "@/components/AdminSidebar";
 
-import {
-  addUnavailableSlot,
-  removeUnavailableSlot,
-} from "@/data/unavailableSlots";
+// import {
+//   addUnavailableSlot,
+//   removeUnavailableSlot,
+// } from "@/data/unavailableSlots";
 import { CalendarPlus, Calendar, Clock, X } from "lucide-react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -39,7 +39,7 @@ const Schedule = () => {
       meetingLink: string;
     }>
   >([]);
-  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<Array<{id: string; title: string; start: Date; end: Date; backgroundColor: string; borderColor: string; textColor: string; display: string; classNames: string}>>([]);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [ebProfile, setEbProfile] = useState<{
@@ -80,35 +80,7 @@ const Schedule = () => {
     };
   };
 
-  useEffect(() => {
-    if (status === "loading") return;
-
-    if (status === "unauthenticated") {
-      router.push("/auth/signin");
-      return;
-    }
-
-    if (
-      session?.user?.role !== "admin" &&
-      session?.user?.role !== "super_admin"
-    ) {
-      router.push("/user");
-      return;
-    }
-
-    setScheduleIsLoading(true);
-    getEBData(session?.user?.dbId);
-  }, [status, session, router]);
-
-  // Separate useEffect for fetching slots when ebProfile is available
-  useEffect(() => {
-    if (ebProfile) {
-      fetchSlots();
-      setScheduleIsLoading(false);
-    }
-  }, [ebProfile]);
-
-  const getEBData = async (id: string) => {
+  const getEBData = useCallback(async (id: string) => {
     try{
       const ebData = await fetch(`/api/admin/eb-profiles/${id}`, {
         method: "GET",
@@ -123,10 +95,10 @@ const Schedule = () => {
     }catch(error){
       console.error("Error getting EB data:", error);
     }
-  }
+  }, []);
 
   // FullCalendar event handlers
-  const handleDateSelect = (selectInfo: any) => {
+  const handleDateSelect = (selectInfo: {start: Date; end: Date}) => {
     const start = selectInfo.start;
     const end = selectInfo.end;
 
@@ -206,7 +178,7 @@ const Schedule = () => {
     }
   };
 
-  const handleEventClick = (clickInfo: any) => {
+  const handleEventClick = (clickInfo: {event: {id: string}}) => {
     // Only allow removal of unavailable slots, not interview slots
     const eventId = clickInfo.event.id;
 
@@ -224,7 +196,7 @@ const Schedule = () => {
     );
   };
 
-  const generateCalendarEvents = () => {
+  const generateCalendarEvents = useCallback(() => {
     const events = [];
 
     // Convert unavailable time slots to FullCalendar events
@@ -265,15 +237,15 @@ const Schedule = () => {
 
     events.push(...unavailableEvents, ...interviewEvents);
     setCalendarEvents(events);
-  };
+  }, [unavailableTimeSlots, interviewSlots]);
 
   useEffect(() => {
     if (unavailableTimeSlots.length > 0 || interviewSlots.length > 0) {
       generateCalendarEvents();
     }
-  }, [unavailableTimeSlots, interviewSlots]);
+  }, [unavailableTimeSlots, interviewSlots, generateCalendarEvents]);
 
-  const fetchSlots = async () => {
+  const fetchSlots = useCallback(async () => {
     if (!ebProfile) return;
     
     try {
@@ -303,7 +275,35 @@ const Schedule = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [ebProfile]);
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+      return;
+    }
+
+    if (
+      session?.user?.role !== "admin" &&
+      session?.user?.role !== "super_admin"
+    ) {
+      router.push("/user");
+      return;
+    }
+
+    setScheduleIsLoading(true);
+    getEBData(session?.user?.dbId);
+  }, [status, session, router, getEBData]);
+
+  // Separate useEffect for fetching slots when ebProfile is available
+  useEffect(() => {
+    if (ebProfile) {
+      fetchSlots();
+      setScheduleIsLoading(false);
+    }
+  }, [ebProfile, fetchSlots]);
 
   const handleCreateSlot = async () => {
     if (unavailableTimeSlots.length === 0) {
@@ -467,8 +467,8 @@ const Schedule = () => {
                           • <strong>Remove unavailable times:</strong> Click on blue blocks to remove them
                         </li>
                         <li>
-                          • <strong>Save:</strong> Click "Save Unavailable
-                          Times" when done
+                          • <strong>Save:</strong> Click &quot;Save Unavailable
+                          Times&quot; when done
                         </li>
                       </ul>
                     </div>
