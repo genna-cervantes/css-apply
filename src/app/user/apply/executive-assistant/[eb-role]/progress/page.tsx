@@ -10,9 +10,37 @@ import { useSession } from "next-auth/react";
 
 function EAProgressPageContent() {
     const router = useRouter();
-    const { data: session, status } = useSession();
+    const { data: session } = useSession();
     
-    const [applicationData, setApplicationData] = useState<any>(null);
+    const [applicationData, setApplicationData] = useState<{
+        hasApplication: boolean;
+        application: {
+            id: string;
+            studentNumber: string;
+            ebRole: string;
+            firstOptionEb: string;
+            secondOptionEb: string;
+            cv: string;
+            supabaseFilePath?: string;
+            interviewSlotDay?: string;
+            interviewSlotTimeStart?: string;
+            interviewSlotTimeEnd?: string;
+            interviewBy?: string;
+            hasFinishedInterview: boolean;
+            status?: string;
+            redirection?: string;
+            hasAccepted: boolean;
+            createdAt: string;
+            updatedAt: string;
+        };
+        user: {
+            studentNumber: string;
+            name: string;
+            section: string;
+        };
+        ebRole: string;
+        meetingLink?: string;
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [scheduledTime, setScheduledTime] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
@@ -170,7 +198,7 @@ function EAProgressPageContent() {
                 No Application Found
                 </h1>
                 <p className="text-gray-600 mb-6">
-                You don't have an active EA application.
+                You don&apos;t have an active EA application.
                 </p>
                 <button
                 onClick={() => router.push("/user/apply/executive-assistant")}

@@ -247,6 +247,7 @@ export default function ExecutiveAssistantApplication() {
         setUploadError(prev => ({ ...prev, [type]: result.error || 'Upload failed' }));
       }
     } catch (error) {
+      console.error('Upload error:', error);
       setUploadError(prev => ({ ...prev, [type]: 'Upload failed. Please try again.' }));
       setFormData(prev => ({ ...prev, cv: file.name }));
     } finally {

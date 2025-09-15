@@ -9,7 +9,11 @@ import { useSession } from "next-auth/react";
 
 function MemberProgressPageContent() {
   const router = useRouter();
-  const [applicationData, setApplicationData] = useState<any>(null);
+  const [applicationData, setApplicationData] = useState<{
+    hasApplication: boolean;
+    application: {id: string; hasAccepted?: boolean; paymentProof?: string; createdAt: string} | null;
+    user: {studentNumber: string; name: string; section: string};
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
 
@@ -53,7 +57,7 @@ function MemberProgressPageContent() {
               No Member Application Found
             </h1>
             <p className="text-gray-600 mb-6">
-              You don't have an active member application.
+              You don&apos;t have an active member application.
             </p>
             <button
               onClick={() => router.push("/user/apply/member")}
@@ -107,7 +111,7 @@ function MemberProgressPageContent() {
                       Name:
                     </span>
                     <span className="text-sm sm:text-base break-words">
-                      {applicationData.user?.name}
+                      {applicationData.user.name}
                     </span>
                   </div>
 
@@ -116,7 +120,7 @@ function MemberProgressPageContent() {
                       Student Number:
                     </span>
                     <span className="text-sm sm:text-base">
-                      {applicationData.user?.studentNumber}
+                      {applicationData.user.studentNumber}
                     </span>
                   </div>
                 </div>
@@ -128,7 +132,7 @@ function MemberProgressPageContent() {
                       Section:
                     </span>
                     <span className="text-sm sm:text-base">
-                      {applicationData.user?.section}
+                      {applicationData.user.section}
                     </span>
                   </div>
 

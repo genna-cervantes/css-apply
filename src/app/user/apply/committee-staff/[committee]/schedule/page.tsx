@@ -1,14 +1,14 @@
 "use client";
 
-import {  useState, useEffect } from "react";
+import {  useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ConfirmationModal from "@/components/Modal";
 import ApplicationGuard from "@/components/ApplicationGuard";
 import { committeeRoles } from "@/data/committeeRoles";
-import { adminSchedule } from "@/data/adminSchedule";
+// import { adminSchedule } from "@/data/adminSchedule";
 // import { unavailableSlots } from "@/data/unavailableSlots";
 
 function SchedulePageContent() {
@@ -66,22 +66,22 @@ function SchedulePageContent() {
     };
   }, [showModal]);
 
-  const fetchUnavailableSlots = async () => {
+  const fetchUnavailableSlots = useCallback(async () => {
 
     const ebForInterview = await fetch(`/api/applications/committee-staff/eb/${committeeId}`);
     const ebRes = await ebForInterview.json();
     const ebForInterviewData = ebRes.ebs;
 
-    const ebUnavailabilityMap = await Promise.all(ebForInterviewData.map(async (eb: any) => {
+    const ebUnavailabilityMap = await Promise.all(ebForInterviewData.map(async (eb: {position: string}) => {
       // Fetch unavailable slots
       const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${eb.position}`);
       const unavailableData = await unavailableResponse.json();
-      const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: any) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
+      const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: {date: string; startTime: string; endTime: string}) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
       
       // Fetch existing interview bookings
       const interviewSlotsResponse = await fetch(`/api/admin/interview-slots/${eb.position}`);
       const interviewSlotsData = await interviewSlotsResponse.json();
-      const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: any) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
+      const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: {day: string; timeStart: string; timeEnd: string}) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
       
       return {
         eb: eb.position,
@@ -96,14 +96,14 @@ function SchedulePageContent() {
     return {
       unavailableSlots: new Set(flattenedSlots),
       ebUnavailabilityMap,
-      allEbs: ebForInterviewData.map((eb: any) => eb.position)
+      allEbs: ebForInterviewData.map((eb: {position: string}) => eb.position)
     };
-  };
+  }, [committeeId]);
 
   // Generate hardcoded available slots (same as admin)
   useEffect(() => {
     const generateHardcodedSlots = async () => {
-      const { unavailableSlots, ebUnavailabilityMap, allEbs } = await fetchUnavailableSlots();
+      const { ebUnavailabilityMap, allEbs } = await fetchUnavailableSlots();
 
       const slots: Array<{
         id: string;
@@ -239,7 +239,7 @@ function SchedulePageContent() {
     };
 
     generateHardcodedSlots();
-  }, []);
+  }, [fetchUnavailableSlots]);
 
   const handleSlotSelect = (slotId: string) => {
     if (selectedSlot === slotId) {
@@ -468,7 +468,7 @@ function SchedulePageContent() {
                                 ([a], [b]) =>
                                   new Date(a).getTime() - new Date(b).getTime()
                               )
-                              .map(([date, slots]) => {
+                              .map(([date]) => {
                                 const dayDate = new Date(date);
                                 const dayName = dayDate.toLocaleDateString(
                                   "en-US",

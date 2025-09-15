@@ -318,7 +318,7 @@ export default function SuperAdminDashboard() {
                 <div className="ml-3">
                   <p className="text-sm text-yellow-700">
                     You have <span className="font-medium">{pendingChanges.length} pending role change(s)</span>. 
-                    Click "Confirm Changes" to save them.
+                    Click &quot;Confirm Changes&quot; to save them.
                   </p>
                 </div>
               </div>

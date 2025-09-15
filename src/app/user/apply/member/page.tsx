@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Header from "@/components/Header";
 
 export default function MemberApplication() {
@@ -141,6 +142,7 @@ export default function MemberApplication() {
         setError(errorData.error || "Application submission failed");
       }
     } catch (error) {
+      console.error(error);
       setError("An error occurred while submitting your application");
     } finally {
       setLoading(false);
@@ -162,7 +164,7 @@ export default function MemberApplication() {
           </div>
           <div className="text-black text-xs lg:text-lg font-Inter font-light">
             Be part of the Computer Science Society community. As a member,
-            you'll gain access to exclusive workshops, events, and opportunities
+            you&apos;ll gain access to exclusive workshops, events, and opportunities
             to grow alongside fellow students passionate about tech.
           </div>
 
@@ -276,11 +278,15 @@ export default function MemberApplication() {
             </div>
 
             <div className="hidden lg:flex justify-center items-center mt-8">
-              <img
-                src="/assets/pictures/MemberImage.jpg"
-                alt="Member"
-                className="w-300 h-90 object-cover shadow-md border border-[#2F7EE3] rounded-lg"
-              />
+              <div className="relative w-[300px] h-[360px]">
+                <Image
+                  src="/assets/pictures/MemberImage.jpg"
+                  alt="Member"
+                  fill
+                  sizes="300px"
+                  className="object-cover shadow-md border border-[#2F7EE3] rounded-lg"
+                />
+              </div>
             </div>
           </div>
           <hr className="my-8 border-t-1 border-[#717171]" />

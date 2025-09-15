@@ -1,4 +1,3 @@
-// src/types/next-auth.d.ts
 import NextAuth from "next-auth";
 
 declare module "next-auth" {
@@ -15,11 +14,11 @@ declare module "next-auth" {
       updatedAt: Date;
       hasCompletedProfile: boolean;
       hasMemberApplication: boolean;
-      memberApplication?: any;
+      memberApplication?: {id: string; hasAccepted: boolean; paymentProof?: string; createdAt: Date};
       hasEAApplication: boolean;
-      eaApplication?: any;
+      eaApplication?: {id: string; hasAccepted: boolean; status: string};
       hasCommitteeApplication: boolean;
-      committeeApplication?: any;
+      committeeApplication?: {id: string; hasAccepted: boolean; status: string};
       applicationStatus: {
         member: {
           hasApplication: boolean;

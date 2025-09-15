@@ -13,7 +13,35 @@ function CommitteeProgressPageContent() {
     const { data: session } = useSession();
     const { committee: committeeId } = useParams<{ committee: string }>();
 
-    const [applicationData, setApplicationData] = useState<any>(null);
+    const [applicationData, setApplicationData] = useState<{
+        hasApplication: boolean;
+        application: {
+            id: string;
+            studentNumber: string;
+            ebRole: string;
+            firstOptionCommittee: string;
+            secondOptionCommittee: string;
+            cv: string;
+            supabaseFilePath?: string;
+            interviewSlotDay?: string;
+            interviewSlotTimeStart?: string;
+            interviewSlotTimeEnd?: string;
+            interviewBy?: string;
+            hasFinishedInterview: boolean;
+            status?: string;
+            redirection?: string;
+            hasAccepted: boolean;
+            createdAt: string;
+            updatedAt: string;
+        };
+        user: {
+            studentNumber: string;
+            name: string;
+            section: string;
+        };
+        ebRole: string;
+        meetingLink?: string;
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [scheduledTime, setScheduledTime] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
@@ -172,7 +200,7 @@ function CommitteeProgressPageContent() {
                 No Application Found
                 </h1>
                 <p className="text-gray-600 mb-6">
-                You don't have an active committee application.
+                You don&apos;t have an active committee application.
                 </p>
                 <button
                 onClick={() => router.push("/user/apply/committee-staff")}

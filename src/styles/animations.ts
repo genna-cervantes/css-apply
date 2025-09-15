@@ -86,7 +86,6 @@ export const getImageScrollAnimationStyles = (
   duration: number = 20,
   direction: "left" | "right" = "left"
 ) => {
-  const translateX = direction === "left" ? "-50%" : "50%";
   return {
     animation: `scroll-${direction} ${duration}s linear infinite`,
     willChange: "transform",

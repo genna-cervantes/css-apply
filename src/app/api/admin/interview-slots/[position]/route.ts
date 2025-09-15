@@ -28,7 +28,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         // For position titles or committee names, use as-is but ensure consistent casing
         const normalizedPosition = getPositionTitle(position);
 
-        const applications: any[] = [];
+        const applications: Array<{id: string; interviewSlotDay: string|null; interviewSlotTimeStart: string|null; interviewSlotTimeEnd: string|null; user: {name: string}}> = [];
         const committeeApplicationsSlots = await prisma.committeeApplication.findMany({
             where: {
                 interviewBy: {
@@ -36,7 +36,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
                     mode: 'insensitive'
                 }
             },
-            include: {
+            select: {
+                id: true,
+                interviewSlotDay: true,
+                interviewSlotTimeStart: true,
+                interviewSlotTimeEnd: true,
                 user: {
                     select: {
                         name: true
@@ -57,7 +61,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
                     mode: 'insensitive'
                 }
             },
-            include: {
+            select: {
+                id: true,
+                interviewSlotDay: true,
+                interviewSlotTimeStart: true,
+                interviewSlotTimeEnd: true,
                 user: {
                     select: {
                         name: true
@@ -71,11 +79,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         });
         applications.push(...eaApplicationsSlots);
 
+        // Get meeting link from EBProfile
+        let meetingLink = null;
+        const ebProfile = await prisma.eBProfile.findFirst({
+            where: { 
+                position: normalizedPosition 
+            }
+        });
+        meetingLink = ebProfile?.meetingLink || null;
+
         const slots = applications.map((application) => ({
             id: application.id,
             day: application.interviewSlotDay,
             name: application.user.name,
-            meetingLink: application.meetingLink,
+            meetingLink: meetingLink,
             timeStart: application.interviewSlotTimeStart,
             timeEnd: application.interviewSlotTimeEnd
         }));

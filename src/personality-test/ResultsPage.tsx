@@ -92,8 +92,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ answers, onRetake }) => {
                     const payload = await resp.json().catch(() => ({}));
                     throw new Error(payload?.error || `API error (${resp.status})`);
                 }
-                const payload = await resp.json();
-                // console.log('Submitted quiz results to Supabase:', payload?.data);
+                
             } catch (error: unknown) {
                 const errObj = (error as { name?: string; message?: string }) || {};
                 const name = errObj.name ?? '';

@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Header from "@/components/Header";
@@ -29,7 +28,7 @@ interface ErrorPageProps {
 
 export default function ErrorPage({
   title = "Oops! Something went wrong",
-  message = "We encountered an unexpected error. Don't worry, our team has been notified and we're working to fix it.",
+  message = "We encountered an unexpected error. Don&apos;t worry, our team has been notified and we&apos;re working to fix it.",
   showRetry = true,
   showGoHome = true,
   customActions,

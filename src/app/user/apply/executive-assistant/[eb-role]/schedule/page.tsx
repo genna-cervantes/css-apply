@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { adminSchedule } from "@/data/adminSchedule";
+// import { useSession } from "next-auth/react";
+// import { adminSchedule } from "@/data/adminSchedule";
 import Header from "@/components/Header";
 import ConfirmationModal from "@/components/Modal";
 import Footer from "@/components/Footer";
@@ -65,23 +65,23 @@ function SchedulePageContent() {
     };
   }, [showModal]);
 
-  const fetchUnavailableSlots = async () => {
+  const fetchUnavailableSlots = useCallback(async () => {
     // Fetch unavailable slots
     const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${ebId}`);
     const unavailableData = await unavailableResponse.json();
-    const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: any) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
+    const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: {date: string; startTime: string; endTime: string}) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
     
     // Fetch existing interview bookings
     const interviewSlotsResponse = await fetch(`/api/admin/interview-slots/${ebId}`);
     const interviewSlotsData = await interviewSlotsResponse.json();
-    const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: any) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
+    const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: {day: string; timeStart: string; timeEnd: string}) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
     
     return {
       unavailableSlots: new Set(unavailableSlots),
       bookedSlots: new Set(bookedSlots),
       ebRole: ebId
     };
-  };
+  }, [ebId]);
 
   // Generate hardcoded available slots (same as admin and committee)
   useEffect(() => {
@@ -198,7 +198,7 @@ function SchedulePageContent() {
     };
 
     generateHardcodedSlots();
-  }, []);
+  }, [ebId, fetchUnavailableSlots]);
 
   const handleSlotSelect = (slotId: string) => {
     if (selectedSlot === slotId) {
@@ -429,7 +429,7 @@ function SchedulePageContent() {
                                 ([a], [b]) =>
                                   new Date(a).getTime() - new Date(b).getTime()
                               )
-                              .map(([date, slots]) => {
+                              .map(([date]) => {
                                 const dayDate = new Date(date);
                                 const dayName = dayDate.toLocaleDateString(
                                   "en-US",
