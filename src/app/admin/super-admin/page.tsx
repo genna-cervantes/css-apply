@@ -54,16 +54,16 @@ const EB_POSITIONS = [
 ] as const;
 
 const EB_COMMITTEES = [
-  'Academics Committee',
-  'Community Development Committee',
-  'Creatives and Technical Committee',
-  'Documentation Committee',
-  'External Affairs Committee',
-  'Finance Committee',
-  'Logistics Committee',
-  'Publicity Committee',
-  'Sports & Talent Committee',
-  'Technology Development Committee'
+  'academics',
+  'community development',
+  'creatives and technical',
+  'documentation',
+  'external affairs',
+  'finance',
+  'logistics',
+  'publicity',
+  'sports and talent',
+  'technology development'
 ] as const;
 
 export default function SuperAdminDashboard() {
