@@ -190,9 +190,9 @@ function SchedulePageContent() {
               });
             });
 
-            // Only add slots if ALL EBs are available (intersection of available times)
-            // This ensures that if any EB is unavailable at a time, that time is blocked for all applicants
-            if (availableEBsForSlot.length === allEbs.length && allEbs.length > 0) {
+             // Only add slots if at least one EB is available (union of available times)
+             // This allows interviews to proceed as long as one EB is free to conduct them
+             if (availableEBsForSlot.length > 0) {
               // Randomly assign one EB from the available EBs
               const randomIndex = Math.floor(Math.random() * availableEBsForSlot.length);
               const assignedEB = availableEBsForSlot[randomIndex];
@@ -437,9 +437,9 @@ function SchedulePageContent() {
 
             {/* Scheduling Section */}
             <div className="lg:mb-8 mt-5 lg:mt-8 flex flex-col items-center justify-center w-full">
-              <p className="text-black text-xs lg:text-md font-bold text-center mb-3 lg:mb-6 font-inter">
-                Click on any available slot to reserve your interview schedule. Each slot shows the EB who will conduct your interview.
-              </p>
+               <p className="text-black text-xs lg:text-md font-bold text-center mb-3 lg:mb-6 font-inter">
+                 Click on any available slot to reserve your interview schedule. Each slot shows the EB who will conduct your interview. Slots are available when at least one EB is free.
+               </p>
 
               {isLoading ? (
                 <div className="flex justify-center items-center py-12">
