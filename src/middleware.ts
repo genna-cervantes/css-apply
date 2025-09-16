@@ -3,7 +3,12 @@ import { getToken } from 'next-auth/jwt'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request })
+  const token = await getToken({
+    req: request,
+    // Match custom cookie name set in auth options to ensure middleware reads it in production
+    cookieName: 'next-auth.session-token',
+    secret: process.env.NEXTAUTH_SECRET,
+  })
   const pathname = request.nextUrl.pathname
 
   // Skip middleware for auth-related paths
