@@ -55,10 +55,23 @@ export async function POST(request: NextRequest) {
                 }
             })
         }
-        await prisma.availableEBInterviewTime.createMany({
-            data: unavailableSlotsData,
-            skipDuplicates: true
-        })
+        
+        // Get current DB slot IDs after deletion
+        const currentDbSlotIds = currentDbSlots.map(slot => slot.id)
+        
+        // Filter out slots that already exist in the database
+        const newSlotsToCreate = unavailableSlotsData.filter(slot => 
+            !currentDbSlotIds.includes(slot.id)
+        )
+        
+        console.log('newSlotsToCreate', newSlotsToCreate);
+        
+        // Only create truly new slots
+        if (newSlotsToCreate.length > 0) {
+            await prisma.availableEBInterviewTime.createMany({
+                data: newSlotsToCreate
+            })
+        }
 
         console.log('unavailableSlotsData', unavailableSlotsData);
 
