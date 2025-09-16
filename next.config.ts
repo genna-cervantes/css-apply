@@ -6,21 +6,37 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    // Enable optimized package imports
+    optimizePackageImports: ['@fullcalendar/react', '@fullcalendar/timegrid', '@fullcalendar/interaction'],
+    // Enable optimized CSS
+    optimizeCss: true,
+    // Enable server components
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
   images: {
-    // Increase the limit for image optimization
+    // Optimize image loading
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Add domains if you're loading external images
     domains: [],
-    // Increase memory limit for image optimization
-    minimumCacheTTL: 60,
+    // Optimize caching
+    minimumCacheTTL: 31536000, // 1 year
     // Handle large images better
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Disable optimization for deployment issues
-    unoptimized: true,
+    // Enable optimization for better performance
+    unoptimized: false,
+    // Add formats for better compression
+    formats: ['image/webp', 'image/avif'],
+    // Enable lazy loading by default
+    loader: 'default',
   },
+  // Enable compression
+  compress: true,
+  // Optimize bundle
+  swcMinify: true,
+  // Enable static optimization
+  trailingSlash: false,
+  // Optimize for production
+  poweredByHeader: false,
 };
-
-export default nextConfig;

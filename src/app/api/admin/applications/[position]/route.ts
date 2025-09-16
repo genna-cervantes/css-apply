@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { getPositionFromRoleId } from "@/lib/eb-mapping";
+import { getCommitteeEBRoleFromCommitteeId } from "@/data/committeeRoles";
 
 // GET all applications with filtering
 export async function GET(
@@ -69,10 +70,27 @@ export async function GET(
           member: [],
       };
   
+      // Map committee IDs to committee titles for filtering
+      const committeeIds = Object.keys({
+        academics: "academics",
+        community: "community development", 
+        creatives: "creatives and technical",
+        documentation: "documentation",
+        external: "external affairs",
+        finance: "finance",
+        logistics: "logistics",
+        publicity: "publicity",
+        sports: "sports and talent",
+        technology: "technology development"
+      }).filter(committeeId => {
+        const committeeTitle = getCommitteeEBRoleFromCommitteeId(committeeId);
+        return committeeTitle && committees.includes(committeeTitle);
+      });
+
       const commApplications = await prisma.committeeApplication.findMany({
         where: {
           firstOptionCommittee: {
-            in: committees,
+            in: committeeIds,
           }
         },
         orderBy: { createdAt: "desc" },

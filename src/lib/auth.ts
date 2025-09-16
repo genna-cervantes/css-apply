@@ -108,6 +108,43 @@ export const authOptions: NextAuthOptions = {
           session.user.role === "super_admin" ||
           token.fetchFullData === true;
 
+        // Check if we have cached data in token (5 minute cache)
+        if (token.cachedUserData && Date.now() - (token.cachedUserData as { timestamp: number }).timestamp < 5 * 60 * 1000) {
+          const cachedData = token.cachedUserData as {
+            id: string;
+            studentNumber: string | null;
+            section: string | null;
+            name: string;
+            role: string;
+            createdAt: Date;
+            updatedAt: Date;
+            ebProfile: { position: string; committees: string[]; isActive: boolean } | null;
+            hasMemberApplication: boolean;
+            hasEAApplication: boolean;
+            hasCommitteeApplication: boolean;
+            hasCompletedProfile: boolean;
+            applicationStatus: {
+              member: { hasApplication: boolean; hasPayment?: boolean; isAccepted?: boolean; appliedAt?: Date };
+              ea: { hasApplication: boolean; status?: string; isAccepted?: boolean };
+              committee: { hasApplication: boolean; status?: string; isAccepted?: boolean };
+            };
+          };
+          (session.user as UserSession).dbId = cachedData.id;
+          (session.user as UserSession).studentNumber = cachedData.studentNumber;
+          (session.user as UserSession).section = cachedData.section;
+          (session.user as UserSession).name = cachedData.name;
+          (session.user as UserSession).role = cachedData.role;
+          (session.user as UserSession).createdAt = cachedData.createdAt;
+          (session.user as UserSession).updatedAt = cachedData.updatedAt;
+          (session.user as UserSession).ebProfile = cachedData.ebProfile;
+          (session.user as UserSession).hasMemberApplication = cachedData.hasMemberApplication;
+          (session.user as UserSession).hasEAApplication = cachedData.hasEAApplication;
+          (session.user as UserSession).hasCommitteeApplication = cachedData.hasCommitteeApplication;
+          (session.user as UserSession).hasCompletedProfile = cachedData.hasCompletedProfile;
+          (session.user as UserSession).applicationStatus = cachedData.applicationStatus;
+          return session;
+        }
+
         if (shouldFetchFullData) {
           try {
             const dbUser = await prisma.user.findUnique({
@@ -153,31 +190,8 @@ export const authOptions: NextAuthOptions = {
             });
 
             if (dbUser) {
-              // Add database user details to session
-              (session.user as UserSession).dbId = dbUser.id;
-              (session.user as UserSession).studentNumber =
-                dbUser.studentNumber;
-              (session.user as UserSession).section = dbUser.section;
-              (session.user as UserSession).name = dbUser.name;
-              (session.user as UserSession).role = dbUser.role;
-              (session.user as UserSession).createdAt = dbUser.createdAt;
-              (session.user as UserSession).updatedAt = dbUser.updatedAt;
-              (session.user as UserSession).ebProfile = dbUser.ebProfile;
-
-              // Add application status information
-              (session.user as UserSession).hasMemberApplication =
-                !!dbUser.memberApplication;
-              (session.user as UserSession).hasEAApplication =
-                !!dbUser.eaApplication;
-              (session.user as UserSession).hasCommitteeApplication =
-                !!dbUser.committeeApplication;
-
-              // Check if user has completed their profile
-              (session.user as UserSession).hasCompletedProfile =
-                !!dbUser.studentNumber && !!dbUser.section;
-
-              // Check application status for routing
-              (session.user as UserSession).applicationStatus = {
+              // Cache the data in token for 5 minutes
+              const applicationStatus = {
                 member: dbUser.memberApplication
                   ? {
                       hasApplication: true,
@@ -203,6 +217,31 @@ export const authOptions: NextAuthOptions = {
                     }
                   : { hasApplication: false },
               };
+
+              token.cachedUserData = {
+                ...dbUser,
+                hasMemberApplication: !!dbUser.memberApplication,
+                hasEAApplication: !!dbUser.eaApplication,
+                hasCommitteeApplication: !!dbUser.committeeApplication,
+                hasCompletedProfile: !!dbUser.studentNumber && !!dbUser.section,
+                applicationStatus,
+                timestamp: Date.now(),
+              };
+
+              // Add database user details to session
+              (session.user as UserSession).dbId = dbUser.id;
+              (session.user as UserSession).studentNumber = dbUser.studentNumber;
+              (session.user as UserSession).section = dbUser.section;
+              (session.user as UserSession).name = dbUser.name;
+              (session.user as UserSession).role = dbUser.role;
+              (session.user as UserSession).createdAt = dbUser.createdAt;
+              (session.user as UserSession).updatedAt = dbUser.updatedAt;
+              (session.user as UserSession).ebProfile = dbUser.ebProfile;
+              (session.user as UserSession).hasMemberApplication = !!dbUser.memberApplication;
+              (session.user as UserSession).hasEAApplication = !!dbUser.eaApplication;
+              (session.user as UserSession).hasCommitteeApplication = !!dbUser.committeeApplication;
+              (session.user as UserSession).hasCompletedProfile = !!dbUser.studentNumber && !!dbUser.section;
+              (session.user as UserSession).applicationStatus = applicationStatus;
             }
           } catch (error) {
             console.error("Session callback database error:", error);
