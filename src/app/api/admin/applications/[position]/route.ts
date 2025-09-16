@@ -2,6 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { getPositionFromRoleId } from "@/lib/eb-mapping";
 
 // GET all applications with filtering
 export async function GET(
@@ -61,8 +62,6 @@ export async function GET(
           ea: [],
       };
   
-      console.log('committees', JSON.stringify(committees, null, 2));
-  
       const commApplications = await prisma.committeeApplication.findMany({
         where: {
           firstOptionCommittee: {
@@ -77,14 +76,12 @@ export async function GET(
           },
       });
   
-  
-      console.log('commApplications', JSON.stringify(commApplications, null, 2));
-      
       // get ea applications
       const eAApplications = await prisma.eAApplication.findMany({
           where: {
               firstOptionEb: {
-                  equals: position,
+                  equals: getPositionFromRoleId(position),
+                  mode: 'insensitive'
               }
           },
           orderBy: { createdAt: "desc" },
@@ -94,8 +91,6 @@ export async function GET(
             },
           },
       });
-  
-      console.log('eAApplications', JSON.stringify(eAApplications, null, 2));
   
       applications.committee = commApplications.map(application => ({
         ...application,

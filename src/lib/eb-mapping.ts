@@ -36,3 +36,13 @@ export function getRoleId(positionTitle: string): string {
   const entry = Object.entries(EB_ROLE_TO_POSITION_MAP).find(([title]) => title === positionTitle);
   return entry ? entry[0] : positionTitle;
 }
+
+/**
+ * Converts a role ID to the corresponding position title (inverse of getRoleId)
+ * @param roleId - The EB role ID (e.g., "president", "internal-vice-president")
+ * @returns The position title (e.g., "President", "Internal Vice President") or the original roleId if not found
+ */
+export function getPositionFromRoleId(roleId: string): string {
+  const entry = Object.entries(EB_ROLE_TO_POSITION_MAP).find(([id]) => id === roleId);
+  return entry ? entry[1] : roleId;
+}
