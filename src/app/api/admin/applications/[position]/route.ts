@@ -57,9 +57,16 @@ export async function GET(
           hasFinishedInterview: boolean;
           cv: string;
           supabaseFilePath: string | null;
+      }[], member: {
+          id: string;
+          studentNumber: string;
+          createdAt: Date;
+          hasAccepted: boolean;
+          paymentProof: string;
       }[]} = {
           committee: [],
           ea: [],
+          member: [],
       };
   
       const commApplications = await prisma.committeeApplication.findMany({
@@ -92,6 +99,16 @@ export async function GET(
           },
       });
   
+      // get member applications
+      const memberApplications = await prisma.memberApplication.findMany({
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: { id: true, name: true, email: true, studentNumber: true, section: true },
+          },
+        },
+      });
+
       applications.committee = commApplications.map(application => ({
         ...application,
         type: 'committee',
@@ -100,7 +117,11 @@ export async function GET(
         ...application,
         type: 'ea',
       }));
-  
+      applications.member = memberApplications.map(application => ({
+        ...application,
+        type: 'member',
+      }));
+
       return NextResponse.json({
         success: true,
         applications

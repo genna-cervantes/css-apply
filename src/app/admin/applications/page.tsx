@@ -33,12 +33,13 @@ interface Application {
   createdAt: string;
   type: 'committee' | 'ea' | 'member';
   cv?: string;
+  paymentProof?: string;
 }
 
 const Applications = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [applications, setApplications] = useState<{committee: Application[], ea: Application[]}>({committee: [], ea: []});
+  const [applications, setApplications] = useState<{committee: Application[], ea: Application[], member: Application[]}>({committee: [], ea: [], member: []});
   const [loading, setLoading] = useState(false);
   const [selectedType] = useState<'member' | 'committee' | 'ea'>('member');
   const [selectedStatus] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
@@ -49,6 +50,7 @@ const Applications = () => {
   const [ebData, setEbData] = useState<{position: string} | null>(null);
   const [showCommitteeApplications, setShowCommitteeApplications] = useState(true);
   const [showEaApplications, setShowEaApplications] = useState(true);
+  const [showMemberApplications, setShowMemberApplications] = useState(true);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -135,17 +137,25 @@ const Applications = () => {
   };
 
   const getStatusBadge = (application: Application) => {
-    
-      if (application.status === 'accepted') {
+    if (application.type === 'member') {
+      if (application.hasAccepted === true) {
         return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
-      } else if (application.status === 'failed') {
+      } else if (application.hasAccepted === false) {
         return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
-      } else if (application.status === 'redirected') {
-        return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
       } else {
         return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
       }
+    }
     
+    if (application.status === 'accepted') {
+      return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
+    } else if (application.status === 'failed') {
+      return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
+    } else if (application.status === 'redirected') {
+      return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
+    } else {
+      return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
+    }
   };
 
   const getApplicationDetails = (application: Application) => {
@@ -223,13 +233,67 @@ const Applications = () => {
 
         {/* APPLICATIONS LIST */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 min-h-[calc(100vh-180px)] md:min-h-[calc(100vh-280px)]">
-          {applications.committee.length === 0 && applications.ea.length === 0 ? (
+          {applications.committee.length === 0 && applications.ea.length === 0 && applications.member.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">No applications under your position found</p>
             </div>
           ) : (
             <>
             <div className="space-y-4">
+              <div className="flex justify-between items-center bg-green-600 text-white p-4 rounded-md">
+                <div className="flex gap-2 items-center">
+                  <h2 className="font-semibold">Member Applications</h2>
+                  <p>({applications.member.length})</p>
+                </div>
+                <button onClick={() => setShowMemberApplications(!showMemberApplications)}>
+                  {!showMemberApplications ? <LucideChevronUp /> : <LucideChevronDown />}
+                </button>
+              </div>
+
+              {showMemberApplications && applications.member.map((application) => (
+                <div key={application.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-800">{application.user.name}</h3>
+                        {getStatusBadge(application)}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>Student Number: {application.studentNumber}</p>
+                        <p>Section: {application.user.section}</p>
+                        <p>Email: {application.user.email}</p>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-4">
+                        Applied: {new Date(application.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2 ml-4">
+                      {(!application.hasAccepted) && (
+                        <>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'member', 'accept')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                          </button>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'member', 'reject')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4 mt-6">
               <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-md">
                 <div className="flex gap-2 items-center">
                   <h2 className="font-semibold">Committee Applications</h2>

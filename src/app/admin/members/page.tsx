@@ -16,7 +16,7 @@ interface Member {
     studentNumber: string;
     section: string;
   };
-  hasAccepted: boolean;
+  hasAccepted: boolean | null;
   paymentProof: string;
   createdAt: string;
 }
@@ -26,7 +26,7 @@ const Members = () => {
   const router = useRouter();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending'>('all');
+  const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending' | 'rejected'>('all');
 
   const fetchMembers = useCallback(async () => {
     try {
@@ -105,12 +105,13 @@ const Members = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
               <select
                 value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending')}
+                onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected')}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Members</option>
                 <option value="accepted">Accepted</option>
                 <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
               </select>
             </div>
           </div>
@@ -131,11 +132,13 @@ const Members = () => {
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-semibold text-gray-800">{member.user.name}</h3>
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                          member.hasAccepted 
+                          member.hasAccepted === true
                             ? 'text-green-800 bg-green-100' 
+                            : member.hasAccepted === false
+                            ? 'text-red-800 bg-red-100'
                             : 'text-yellow-800 bg-yellow-100'
                         }`}>
-                          {member.hasAccepted ? 'Accepted' : 'Pending'}
+                          {member.hasAccepted === true ? 'Accepted' : member.hasAccepted === false ? 'Rejected' : 'Pending'}
                         </span>
                       </div>
                       <div className="text-sm text-gray-600">
