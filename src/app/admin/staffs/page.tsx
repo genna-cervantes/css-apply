@@ -8,11 +8,6 @@ import SidebarContent from '@/components/AdminSidebar';
 import { committeeRoles } from '@/data/committeeRoles';
 import { Download } from "lucide-react";
 
-// Helper function to check if a committee requires portfolio
-const requiresPortfolio = (committeeId: string) => {
-  return ["creatives", "technology", "documentation"].includes(committeeId);
-};
-
 interface CommitteeStaff {
   id: string;
   studentNumber: string;
@@ -32,8 +27,6 @@ interface CommitteeStaff {
   interviewSlotTimeStart?: string;
   interviewSlotTimeEnd?: string;
   cvDownloadUrl?: string;
-  portfolioLink?: string;
-  portfolioDownloadUrl?: string;
   createdAt: string;
 }
 
@@ -124,41 +117,6 @@ const Staffs = () => {
     } catch (error) {
       console.error('Error downloading CV:', error);
       alert('Error downloading CV');
-    }
-  };
-
-  const handleDownloadPortfolio = async (staff: CommitteeStaff) => {
-    if (!staff.portfolioDownloadUrl) {
-      alert('Portfolio not available for download');
-      return;
-    }
-
-    try {
-      const response = await fetch(staff.portfolioDownloadUrl);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.downloadUrl) {
-          // Create a temporary link to download the file
-          const link = document.createElement('a');
-          link.href = data.downloadUrl;
-          link.download = data.fileName || `${staff.user.name}_Portfolio.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          alert('Failed to generate download link');
-        }
-      } else {
-        const errorData = await response.json();
-        if (response.status === 404) {
-          alert('Portfolio file not found in storage');
-        } else {
-          alert(errorData.error || 'Failed to download portfolio');
-        }
-      }
-    } catch (error) {
-      console.error('Error downloading portfolio:', error);
-      alert('Error downloading portfolio');
     }
   };
 
@@ -260,15 +218,6 @@ const Staffs = () => {
                           >
                             <Download size={16} />
                             Download CV
-                          </button>
-                        )}
-                        {staff.portfolioDownloadUrl && requiresPortfolio(staff.firstOptionCommittee) && (
-                          <button
-                            onClick={() => handleDownloadPortfolio(staff)}
-                            className="flex items-center gap-2 px-3 py-2 bg-teal-500 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
-                          >
-                            <Download size={16} />
-                            Download Portfolio
                           </button>
                         )}
                       </div>

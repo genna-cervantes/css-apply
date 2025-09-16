@@ -151,33 +151,23 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // Add CV and Portfolio download links for Committee applications
-      const committeeApplicationsWithDownloadLinks = await Promise.all(
+      // Add CV download links for Committee applications
+      const committeeApplicationsWithCvLinks = await Promise.all(
         committeeApplications.map(async (app) => {
           const cvDownloadUrl = app.supabaseFilePath 
             ? `/api/admin/cv-download?applicationId=${app.id}&type=committee`
             : null;
           
-          const portfolioDownloadUrl = app.portfolioLink 
-            ? `/api/admin/portfolio-download?applicationId=${app.id}`
-            : null;
-          
           return {
             ...app,
             cvDownloadUrl,
-            portfolioDownloadUrl,
           };
         })
       );
 
       return NextResponse.json({
         success: true,
-        applications: committeeApplicationsWithDownloadLinks,
-      }, {
-        headers: {
-          'Cache-Control': 'private, max-age=300, stale-while-revalidate=60', // 5 min cache, 1 min stale
-          'CDN-Cache-Control': 'max-age=300',
-        }
+        applications: committeeApplicationsWithCvLinks,
       });
     }
 
@@ -185,11 +175,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       applications: [],
-    }, {
-      headers: {
-        'Cache-Control': 'private, max-age=300, stale-while-revalidate=60',
-        'CDN-Cache-Control': 'max-age=300',
-      }
     });
 
   } catch (error) {

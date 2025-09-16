@@ -30,9 +30,6 @@ interface Application {
   interviewSlotTimeStart?: string;
   interviewSlotTimeEnd?: string;
   cvUrl?: string;
-  cvDownloadUrl?: string;
-  portfolioLink?: string;
-  portfolioDownloadUrl?: string;
   createdAt: string;
   type: 'committee' | 'ea' | 'member';
   cv?: string;
@@ -42,15 +39,6 @@ interface Application {
 // Cache for EB data to prevent unnecessary API calls
 const ebDataCache = new Map<string, {position: string; timestamp: number}>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-// Helper function to check if a committee requires portfolio
-const requiresPortfolio = (committeeId: string) => {
-  return ["creatives", "technology", "documentation"].includes(committeeId);
-};
-
-const capitalizeFirstLetter = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
 
 const Applications = () => {
   const { data: session, status } = useSession();
@@ -108,42 +96,6 @@ const Applications = () => {
       console.error('Error fetching applications:', error);
     } finally {
       setLoading(false);
-    }
-  }, []);
-
-  // Portfolio download handler
-  const handleDownloadPortfolio = useCallback(async (application: Application) => {
-    if (!application.portfolioDownloadUrl) {
-      alert('Portfolio not available for download');
-      return;
-    }
-
-    try {
-      const response = await fetch(application.portfolioDownloadUrl);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.downloadUrl) {
-          // Create a temporary link to download the file
-          const link = document.createElement('a');
-          link.href = data.downloadUrl;
-          link.download = data.fileName || `${application.user.name}_Portfolio.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          alert('Failed to generate download link');
-        }
-      } else {
-        const errorData = await response.json();
-        if (response.status === 404) {
-          alert('Portfolio file not found in storage');
-        } else {
-          alert(errorData.error || 'Failed to download portfolio');
-        }
-      }
-    } catch (error) {
-      console.error('Error downloading portfolio:', error);
-      alert('Error downloading portfolio');
     }
   }, []);
 
@@ -426,22 +378,9 @@ const Applications = () => {
 
                     <div className="flex flex-col items-end gap-2">
                       <div className="bg-blue-200 p-2 rounded-md text-sm text-gray-500">
-                          Second Option: {capitalizeFirstLetter(application.secondOptionCommittee || '')}
+                          Second Option: {application.secondOptionCommittee}
                       </div>
-                      <div className="flex flex-col gap-2 mt-2">
-                        <a target="_blank" href={application.cv} className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">Open CV</a>
-                        {application.portfolioLink && requiresPortfolio(application.firstOptionCommittee || '') && (
-                          <a target="_blank" href={application.portfolioLink} className="px-3 py-1 bg-teal-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50">Open Portfolio</a>
-                        )}
-                        {application.portfolioDownloadUrl && requiresPortfolio(application.firstOptionCommittee || '') && (
-                          <button
-                            onClick={() => handleDownloadPortfolio(application)}
-                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
-                          >
-                            Download Portfolio
-                          </button>
-                        )}
-                      </div>
+                      <a target="_blank" href={application.cv} className="px-3 py-1 mt-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">Open CV</a>
                     </div>
                     
                     <div className="flex gap-2 ml-4">
@@ -555,7 +494,7 @@ const Applications = () => {
 
                     <div className="flex flex-col items-end gap-2">
                       <div className="bg-blue-200 p-2 rounded-md text-sm text-gray-500">
-                          Second Option: {capitalizeFirstLetter(application.secondOptionEb || '')}
+                          Second Option: {application.secondOptionEb}
                       </div>
                       <a target="_blank" href={application.cv} className="px-3 py-1 mt-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">Open CV</a>
                     </div>

@@ -223,8 +223,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    loading="lazy"
-                    priority={false}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -234,8 +232,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    loading="lazy"
-                    priority={false}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
@@ -245,8 +241,6 @@ function HomeContent() {
                     width={400}
                     height={300}
                     className="hero-img cursor-pointer w-full h-full object-cover opacity-70 grayscale shadow-md"
-                    loading="lazy"
-                    priority={false}
                   />
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
