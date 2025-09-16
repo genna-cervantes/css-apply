@@ -372,16 +372,15 @@ export default function ExecutiveAssistantApplication() {
                   <div className="text-black text-sm font-Inter w-full lg:w-[400px]">
                     <input
                       type="text"
+                      name="firstName"
                       value={formData.firstName}
                       onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          firstName: e.target.value,
-                        })
+                        setFormData({ ...formData, firstName: e.target.value })
                       }
-                      className="w-full h-9 lg:h-12 rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
-                      placeholder="e.g. Juan"
-                      required
+                      readOnly
+                      disabled
+                      aria-readonly
+                      className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] bg-gray-100 text-gray-700 px-4 py-3 text-sm lg:text-base"
                     />
                   </div>
                 </div>
@@ -393,13 +392,15 @@ export default function ExecutiveAssistantApplication() {
                   <div className="text-black lg:text-sm font-Inter lg:w-[400px]">
                     <input
                       type="text"
+                      name="lastName"
                       value={formData.lastName}
                       onChange={(e) =>
                         setFormData({ ...formData, lastName: e.target.value })
                       }
-                      className="w-full h-9 lg:h-12  rounded-md border border-[#A8A8A8] focus:border-1 focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3  text-sm lg:text-base"
-                      placeholder="e.g. Dela Cruz"
-                      required
+                      readOnly
+                      disabled
+                      aria-readonly
+                      className="w-full h-9 lg:h-12  rounded-md border-2 border-[#CDCECF] bg-gray-100 text-gray-700 px-4 py-3 text-sm lg:text-base"
                     />
                   </div>
                 </div>
