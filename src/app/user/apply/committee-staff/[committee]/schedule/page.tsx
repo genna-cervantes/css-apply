@@ -192,8 +192,8 @@ function SchedulePageContent() {
               });
             });
 
-             // Only add slots if at least one EB is available (union of available times)
-             // This allows interviews to proceed as long as one EB is free to conduct them
+             // Only add slots if at least one EB is available
+             // Hide slots when ALL EBs are unavailable (no one can conduct interviews)
              if (availableEBsForSlot.length > 0) {
               // Randomly assign one EB from the available EBs
               const randomIndex = Math.floor(Math.random() * availableEBsForSlot.length);
