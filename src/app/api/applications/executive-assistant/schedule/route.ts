@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import { emailTemplates, sendEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
     try {
@@ -52,6 +53,21 @@ export async function POST(request: NextRequest) {
                 interviewBy
             },
         });
+
+        // Try sending schedule confirmation email (non-blocking for response)
+        try {
+            const emailTemplate = emailTemplates.scheduleEAInterview(
+                user.name ?? 'Applicant',
+                interviewSlotDay,
+                interviewSlotTimeStart,
+                interviewSlotTimeEnd,
+                interviewBy
+            );
+            await sendEmail(user.email, emailTemplate.subject, emailTemplate.html);
+            console.log('Executive Assistant schedule confirmation email sent to:', user.email);
+        } catch (emailError) {
+            console.error('Failed to send executive assistant schedule confirmation email:', emailError);
+        }
 
         return NextResponse.json({
             success: true,
