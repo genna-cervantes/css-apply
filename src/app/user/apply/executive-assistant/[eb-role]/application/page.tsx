@@ -42,8 +42,8 @@ export default function ExecutiveAssistantApplication() {
         const fullName = session?.user?.name || "";
         if (fullName) {
           const nameParts = fullName.trim().split(/\s+/);
-          const extractedFirstName = nameParts.shift() || "";
-          const extractedLastName = nameParts.join(" ");
+          const extractedLastName = nameParts.length > 1 ? (nameParts.pop() as string) : "";
+          const extractedFirstName = nameParts.join(" ");
           setFormData((prev) => ({
             ...prev,
             firstName: prev.firstName || extractedFirstName,
