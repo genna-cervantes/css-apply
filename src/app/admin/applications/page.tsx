@@ -156,7 +156,7 @@ const Applications = () => {
     } else {
       return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
     }
-  };
+  }; 
 
   const getApplicationDetails = (application: Application) => {
     if (selectedType === 'member') {
