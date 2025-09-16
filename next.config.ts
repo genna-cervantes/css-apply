@@ -40,3 +40,5 @@ const nextConfig: NextConfig = {
   // Optimize for production
   poweredByHeader: false,
 };
+
+export default nextConfig;
