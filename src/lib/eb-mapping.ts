@@ -33,7 +33,7 @@ export function getPositionTitle(roleId: string): string {
  * @returns The EB role ID (e.g., "president", "internal-vice-president") or the original title if not found
  */
 export function getRoleId(positionTitle: string): string {
-  const entry = Object.entries(EB_ROLE_TO_POSITION_MAP).find(([title]) => title === positionTitle);
+  const entry = Object.entries(EB_ROLE_TO_POSITION_MAP).find(([, title]) => title === positionTitle);
   return entry ? entry[0] : positionTitle;
 }
 
