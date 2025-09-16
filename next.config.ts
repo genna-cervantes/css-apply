@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
     // Add domains if you're loading external images
     domains: [],
     // Optimize caching
-    minimumCacheTTL: 31536000, // 1 year
+    minimumCacheTTL: 60, // 1 year
     // Handle large images better
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
