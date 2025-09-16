@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
 import SidebarContent from '@/components/AdminSidebar';
 import { committeeRoles } from '@/data/committeeRoles';
+import { Download } from "lucide-react";
 
 interface CommitteeStaff {
   id: string;
@@ -25,6 +26,7 @@ interface CommitteeStaff {
   interviewSlotDay?: string;
   interviewSlotTimeStart?: string;
   interviewSlotTimeEnd?: string;
+  cvDownloadUrl?: string;
   createdAt: string;
 }
 
@@ -80,6 +82,41 @@ const Staffs = () => {
       return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
     } else {
       return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
+    }
+  };
+
+  const handleDownloadCV = async (staff: CommitteeStaff) => {
+    if (!staff.cvDownloadUrl) {
+      alert('CV not available for download');
+      return;
+    }
+
+    try {
+      const response = await fetch(staff.cvDownloadUrl);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.downloadUrl) {
+          // Create a temporary link to download the file
+          const link = document.createElement('a');
+          link.href = data.downloadUrl;
+          link.download = data.fileName || `${staff.user.name}_CV.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          alert('Failed to generate download link');
+        }
+      } else {
+        const errorData = await response.json();
+        if (response.status === 404) {
+          alert('CV file not found in storage');
+        } else {
+          alert(errorData.error || 'Failed to download CV');
+        }
+      }
+    } catch (error) {
+      console.error('Error downloading CV:', error);
+      alert('Error downloading CV');
     }
   };
 
@@ -172,6 +209,17 @@ const Staffs = () => {
                         <p className="text-xs text-gray-500 mt-2">
                           Applied: {new Date(staff.createdAt).toLocaleDateString()}
                         </p>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {staff.cvDownloadUrl && (
+                          <button
+                            onClick={() => handleDownloadCV(staff)}
+                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                          >
+                            <Download size={16} />
+                            Download CV
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

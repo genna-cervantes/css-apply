@@ -73,6 +73,8 @@ export async function GET(request: NextRequest) {
           { hasAccepted: false, status: null },
           { hasAccepted: false, status: 'pending' }
         ];
+      } else if (status === 'evaluating') {
+        whereClause.status = 'evaluating';
       } else if (status === 'rejected') {
         whereClause.status = 'failed';
       }
@@ -94,9 +96,23 @@ export async function GET(request: NextRequest) {
         },
       });
 
+      // Add CV download links for EA applications
+      const eaApplicationsWithCvLinks = await Promise.all(
+        eaApplications.map(async (app) => {
+          const cvDownloadUrl = app.supabaseFilePath 
+            ? `/api/admin/cv-download?applicationId=${app.id}&type=ea`
+            : null;
+          
+          return {
+            ...app,
+            cvDownloadUrl,
+          };
+        })
+      );
+
       return NextResponse.json({
         success: true,
-        applications: eaApplications,
+        applications: eaApplicationsWithCvLinks,
       });
     }
 
@@ -111,6 +127,8 @@ export async function GET(request: NextRequest) {
           { hasAccepted: false, status: null },
           { hasAccepted: false, status: 'pending' }
         ];
+      } else if (status === 'evaluating') {
+        whereClause.status = 'evaluating';
       } else if (status === 'rejected') {
         whereClause.status = 'failed';
       }
@@ -132,9 +150,23 @@ export async function GET(request: NextRequest) {
         },
       });
 
+      // Add CV download links for Committee applications
+      const committeeApplicationsWithCvLinks = await Promise.all(
+        committeeApplications.map(async (app) => {
+          const cvDownloadUrl = app.supabaseFilePath 
+            ? `/api/admin/cv-download?applicationId=${app.id}&type=committee`
+            : null;
+          
+          return {
+            ...app,
+            cvDownloadUrl,
+          };
+        })
+      );
+
       return NextResponse.json({
         success: true,
-        applications: committeeApplications,
+        applications: committeeApplicationsWithCvLinks,
       });
     }
 
@@ -217,6 +249,23 @@ export async function PUT(request: NextRequest) {
             },
           },
         });
+      } else if (action === "evaluate") {
+        // For member applications, we don't need to set status as they don't have that field
+        // Just return the current application
+        updatedApplication = await prisma.memberApplication.findUnique({
+          where: { id: applicationId },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                studentNumber: true,
+                section: true,
+              },
+            },
+          },
+        });
       }
     } else if (type === "committee") {
       const updateData: {hasAccepted?: boolean; status?: string; redirection?: string} = {};
@@ -230,6 +279,8 @@ export async function PUT(request: NextRequest) {
       } else if (action === "redirect" && redirection) {
         updateData.status = "redirected";
         updateData.redirection = redirection;
+      } else if (action === "evaluate") {
+        updateData.status = "evaluating";
       }
 
       updatedApplication = await prisma.committeeApplication.update({
@@ -259,6 +310,8 @@ export async function PUT(request: NextRequest) {
       } else if (action === "redirect" && redirection) {
         updateData.status = "redirected";
         updateData.redirection = redirection;
+      } else if (action === "evaluate") {
+        updateData.status = "evaluating";
       }
 
       updatedApplication = await prisma.eAApplication.update({

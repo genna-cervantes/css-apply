@@ -97,7 +97,7 @@ const Applications = () => {
     setEbData(data.ebProfile);
   };
 
-  const handleApplicationAction = async (applicationId: string, type: 'committee' | 'ea' | 'member', action: 'accept' | 'reject' | 'redirect') => {
+  const handleApplicationAction = async (applicationId: string, type: 'committee' | 'ea' | 'member', action: 'accept' | 'reject' | 'redirect' | 'evaluate') => {
     try {
       setProcessingId(applicationId);
       
@@ -147,12 +147,14 @@ const Applications = () => {
       }
     }
     
-    if (application.status === 'accepted') {
+    if (application.status === 'passed' || application.hasAccepted === true) {
       return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
     } else if (application.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
     } else if (application.status === 'redirected') {
       return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
+    } else if (application.status === 'evaluating') {
+      return <span className="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">Under Evaluation</span>;
     } else {
       return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
     }
@@ -272,6 +274,13 @@ const Applications = () => {
                       {(!application.hasAccepted) && (
                         <>
                           <button
+                            onClick={() => handleApplicationAction(application.id, 'member', 'evaluate')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
+                          </button>
+                          <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'accept')}
                             disabled={processingId === application.id}
                             className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
@@ -286,6 +295,11 @@ const Applications = () => {
                             {processingId === application.id ? 'Processing...' : 'Reject'}
                           </button>
                         </>
+                      )}
+                      {application.hasAccepted && (
+                        <div className="text-sm text-green-600 font-semibold">
+                          Member ID: {application.user.id.toUpperCase()}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -334,6 +348,13 @@ const Applications = () => {
                       {(!application.status || application.status === 'pending') && (
                         <>
                           <button
+                            onClick={() => handleApplicationAction(application.id, 'committee', 'evaluate')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
+                          </button>
+                          <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
                             disabled={processingId === application.id}
                             className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
@@ -358,6 +379,20 @@ const Applications = () => {
                             Redirect
                           </button>
                         </>
+                      )}
+                      {application.hasAccepted && (
+                        <div className="text-sm text-green-600 font-semibold">
+                          Member ID: {application.user.id.toUpperCase()}
+                          {application.redirection ? (
+                            <div className="text-xs text-blue-600">
+                              Redirected to: {application.redirection}
+                            </div>
+                          ) : (
+                            <div className="text-xs text-green-600">
+                              Accepted at: {application.firstOptionCommittee}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>
@@ -401,6 +436,13 @@ const Applications = () => {
                       {(!application.status || application.status === 'pending') && (
                         <>
                           <button
+                            onClick={() => handleApplicationAction(application.id, 'ea', 'evaluate')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
+                          </button>
+                          <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}
                             className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
@@ -414,19 +456,31 @@ const Applications = () => {
                           >
                             {processingId === application.id ? 'Processing...' : 'Reject'}
                           </button>
-                          {selectedType !== 'member' && (
-                            <button
-                              onClick={() => {
-                                setShowRedirectModal(true)
-                                setSelectedApplication(application)
-                              }}
-                              disabled={processingId === application.id}
-                              className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
-                            >
-                              Redirect
-                            </button>
-                          )}
+                          <button
+                            onClick={() => {
+                              setShowRedirectModal(true)
+                              setSelectedApplication(application)
+                            }}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                          >
+                            Redirect
+                          </button>
                         </>
+                      )}
+                      {application.hasAccepted && (
+                        <div className="text-sm text-green-600 font-semibold">
+                          Member ID: {application.user.id.toUpperCase()}
+                          {application.redirection ? (
+                            <div className="text-xs text-blue-600">
+                              Redirected to: {application.redirection}
+                            </div>
+                          ) : (
+                            <div className="text-xs text-green-600">
+                              Accepted at: {application.firstOptionEb}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   </div>

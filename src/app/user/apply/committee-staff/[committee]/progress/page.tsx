@@ -291,15 +291,15 @@ function CommitteeProgressPageContent() {
                   1
                 </span>
               </div>
-              <div className="w-20 lg:w-28 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
-              <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-7 h-7 lg:w-10 lg:h-10">
-                <span className="text-[#696767] text-[9px] lg:text-xs font-bold font-inter">
+              <div className={`w-20 lg:w-28 h-[2px] lg:h-[3px] ${application.status === 'evaluating' || application.hasAccepted || application.status === 'failed' || application.status === 'redirected' ? 'bg-[#2F7EE3]' : 'bg-[#D9D9D9]'}`} />
+              <div className={`flex items-center justify-center rounded-full w-7 h-7 lg:w-10 lg:h-10 ${application.status === 'evaluating' || application.hasAccepted || application.status === 'failed' || application.status === 'redirected' ? 'bg-[#2F7EE3]' : 'bg-[#D9D9D9]'}`}>
+                <span className={`text-[9px] lg:text-xs font-bold font-inter ${application.status === 'evaluating' || application.hasAccepted || application.status === 'failed' || application.status === 'redirected' ? 'text-white' : 'text-[#696767]'}`}>
                   2
                 </span>
               </div>
-              <div className="w-20 lg:w-28 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
-              <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-7 h-7 lg:w-10 lg:h-10">
-                <span className="text-[#696767] text-[9px] lg:text-xs font-bold font-inter">
+              <div className={`w-20 lg:w-28 h-[2px] lg:h-[3px] ${application.hasAccepted || application.status === 'failed' || application.status === 'redirected' ? 'bg-[#2F7EE3]' : 'bg-[#D9D9D9]'}`} />
+              <div className={`flex items-center justify-center rounded-full w-7 h-7 lg:w-10 lg:h-10 ${application.hasAccepted || application.status === 'failed' || application.status === 'redirected' ? 'bg-[#2F7EE3]' : 'bg-[#D9D9D9]'}`}>
+                <span className={`text-[9px] lg:text-xs font-bold font-inter ${application.hasAccepted || application.status === 'failed' || application.status === 'redirected' ? 'text-white' : 'text-[#696767]'}`}>
                   3
                 </span>
               </div>
@@ -389,8 +389,8 @@ function CommitteeProgressPageContent() {
                     <span className="font-bold text-sm sm:text-base mb-1 sm:mb-0 sm:mr-3 min-w-fit">
                       Member ID:
                     </span>
-                    <span className="text-sm sm:text-base text-gray-500">
-                      Pending
+                    <span className={`text-sm sm:text-base ${application.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
+                      {application.hasAccepted ? applicationData.user.studentNumber.toUpperCase() : 'Pending'}
                     </span>
                   </div>
 
@@ -415,6 +415,67 @@ function CommitteeProgressPageContent() {
               </div>
             </div>
           </div>
+
+          {/* Application Status and Results */}
+          {(application.status === 'evaluating' || application.hasAccepted || application.status === 'failed' || application.status === 'redirected') && (
+            <div className="rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.15)] sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-4 sm:p-6 lg:p-10 w-full max-w-4xl">
+              <h3 className="text-base sm:text-lg lg:text-xl font-semibold mb-4 sm:mb-5">
+                Application Status
+              </h3>
+              
+              <div className="bg-[#F3F8FF] border-[#e5edf9] border-1 rounded-xl p-4 sm:p-6 lg:p-8">
+                {application.status === 'evaluating' && (
+                  <div className="text-center">
+                    <div className="text-purple-600 text-lg font-semibold mb-2">
+                      ⏳ Under Evaluation
+                    </div>
+                    <p className="text-gray-600">
+                      Your application is currently being reviewed. Please wait for the results.
+                    </p>
+                  </div>
+                )}
+                
+                {application.hasAccepted && (
+                  <div className="text-center">
+                    <div className="text-green-600 text-lg font-semibold mb-2">
+                      ✅ Congratulations! You&apos;ve been accepted!
+                    </div>
+                    <div className="text-gray-600">
+                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
+                      {application.redirection ? (
+                        <p><strong>Accepted at:</strong> {application.redirection}</p>
+                      ) : (
+                        <p><strong>Accepted at:</strong> {firstCommittee?.title}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {application.status === 'failed' && (
+                  <div className="text-center">
+                    <div className="text-red-600 text-lg font-semibold mb-2">
+                      ❌ Application Not Accepted
+                    </div>
+                    <p className="text-gray-600">
+                      Unfortunately, your application was not accepted this time. Thank you for your interest in joining the Computer Science Society.
+                    </p>
+                  </div>
+                )}
+                
+                {application.status === 'redirected' && (
+                  <div className="text-center">
+                    <div className="text-blue-600 text-lg font-semibold mb-2">
+                      🔄 Application Redirected
+                    </div>
+                    <div className="text-gray-600">
+                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
+                      <p><strong>Redirected to:</strong> {application.redirection}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             {/* <button
