@@ -67,7 +67,9 @@ export default function UserDashboard() {
     }
   }, [session, status, router]);
 
-  if (session?.user?.email.match(/\.cics@ust\.edu\.ph$/)) {
+  if (session?.user?.email.match(/\.cics@ust\.edu\.ph$/) && 
+      session?.user?.role !== 'admin' && 
+      session?.user?.role !== 'super_admin') {
     router.push("/");
     return;
   }
