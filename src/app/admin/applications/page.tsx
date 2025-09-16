@@ -46,7 +46,6 @@ const Applications = () => {
   const [applications, setApplications] = useState<{committee: Application[], ea: Application[], member: Application[]}>({committee: [], ea: [], member: []});
   const [loading, setLoading] = useState(false);
   const [selectedType] = useState<'member' | 'committee' | 'ea'>('member');
-  const [selectedStatus] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [showRedirectModal, setShowRedirectModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
@@ -420,6 +419,34 @@ const Applications = () => {
                           </button>
                         </>
                       )}
+                      {(application.status === 'evaluating' || application.status === 'failed' || application.status === 'redirected') && !application.hasAccepted && (
+                        <>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                          </button>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'committee', 'reject')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowRedirectModal(true)
+                              setSelectedApplication(application)
+                            }}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-yellow-600 text-white text-sm rounded-md hover:bg-yellow-700 disabled:opacity-50"
+                          >
+                            Redirect
+                          </button>
+                        </>
+                      )}
                       {application.hasAccepted && (
                         <div className="text-sm text-green-600 font-semibold">
                           Member ID: {application.user.id.toUpperCase()}
@@ -482,6 +509,34 @@ const Applications = () => {
                           >
                             {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                          </button>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'ea', 'reject')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowRedirectModal(true)
+                              setSelectedApplication(application)
+                            }}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                          >
+                            Redirect
+                          </button>
+                        </>
+                      )}
+                      {(application.status === 'evaluating' || application.status === 'failed' || application.status === 'redirected') && !application.hasAccepted && (
+                        <>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}

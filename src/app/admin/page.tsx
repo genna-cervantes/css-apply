@@ -22,7 +22,6 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const Schedule = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
   const [unavailableTimeSlots, setUnavailableTimeSlots] = useState<
     Array<{
@@ -281,7 +280,6 @@ const Schedule = () => {
     if (!position) return;
     
     try {
-      setLoading(true);
       
       // Fetch unavailable slots
       const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${position}`, {
@@ -304,8 +302,6 @@ const Schedule = () => {
       setShowCalendar(true);
     } catch (error) {
       console.error("Error generating slots:", error);
-    } finally {
-      setLoading(false);
     }
   }, []);
 

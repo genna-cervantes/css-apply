@@ -87,6 +87,8 @@ export async function POST(request: NextRequest) {
                     hasAccepted: false,
                 },
             });
+
+                // Application created successfully - email will be sent when schedule is selected
         } else {
             if (existingApplication.hasAccepted) {
                 return NextResponse.json(
@@ -95,7 +97,7 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            // Update existing non-accepted application
+            // Update existing non-accepted application (NO EMAIL SENT)
             await prisma.eAApplication.update({
                 where: { studentNumber },
                 data: {
