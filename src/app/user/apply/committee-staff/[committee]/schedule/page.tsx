@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import ConfirmationModal from "@/components/Modal";
 import ApplicationGuard from "@/components/ApplicationGuard";
 import { committeeRoles } from "@/data/committeeRoles";
+import { getRoleId } from "@/lib/eb-mapping";
 // import { adminSchedule } from "@/data/adminSchedule";
 // import { unavailableSlots } from "@/data/unavailableSlots";
 
@@ -74,7 +75,7 @@ function SchedulePageContent() {
 
     const ebUnavailabilityMap = await Promise.all(ebForInterviewData.map(async (eb: {position: string}) => {
       // Fetch unavailable slots
-      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${eb.position}`);
+      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${getRoleId(eb.position)}`);
       const unavailableData = await unavailableResponse.json();
       const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: {date: string; startTime: string; endTime: string}) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
       
