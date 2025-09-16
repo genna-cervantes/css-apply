@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
 
     if (type === 'member') {
-      let whereClause: any = {};
+      const whereClause: Record<string, unknown> = {};
       
       // Filter by status if provided
       if (status === 'accepted') {
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'ea') {
-      let whereClause: any = {};
+      const whereClause: Record<string, unknown> = {};
       
       // Filter by status if provided
       if (status === 'accepted') {
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (type === 'committee') {
-      let whereClause: any = {};
+      const whereClause: Record<string, unknown> = {};
       
       // Filter by status if provided
       if (status === 'accepted') {
