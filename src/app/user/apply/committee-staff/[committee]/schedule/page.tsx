@@ -116,20 +116,15 @@ function SchedulePageContent() {
         assignedEB: string;
       }> = [];
 
-      // Hardcoded dates: September 16-26, 2025 (same as admin)
-      const hardcodedDates = [
-        new Date(2025, 8, 16), // September 16
-        new Date(2025, 8, 17), // September 17
-        new Date(2025, 8, 18), // September 18
-        new Date(2025, 8, 19), // September 19
-        new Date(2025, 8, 20), // September 20
-        new Date(2025, 8, 21), // September 21
-        new Date(2025, 8, 22), // September 22
-        new Date(2025, 8, 23), // September 23
-        new Date(2025, 8, 24), // September 24
-        new Date(2025, 8, 25), // September 25
-        new Date(2025, 8, 26), // September 26
-      ];
+      // Dynamic dates: From current date until September 26, 2025
+      const hardcodedDates = [];
+      const today = new Date();
+      const endDate = new Date(2025, 8, 26); // September 26, 2025
+      
+      // Generate dates from today until September 26
+      for (let date = new Date(today); date <= endDate; date.setDate(date.getDate() + 1)) {
+        hardcodedDates.push(new Date(date));
+      }
 
       // Use shared unavailable slots from admin settings
 

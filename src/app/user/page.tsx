@@ -67,6 +67,11 @@ export default function UserDashboard() {
     }
   }, [session, status, router]);
 
+  if (session?.user?.email.match(/\.cics@ust\.edu\.ph$/)) {
+    router.push("/");
+    return;
+  }
+
   // Show loading screen while checking authentication
   if (
     isLoading ||
