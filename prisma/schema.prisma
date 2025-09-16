@@ -29,6 +29,10 @@ model User {
   committeeApplication CommitteeApplication?
   ebProfile            EBProfile?
 
+  // Indexes for better query performance
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
 }
 
 model MemberApplication {
@@ -40,6 +44,9 @@ model MemberApplication {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Indexes for better query performance
+  @@index([hasAccepted])
+  @@index([createdAt])
 }
 
 model EAApplication {
@@ -62,6 +69,12 @@ model EAApplication {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
+  // Indexes for better query performance
+  @@index([firstOptionEb])
+  @@index([status])
+  @@index([hasAccepted])
+  @@index([interviewBy])
+  @@index([createdAt])
 }
 
 model CommitteeApplication {
@@ -84,6 +97,12 @@ model CommitteeApplication {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
+  // Indexes for better query performance
+  @@index([firstOptionCommittee])
+  @@index([status])
+  @@index([hasAccepted])
+  @@index([interviewBy])
+  @@index([createdAt])
 }
 
 model AvailableEBInterviewTime {
