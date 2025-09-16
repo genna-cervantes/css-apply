@@ -31,15 +31,18 @@ export default function UserDashboard() {
           // Redirect based on existing applications
           if (data.hasMemberApplication) {
             router.push("/user/apply/member/progress");
+            return;
           } else if (data.hasCommitteeApplication) {
             const committeeId = data.applications.committee?.firstOptionCommittee;
             if (committeeId) {
               router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+              return;
             }
           } else if (data.hasEAApplication) {
             const ebRole = data.applications.ea?.firstOptionEb;
             if (ebRole) {
               router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
+              return;
             }
           }
         }
@@ -63,9 +66,7 @@ export default function UserDashboard() {
       return;
     }
 
-    if (status === "authenticated" && session) {
-      setIsLoading(false);
-    }
+    // Don't set isLoading to false here - let checkApplications handle it
   }, [session, status, router]);
 
   if (session?.user?.email.match(/\.cics@ust\.edu\.ph$/) && 
@@ -76,11 +77,7 @@ export default function UserDashboard() {
   }
 
   // Show loading screen while checking authentication or applications
-  if (
-    status === "loading" ||
-    isLoading ||
-    (status === "authenticated" && !hasCheckedApplications)
-  ) {
+  if (status === "loading" || isLoading) {
     return <LoadingScreen />;
   }
 
