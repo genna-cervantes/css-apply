@@ -36,7 +36,7 @@ export function parseFullName(fullName: string): ParsedName {
   // For names with 3+ parts, we need to determine where the surname starts
   // Common patterns:
   // - "Juan De Guzman" -> firstName: "Juan", lastName: "De Guzman"
-  // - "Maria Santos Cruz" -> firstName: "Maria", lastName: "Santos Cruz"
+  // - "Maria Santos Cruz" -> firstName: "Maria Santos", lastName: "Cruz"
   // - "Jose Dela Cruz" -> firstName: "Jose", lastName: "Dela Cruz"
   // - "Juan Carlos De La Torre" -> firstName: "Juan Carlos", lastName: "De La Torre"
   // - "Ana De Los Santos" -> firstName: "Ana", lastName: "De Los Santos"
@@ -52,11 +52,11 @@ export function parseFullName(fullName: string): ParsedName {
     }
   }
   
-  // No surname prefixes found, assume compound surname (last 2 words)
-  // This handles cases like "Maria Santos Cruz" where "Santos Cruz" is the surname
+  // No surname prefixes found, assume last word is surname
+  // This handles cases like "Joevanni Paulo Gumban" where "Gumban" is the surname
   if (nameParts.length >= 3) {
-    const firstName = nameParts.slice(0, -2).join(' ');
-    const lastName = nameParts.slice(-2).join(' ');
+    const firstName = nameParts.slice(0, -1).join(' ');
+    const lastName = nameParts[nameParts.length - 1];
     return { firstName, lastName };
   }
   
