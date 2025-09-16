@@ -144,16 +144,17 @@ function SchedulePageContent() {
             const endTime = new Date(startTime);
             endTime.setMinutes(startTime.getMinutes() + 30);
             
-            const slotId = `${dateStr}-${timeStr}`;
+            const endTimeStr = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`;
+            const slotId = `${dateStr}-${timeStr}-${endTimeStr}`;
             
             // Find which EBs are available for this time slot
             const availableEBsForSlot = allEbs.filter((eb: string) => {
               const ebData = ebUnavailabilityMap.find(item => item.eb === eb);
               if (!ebData) return true; // If no data, assume available
               
-              const endTime = new Date(startTime);
-              endTime.setMinutes(startTime.getMinutes() + 30);
-              const endTimeStr = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`;
+              const slotEndTime = new Date(startTime);
+              slotEndTime.setMinutes(startTime.getMinutes() + 30);
+              const endTimeStr = `${slotEndTime.getHours().toString().padStart(2, "0")}:${slotEndTime.getMinutes().toString().padStart(2, "0")}`;
               
               // Check if this time slot is already booked for this EB
               const slotKey = `${dateStr}-${timeStr}-${endTimeStr}`;
