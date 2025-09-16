@@ -87,6 +87,7 @@ function SchedulePageContent() {
   useEffect(() => {
     const generateHardcodedSlots = async () => {
       const { unavailableSlots, bookedSlots } = await fetchUnavailableSlots();
+      const now = new Date();
 
       const slots: Array<{
         id: string;
@@ -122,6 +123,11 @@ function SchedulePageContent() {
             const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
             const startTime = new Date(date);
             startTime.setHours(hour, minute, 0, 0);
+
+            // Skip slots that are in the past for today's date
+            if (date.toDateString() === now.toDateString() && startTime.getTime() <= now.getTime()) {
+              continue;
+            }
 
             const endTime = new Date(startTime);
             endTime.setMinutes(startTime.getMinutes() + 30);
