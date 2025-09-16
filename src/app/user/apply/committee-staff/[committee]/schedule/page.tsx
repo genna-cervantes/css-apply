@@ -250,7 +250,7 @@ function SchedulePageContent() {
               slots.push({
                 id: slotId,
                 start: startTime.toISOString(),
-                end: endTime.toISOString(),
+                end: endTimeStr,
                 date: dateStr,
                 time: timeStr,
                 isBooked: false, // All slots start as available
