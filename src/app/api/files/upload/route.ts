@@ -4,31 +4,9 @@ import { getServerSession } from 'next-auth/next'
 import { supabase } from '@/lib/supabase'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { uploadRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
     try {
-        // Apply rate limiting to upload endpoint
-        const rateLimitResult = uploadRateLimit(request);
-        
-        if (!rateLimitResult.success) {
-            return NextResponse.json(
-                {
-                    error: "Too many upload attempts. Please try again later.",
-                    retryAfter: Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000),
-                },
-                {
-                    status: 429,
-                    headers: {
-                        'Retry-After': Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000).toString(),
-                        'X-RateLimit-Limit': '10',
-                        'X-RateLimit-Remaining': '0',
-                        'X-RateLimit-Reset': rateLimitResult.resetTime!.toString(),
-                    },
-                }
-            );
-        }
-
         console.log('Upload API called');
         const session = await getServerSession(authOptions);
         

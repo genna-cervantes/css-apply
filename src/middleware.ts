@@ -1,35 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import type { NextRequest } from 'next/server'
-import { authRateLimit } from '@/lib/rate-limit'
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-
-  // Apply rate limiting to auth endpoints
-  if (pathname.startsWith('/api/auth')) {
-    const rateLimitResult = authRateLimit(request);
-    
-    if (!rateLimitResult.success) {
-      return new Response(
-        JSON.stringify({
-          error: "Too many authentication attempts. Please try again later.",
-          retryAfter: Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000),
-        }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'Retry-After': Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000).toString(),
-            'X-RateLimit-Limit': '5',
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': rateLimitResult.resetTime!.toString(),
-          },
-        }
-      );
-    }
-  }
-
   const token = await getToken({
     req: request,
     // Match custom cookie name set in auth options to ensure middleware reads it in production
