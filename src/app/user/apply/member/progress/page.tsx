@@ -12,7 +12,7 @@ function MemberProgressPageContent() {
   const [applicationData, setApplicationData] = useState<{
     hasApplication: boolean;
     application: {id: string; hasAccepted?: boolean; paymentProof?: string; createdAt: string} | null;
-    user: {studentNumber: string; name: string; section: string};
+    user: {id: string; studentNumber: string; name: string; section: string};
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const { data: session } = useSession();
@@ -23,6 +23,9 @@ function MemberProgressPageContent() {
         const response = await fetch("/api/applications/member");
         if (response.ok) {
           const data = await response.json();
+          console.log("Member application data:", data);
+          console.log("User ID:", data.user?.id);
+          console.log("Has accepted:", data.application?.hasAccepted);
           setApplicationData(data);
         }
       } catch (error) {
@@ -141,7 +144,7 @@ function MemberProgressPageContent() {
                       Member ID:
                     </span>
                     <span className={`text-sm sm:text-base ${applicationData.application?.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-                      {applicationData.application?.hasAccepted ? applicationData.user.studentNumber.toUpperCase() : 'Pending'}
+                      {applicationData.application?.hasAccepted ? applicationData.user.id.toUpperCase() : 'Pending'}
                     </span>
                   </div>
                 </div>

@@ -62,7 +62,7 @@ const Members = () => {
     }
 
     fetchMembers();
-  }, [status, session, router, selectedStatus, fetchMembers]);
+  }, [status, session?.user?.role, selectedStatus, fetchMembers, router]);
 
   if (status === 'loading' || loading) {
     return (

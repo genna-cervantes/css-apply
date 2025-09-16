@@ -99,7 +99,7 @@ export default function SuperAdminDashboard() {
     }
 
     fetchUsers()
-  }, [status, session, router])
+  }, [status, session?.user?.role, router])
 
   // REF: doesnt need a useEffect
   useEffect(() => {

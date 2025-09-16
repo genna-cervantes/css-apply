@@ -65,8 +65,11 @@ const Applications = () => {
       return;
     }
 
-    getEBData(session?.user?.dbId);
-  }, [status, session, router]);
+    // Only fetch EB data if we don't have it yet
+    if (!ebData && session?.user?.dbId) {
+      getEBData(session.user.dbId);
+    }
+  }, [status, session?.user?.role, session?.user?.dbId, ebData, router]);
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -98,6 +101,11 @@ const Applications = () => {
   };
 
   const handleApplicationAction = async (applicationId: string, type: 'committee' | 'ea' | 'member', action: 'accept' | 'reject' | 'redirect' | 'evaluate') => {
+    // Skip member evaluation - only allow accept/reject
+    if (type === 'member' && action === 'evaluate') {
+      return;
+    }
+    
     try {
       setProcessingId(applicationId);
       
@@ -273,13 +281,6 @@ const Applications = () => {
                     <div className="flex gap-2 ml-4">
                       {(!application.hasAccepted) && (
                         <>
-                          <button
-                            onClick={() => handleApplicationAction(application.id, 'member', 'evaluate')}
-                            disabled={processingId === application.id}
-                            className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50"
-                          >
-                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
-                          </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'accept')}
                             disabled={processingId === application.id}

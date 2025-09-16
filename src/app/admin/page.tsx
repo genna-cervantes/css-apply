@@ -81,6 +81,8 @@ const Schedule = () => {
   };
 
   const getEBData = useCallback(async (id: string) => {
+    if (!id) return;
+    
     try{
       const ebData = await fetch(`/api/admin/eb-profiles/${id}`, {
         method: "GET",
@@ -246,7 +248,7 @@ const Schedule = () => {
   }, [unavailableTimeSlots, interviewSlots, generateCalendarEvents]);
 
   const fetchSlots = useCallback(async () => {
-    if (!ebProfile) return;
+    if (!ebProfile?.position) return;
     
     try {
       setLoading(true);
@@ -275,7 +277,7 @@ const Schedule = () => {
     } finally {
       setLoading(false);
     }
-  }, [ebProfile]);
+  }, [ebProfile?.position]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -293,17 +295,20 @@ const Schedule = () => {
       return;
     }
 
-    setScheduleIsLoading(true);
-    getEBData(session?.user?.dbId);
-  }, [status, session, router, getEBData]);
+    // Only fetch EB data if we don't have it yet
+    if (!ebProfile && session?.user?.dbId) {
+      setScheduleIsLoading(true);
+      getEBData(session.user.dbId);
+    }
+  }, [status, session?.user?.role, session?.user?.dbId, ebProfile, router]);
 
   // Separate useEffect for fetching slots when ebProfile is available
   useEffect(() => {
-    if (ebProfile) {
+    if (ebProfile && unavailableTimeSlots.length === 0 && interviewSlots.length === 0) {
       fetchSlots();
       setScheduleIsLoading(false);
     }
-  }, [ebProfile, fetchSlots]);
+  }, [ebProfile, fetchSlots, unavailableTimeSlots.length, interviewSlots.length]);
 
   const handleCreateSlot = async () => {
     if (unavailableTimeSlots.length === 0) {
@@ -354,7 +359,8 @@ const Schedule = () => {
     }
   };
 
-  if (status === "loading" || loading || !ebProfile || scheduleIsLoading) {
+  // Only show loading if we're actually loading something important
+  if (status === "loading" || (loading && !showCalendar) || !ebProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center">
