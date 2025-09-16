@@ -19,9 +19,23 @@ function HomeContent() {
   const handleEnterClick = async () => {
     setIsLoggingIn(true);
     try {
-      await signIn("google", { callbackUrl, redirect: true });
+      const result = await signIn("google", { 
+        callbackUrl, 
+        redirect: false 
+      });
+      
+      if (result?.error) {
+        console.error("Sign-in error:", result.error);
+        // Redirect to error page with error details
+        window.location.href = `/auth/error?error=${encodeURIComponent(result.error)}`;
+      } else if (result?.ok) {
+        // Successful sign-in, redirect manually
+        window.location.href = callbackUrl;
+      }
     } catch (error) {
       console.error("Sign-in error:", error);
+      window.location.href = `/auth/error?error=Default`;
+    } finally {
       setIsLoggingIn(false);
     }
   };
@@ -29,9 +43,21 @@ function HomeContent() {
   const handleApplyClick = async (targetPath: string) => {
     setIsLoggingIn(true);
     try {
-      await signIn("google", { callbackUrl: targetPath, redirect: true });
+      const result = await signIn("google", { 
+        callbackUrl: targetPath, 
+        redirect: false 
+      });
+      
+      if (result?.error) {
+        console.error("Sign-in error:", result.error);
+        window.location.href = `/auth/error?error=${encodeURIComponent(result.error)}`;
+      } else if (result?.ok) {
+        window.location.href = targetPath;
+      }
     } catch (error) {
       console.error("Sign-in error:", error);
+      window.location.href = `/auth/error?error=Default`;
+    } finally {
       setIsLoggingIn(false);
     }
   };
