@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { roles } from "@/data/ebRoles";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { parseFullName } from "@/lib/name-parsing";
 
 export default function ExecutiveAssistantApplication() {
   const router = useRouter();
@@ -41,9 +42,7 @@ export default function ExecutiveAssistantApplication() {
         // Prefill first and last name from Google session
         const fullName = session?.user?.name || "";
         if (fullName) {
-          const nameParts = fullName.trim().split(/\s+/);
-          const extractedLastName = nameParts.length > 1 ? (nameParts.pop() as string) : "";
-          const extractedFirstName = nameParts.join(" ");
+          const { firstName: extractedFirstName, lastName: extractedLastName } = parseFullName(fullName);
           setFormData((prev) => ({
             ...prev,
             firstName: prev.firstName || extractedFirstName,
