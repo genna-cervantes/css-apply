@@ -222,7 +222,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage1.jpg"
+                    src="/assets/pictures/landingpage/landingpage5.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -231,7 +231,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage2.jpg"
+                    src="/assets/pictures/landingpage/landingpage6.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -243,7 +243,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage3.jpg"
+                    src="/assets/pictures/landingpage/landingpage7.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -252,7 +252,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage4.png"
+                    src="/assets/pictures/landingpage/landingpage8.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -261,7 +261,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage1.jpg"
+                    src="/assets/pictures/landingpage/landingpage9.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -270,7 +270,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage2.jpg"
+                    src="/assets/pictures/landingpage/landingpage10.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -279,7 +279,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage3.jpg"
+                    src="/assets/pictures/landingpage/landingpage11.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -288,7 +288,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage4.png"
+                    src="/assets/pictures/landingpage/landingpage12.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -340,7 +340,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage1.jpg"
+                    src="/assets/pictures/landingpage/landingpage13.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -349,7 +349,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage2.jpg"
+                    src="/assets/pictures/landingpage/landingpage14.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -358,7 +358,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage3.jpg"
+                    src="/assets/pictures/landingpage/landingpage15.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -367,7 +367,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage4.png"
+                    src="/assets/pictures/landingpage/landingpage16.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -376,7 +376,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage1.jpg"
+                    src="/assets/pictures/landingpage/landingpage17.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -388,7 +388,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage2.jpg"
+                    src="/assets/pictures/landingpage/landingpage18.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -397,7 +397,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage3.jpg"
+                    src="/assets/pictures/landingpage/landingpage19.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -406,7 +406,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage4.png"
+                    src="/assets/pictures/landingpage/landingpage20.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -415,7 +415,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage1.jpg"
+                    src="/assets/pictures/landingpage/landingpage21.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -424,7 +424,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage2.jpg"
+                    src="/assets/pictures/landingpage/landingpage22.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -862,25 +862,27 @@ function HomeContent() {
 
             <div className="flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
               <button
-                  onClick={() => handleApplyClick("/user/apply/member")}
-                  className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
-                >
-                  Apply as Member
-                </button>
+                onClick={() => handleApplyClick("/user/apply/member")}
+                className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
+              >
+                Apply as Member
+              </button>
 
-                <button
-                  onClick={() => handleApplyClick("/user/apply/committee-staff")}
-                  className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
-                >
-                  Apply as Staff
-                </button>
+              <button
+                onClick={() => handleApplyClick("/user/apply/committee-staff")}
+                className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
+              >
+                Apply as Staff
+              </button>
 
-                <button
-                  onClick={() => handleApplyClick("/user/apply/executive-assistant")}
-                  className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
-                >
-                  Apply as Executive Assistant
-                </button>
+              <button
+                onClick={() =>
+                  handleApplyClick("/user/apply/executive-assistant")
+                }
+                className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
+              >
+                Apply as Executive Assistant
+              </button>
             </div>
           </div>
         </div>
