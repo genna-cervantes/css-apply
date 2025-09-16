@@ -241,5 +241,136 @@ export const emailTemplates = {
                 </div>
             </div>
         `
+    }),
+
+    // Acceptance notification templates
+    memberAccepted: (userName: string, userId: string): EmailTemplate => ({
+        subject: "CSS Apply - Congratulations! Your Member Application Has Been Accepted",
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #2563eb;">CSS Apply</h1>
+                </div>
+                
+                <h2 style="color: #1f2937;">Congratulations ${userName}!</h2>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    We are thrilled to inform you that your member application has been <strong style="color: #059669;">ACCEPTED</strong>! 
+                    Welcome to the Computer Science Society!
+                </p>
+                
+                <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #059669; margin-top: 0;">🎉 Acceptance Details:</h3>
+                    <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
+                    <p style="margin: 5px 0;"><strong>Application Type:</strong> Member</p>
+                    <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
+                </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Your Member ID (<strong>${userId.toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for future activities and events.
+                </p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    We look forward to seeing you at our upcoming events and activities. Welcome to the CSS family!
+                </p>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; font-size: 14px;">
+                        Best regards,<br>
+                        CSS Apply Team
+                    </p>
+                </div>
+            </div>
+        `
+    }),
+
+    committeeAccepted: (userName: string, userId: string, committee: string): EmailTemplate => ({
+        subject: "CSS Apply - Congratulations! Your Committee Staff Application Has Been Accepted",
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #2563eb;">CSS Apply</h1>
+                </div>
+                
+                <h2 style="color: #1f2937;">Congratulations ${userName}!</h2>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    We are thrilled to inform you that your committee staff application has been <strong style="color: #059669;">ACCEPTED</strong>! 
+                    Welcome to the Computer Science Society Committee Staff!
+                </p>
+                
+                <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #059669; margin-top: 0;">🎉 Acceptance Details:</h3>
+                    <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
+                    <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
+                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${capitalizeWords(committee)} Committee</p>
+                    <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
+                </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Your Member ID (<strong>${userId.toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for committee activities and events.
+                </p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    As a member of the ${capitalizeWords(committee)} Committee, you'll be involved in exciting projects and initiatives. 
+                    We look forward to working with you!
+                </p>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; font-size: 14px;">
+                        Best regards,<br>
+                        CSS Apply Team
+                    </p>
+                </div>
+            </div>
+        `
+    }),
+
+    executiveAssistantAccepted: (userName: string, userId: string, ebRole: string): EmailTemplate => ({
+        subject: "CSS Apply - Congratulations! Your Executive Assistant Application Has Been Accepted",
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #2563eb;">CSS Apply</h1>
+                </div>
+                
+                <h2 style="color: #1f2937;">Congratulations ${userName}!</h2>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    We are thrilled to inform you that your executive assistant application has been <strong style="color: #059669;">ACCEPTED</strong>! 
+                    Welcome to the Computer Science Society Executive Board!
+                </p>
+                
+                <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #059669; margin-top: 0;">🎉 Acceptance Details:</h3>
+                    <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
+                    <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
+                    <p style="margin: 5px 0;"><strong>EB Role:</strong> ${capitalizeWords(ebRole)}</p>
+                    <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
+                </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Your Member ID (<strong>${userId.toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for executive board activities and events.
+                </p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    As an Executive Assistant for ${capitalizeWords(ebRole)}, you'll play a crucial role in supporting our leadership team. 
+                    We look forward to working with you!
+                </p>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; font-size: 14px;">
+                        Best regards,<br>
+                        CSS Apply Team
+                    </p>
+                </div>
+            </div>
+        `
     })
 };

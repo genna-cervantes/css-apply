@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEmail, emailTemplates } from "@/lib/email";
 
 // GET applications with filtering
 export async function GET(request: NextRequest) {
@@ -233,6 +234,21 @@ export async function PUT(request: NextRequest) {
             },
           },
         });
+
+        // Send acceptance email
+        if (updatedApplication?.user?.email && updatedApplication?.user?.name && updatedApplication?.user?.id) {
+          try {
+            const emailTemplate = emailTemplates.memberAccepted(
+              updatedApplication.user.name,
+              updatedApplication.user.id
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Acceptance email sent to ${updatedApplication.user.email} for member application`);
+          } catch (emailError) {
+            console.error('Failed to send acceptance email:', emailError);
+            // Don't fail the request if email fails
+          }
+        }
       } else if (action === "reject") {
         updatedApplication = await prisma.memberApplication.update({
           where: { id: applicationId },
@@ -298,6 +314,22 @@ export async function PUT(request: NextRequest) {
           },
         },
       });
+
+      // Send acceptance email if application was accepted
+      if (action === "accept" && updatedApplication?.user?.email && updatedApplication?.user?.name && updatedApplication?.user?.id && updatedApplication?.firstOptionCommittee) {
+        try {
+          const emailTemplate = emailTemplates.committeeAccepted(
+            updatedApplication.user.name,
+            updatedApplication.user.id,
+            updatedApplication.firstOptionCommittee
+          );
+          await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+          console.log(`Acceptance email sent to ${updatedApplication.user.email} for committee application`);
+        } catch (emailError) {
+          console.error('Failed to send acceptance email:', emailError);
+          // Don't fail the request if email fails
+        }
+      }
     } else if (type === "ea") {
       const updateData: {hasAccepted?: boolean; status?: string; redirection?: string} = {};
 
@@ -329,6 +361,22 @@ export async function PUT(request: NextRequest) {
           },
         },
       });
+
+      // Send acceptance email if application was accepted
+      if (action === "accept" && updatedApplication?.user?.email && updatedApplication?.user?.name && updatedApplication?.user?.id && updatedApplication?.ebRole) {
+        try {
+          const emailTemplate = emailTemplates.executiveAssistantAccepted(
+            updatedApplication.user.name,
+            updatedApplication.user.id,
+            updatedApplication.ebRole
+          );
+          await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+          console.log(`Acceptance email sent to ${updatedApplication.user.email} for EA application`);
+        } catch (emailError) {
+          console.error('Failed to send acceptance email:', emailError);
+          // Don't fail the request if email fails
+        }
+      }
     } else {
       return NextResponse.json(
         { error: "Invalid application type" },
