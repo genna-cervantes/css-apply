@@ -21,44 +21,39 @@ export default function UserDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
 
+  if (status === "authenticated" && !hasCheckedApplications) {
+    const checkApplications = async () => {
+      try {
+        const response = await fetch("/api/applications/check-existing");
+        if (response.ok) {
+          const data = await response.json();
 
-  useEffect(() => {
-    if (status === "authenticated" && !hasCheckedApplications) {
-      const checkApplications = async () => {
-        try {
-          const response = await fetch("/api/applications/check-existing");
-          
-          if (response.ok) {
-            const data = await response.json();
-
-            // Redirect based on existing applications
-            if (data.hasMemberApplication) {
-              router.push("/user/apply/member/progress");
-            } else if (data.hasCommitteeApplication) {
-              const committeeId = data.applications.committee?.firstOptionCommittee;
-              if (committeeId) {
-                router.push(`/user/apply/committee-staff/${committeeId}/progress`);
-              }
-            } else if (data.hasEAApplication) {
-              const ebRole = data.applications.ea?.firstOptionEb;
-              if (ebRole) {
-                router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
-              }
+          // Redirect based on existing applications
+          if (data.hasMemberApplication) {
+            router.push("/user/apply/member/progress");
+          } else if (data.hasCommitteeApplication) {
+            const committeeId = data.applications.committee?.firstOptionCommittee;
+            if (committeeId) {
+              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
             }
-          } else {
-            console.error("Failed to fetch applications:", response.status, response.statusText);
+          } else if (data.hasEAApplication) {
+            const ebRole = data.applications.ea?.firstOptionEb;
+            if (ebRole) {
+              router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
+            }
           }
-        } catch (error) {
-          console.error("Error checking applications:", error);
-        } finally {
-          setHasCheckedApplications(true);
         }
-      };
+      } catch (error) {
+        console.error("Error checking applications:", error);
+      } finally {
+        setHasCheckedApplications(true);
+      }
+    };
 
-      checkApplications();
-    }
-  }, [status, hasCheckedApplications, router]);
+    checkApplications();
+  }
 
+  // REF: this too does not need useEffect
   useEffect(() => {
     if (status === "loading") return;
 
@@ -88,34 +83,11 @@ export default function UserDashboard() {
     return <LoadingScreen />;
   }
 
-  // Show error state if authentication failed
-  if (status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-[#F3F3FD] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Authentication Required</h1>
-          <p className="text-gray-600 mb-6">Please sign in to access this page.</p>
-          <button
-            onClick={() => router.push("/")}
-            className="bg-[#134687] hover:bg-[#0d3569] text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            Go to Sign In
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // Get user name from session
   const rawFirstName = session?.user?.name?.split(" ")[0];
   const firstName = rawFirstName
     ? rawFirstName.charAt(0).toUpperCase() + rawFirstName.slice(1).toLowerCase()
     : "";
-
-  // Safety check - if no session, show loading
-  if (!session) {
-    return <LoadingScreen />;
-  }
 
   return (
     <div>
@@ -254,7 +226,7 @@ export default function UserDashboard() {
                             </li>
                           </ul>
                           <a
-                            href="/user/apply/executive-assistant"
+                            href="/user/apply/executive-assistants"
                             className="whitespace-nowrap bg-[#044FAF] font-inter text-[10px] md:text-sm text-white px-3 py-2 md:px-4 md:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                           >
                             Apply as Executive Assistant
