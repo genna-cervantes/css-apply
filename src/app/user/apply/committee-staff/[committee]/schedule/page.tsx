@@ -190,8 +190,9 @@ function SchedulePageContent() {
               });
             });
 
-            // Only add slots if at least one EB is available
-            if (availableEBsForSlot.length > 0) {
+            // Only add slots if ALL EBs are available (intersection of available times)
+            // This ensures that if any EB is unavailable at a time, that time is blocked for all applicants
+            if (availableEBsForSlot.length === allEbs.length && allEbs.length > 0) {
               // Randomly assign one EB from the available EBs
               const randomIndex = Math.floor(Math.random() * availableEBsForSlot.length);
               const assignedEB = availableEBsForSlot[randomIndex];
