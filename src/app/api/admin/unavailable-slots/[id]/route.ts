@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { NextRequest, NextResponse } from "next/server"
+import { getPositionFromRoleId } from "@/lib/eb-mapping"
 
 // GET unavailable slots for admin view
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {  
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
         const unavailableSlots = await prisma.availableEBInterviewTime.findMany({
             where: {
-                ...(id && { eb: id })
+                ...(id && { eb: getPositionFromRoleId(id) })
             },
             orderBy: [
                 { day: 'asc' },
