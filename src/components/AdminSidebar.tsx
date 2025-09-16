@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 
 interface SidebarContentProps {
   activePage: string;
@@ -9,6 +9,14 @@ interface SidebarContentProps {
 const SidebarContent = ({ activePage }: SidebarContentProps) => {
   const { data: session } = useSession();
   const isSuperAdmin = session?.user?.role === 'super_admin';
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ callbackUrl: "/", redirect: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
   return (
     <>
       {/* CSS logo inside sidebar */}
@@ -290,7 +298,10 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
 
       {/* logout button */}
       <div className="absolute bottom-0 left-0 w-64 p-4 border-t">
-        <div className="group flex items-center px-4 py-3 text-gray-600 hover:bg-red-50 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md">
+        <button 
+          onClick={handleLogout}
+          className="group flex items-center w-full px-4 py-3 text-gray-600 hover:bg-red-50 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
+        >
           <div className="w-5 h-5 mr-3 text-gray-500 group-hover:text-red-600 transition-all duration-300">
             <svg 
               viewBox="0 0 24 24" 
@@ -305,7 +316,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
             </svg>
           </div>
           <span className="text-sm text-gray-700 transition-colors duration-300">Log Out</span>
-        </div>
+        </button>
       </div>
     </>
   );
