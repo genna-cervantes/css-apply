@@ -47,13 +47,14 @@ export default function UserDashboard() {
         console.error("Error checking applications:", error);
       } finally {
         setHasCheckedApplications(true);
+        setIsLoading(false);
       }
     };
 
     checkApplications();
   }
 
-  // REF: this too does not need useEffect
+  // Handle authentication status changes
   useEffect(() => {
     if (status === "loading") return;
 
@@ -74,10 +75,10 @@ export default function UserDashboard() {
     return;
   }
 
-  // Show loading screen while checking authentication
+  // Show loading screen while checking authentication or applications
   if (
-    isLoading ||
     status === "loading" ||
+    isLoading ||
     (status === "authenticated" && !hasCheckedApplications)
   ) {
     return <LoadingScreen />;
