@@ -216,3 +216,50 @@ export const committeeRolesSubmitted = [
         title: "Technology Development Committee",
     },
 ]
+
+export const committeeRolesEBRole = [
+  {
+      id: "academics",
+      title: "academics",
+  },
+  {
+      id: "community",
+      title: "community development",
+  },
+  {
+      id: "creatives",
+      title: "creatives and technical",
+  },
+  {
+      id: "documentation",
+      title: "documentation",
+  },
+  {
+      id: "external",
+      title: "external affairs",
+  },
+  {
+      id: "finance",
+      title: "finance",
+  },
+  {
+      id: "logistics",
+      title: "logistics",
+  },
+  {
+      id: "publicity",
+      title: "publicity",
+  },
+  {
+      id: "sports",
+      title: "sports and talent",
+  },
+  {
+      id: "technology",
+      title: "technology development",
+  },
+]
+
+export const getCommitteeEBRoleFromCommitteeId = (committeeId: string) => {
+    return committeeRolesEBRole.find(committee => committee.id === committeeId)?.title;
+}
