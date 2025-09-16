@@ -279,7 +279,7 @@ export default function MemberApplication() {
             <div className="hidden lg:flex justify-center items-center mt-8">
               <div className="relative w-[300px] h-[360px]">
                 <Image
-                  src="/assets/pictures/MemberImage.jpg"
+                  src="/assets/pictures/MemberImage1.png"
                   alt="Member"
                   fill
                   sizes="300px"
