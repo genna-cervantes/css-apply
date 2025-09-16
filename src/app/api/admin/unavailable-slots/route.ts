@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         const unavailableSlots: { id: string, eb: string, day: string, timeStart: string, timeEnd: string }[] = await request.json()
 
         const unavailableSlotsData = unavailableSlots.map((slot) => ({
-            id: slot.id,
+            id: `${slot.id}-${slot.eb}`,
             eb: slot.eb,
             day: slot.day,
             timeStart: slot.timeStart,
