@@ -25,9 +25,12 @@ export default function AssistantApplication() {
           if (data.hasMemberApplication) {
             router.push("/user/apply/member/progress");
           } else if (data.hasCommitteeApplication) {
-            const committeeId = data.applications.committee?.firstOptionCommittee;
+            const committeeId =
+              data.applications.committee?.firstOptionCommittee;
             if (committeeId) {
-              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+              router.push(
+                `/user/apply/committee-staff/${committeeId}/progress`
+              );
             }
           } else if (data.hasEAApplication) {
             const ebRole = data.applications.ea?.firstOptionEb;
@@ -234,7 +237,7 @@ export default function AssistantApplication() {
               <button
                 type="button"
                 onClick={() => router.push("/user")}
-                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+                className="cursor-pointer hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
               >
                 Back
               </button>
@@ -245,7 +248,7 @@ export default function AssistantApplication() {
                       `/user/apply/executive-assistant/${selectedRole}/application`
                     )
                   }
-                  className="bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
+                  className="cursor-pointer bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
                 >
                   Apply
                 </button>

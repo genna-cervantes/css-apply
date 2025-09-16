@@ -67,19 +67,31 @@ function SchedulePageContent() {
 
   const fetchUnavailableSlots = useCallback(async () => {
     // Fetch unavailable slots
-    const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${ebId}`);
+    const unavailableResponse = await fetch(
+      `/api/admin/unavailable-slots/${ebId}`
+    );
     const unavailableData = await unavailableResponse.json();
-    const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: {date: string; startTime: string; endTime: string}) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
-    
+    const unavailableSlots = unavailableData.unavailableSlotsData.map(
+      (slot: { date: string; startTime: string; endTime: string }) =>
+        `${slot.date}-${slot.startTime}-${slot.endTime}`
+    );
+
     // Fetch existing interview bookings
-    const interviewSlotsResponse = await fetch(`/api/admin/interview-slots/${ebId}`);
+    const interviewSlotsResponse = await fetch(
+      `/api/admin/interview-slots/${ebId}`
+    );
     const interviewSlotsData = await interviewSlotsResponse.json();
-    const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: {day: string; timeStart: string; timeEnd: string}) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
-    
+    const bookedSlots = interviewSlotsData.success
+      ? interviewSlotsData.slots.map(
+          (slot: { day: string; timeStart: string; timeEnd: string }) =>
+            `${slot.day}-${slot.timeStart}-${slot.timeEnd}`
+        )
+      : [];
+
     return {
       unavailableSlots: new Set(unavailableSlots),
       bookedSlots: new Set(bookedSlots),
-      ebRole: ebId
+      ebRole: ebId,
     };
   }, [ebId]);
 
@@ -103,9 +115,13 @@ function SchedulePageContent() {
       const hardcodedDates = [];
       const today = new Date();
       const endDate = new Date(2025, 8, 26); // September 26, 2025
-      
+
       // Generate dates from today until September 26
-      for (let date = new Date(today); date <= endDate; date.setDate(date.getDate() + 1)) {
+      for (
+        let date = new Date(today);
+        date <= endDate;
+        date.setDate(date.getDate() + 1)
+      ) {
         hardcodedDates.push(new Date(date));
       }
 
@@ -120,12 +136,17 @@ function SchedulePageContent() {
         // Generate time slots from 7 AM to 9 PM in 30-minute increments
         for (let hour = 7; hour < 21; hour++) {
           for (let minute = 0; minute < 60; minute += 30) {
-            const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+            const timeStr = `${hour.toString().padStart(2, "0")}:${minute
+              .toString()
+              .padStart(2, "0")}`;
             const startTime = new Date(date);
             startTime.setHours(hour, minute, 0, 0);
 
             // Skip slots that are in the past for today's date
-            if (date.toDateString() === now.toDateString() && startTime.getTime() <= now.getTime()) {
+            if (
+              date.toDateString() === now.toDateString() &&
+              startTime.getTime() <= now.getTime()
+            ) {
               continue;
             }
 
@@ -133,31 +154,46 @@ function SchedulePageContent() {
             endTime.setMinutes(startTime.getMinutes() + 30);
 
             const slotId = `${dateStr}-${timeStr}`;
-            
-            const endTimeStr = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`;
-            
+
+            const endTimeStr = `${endTime
+              .getHours()
+              .toString()
+              .padStart(2, "0")}:${endTime
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}`;
+
             // Check if this time slot is already booked
             const slotKey = `${dateStr}-${timeStr}-${endTimeStr}`;
             const isBooked = bookedSlots.has(slotKey);
-            
+
             // Check if this time slot is unavailable
-            const isUnavailable = (Array.from(unavailableSlots) as string[]).some((unavailableSlot: string) => {
-              const parts = unavailableSlot.split('-');
+            const isUnavailable = (
+              Array.from(unavailableSlots) as string[]
+            ).some((unavailableSlot: string) => {
+              const parts = unavailableSlot.split("-");
               if (parts.length >= 4) {
                 const unavailableDate = `${parts[0]}-${parts[1]}-${parts[2]}`;
                 const unavailableStartTime = parts[3];
                 const unavailableEndTime = parts[4];
-                
+
                 // Check if the date matches and the time is within the range
                 if (unavailableDate === dateStr) {
                   const slotTimeMinutes = hour * 60 + minute;
-                  const [startHour, startMinute] = unavailableStartTime.split(':').map(Number);
-                  const [endHour, endMinute] = unavailableEndTime.split(':').map(Number);
+                  const [startHour, startMinute] = unavailableStartTime
+                    .split(":")
+                    .map(Number);
+                  const [endHour, endMinute] = unavailableEndTime
+                    .split(":")
+                    .map(Number);
                   const startTimeMinutes = startHour * 60 + startMinute;
                   const endTimeMinutes = endHour * 60 + endMinute;
-                  
+
                   // Check if slot time is within the unavailable range
-                  return slotTimeMinutes >= startTimeMinutes && slotTimeMinutes < endTimeMinutes;
+                  return (
+                    slotTimeMinutes >= startTimeMinutes &&
+                    slotTimeMinutes < endTimeMinutes
+                  );
                 }
               }
               return false;
@@ -165,8 +201,11 @@ function SchedulePageContent() {
 
             // Only add slot if it's not unavailable and not booked
             if (!isUnavailable && !isBooked) {
-              const endHour = endTime.getHours().toString().padStart(2, '0');
-              const endMinute = endTime.getMinutes().toString().padStart(2, '0');
+              const endHour = endTime.getHours().toString().padStart(2, "0");
+              const endMinute = endTime
+                .getMinutes()
+                .toString()
+                .padStart(2, "0");
               const endTimeStr = `${endHour}:${endMinute}`;
 
               slots.push({
@@ -229,7 +268,9 @@ function SchedulePageContent() {
       setIsSubmitting(true);
 
       try {
-        const userResponse = await fetch("/api/applications/executive-assistant");
+        const userResponse = await fetch(
+          "/api/applications/executive-assistant"
+        );
         let studentNumber = "";
 
         if (userResponse.ok) {
@@ -302,7 +343,7 @@ function SchedulePageContent() {
   };
 
   const selectedEB = roles.find((role) => role.id === ebId);
-  
+
   if (!selectedEB) {
     return (
       <section className="min-h-screen bg-[rgb(243,243,253)]">
@@ -586,7 +627,7 @@ function SchedulePageContent() {
                     `/user/apply/executive-assistant/${ebId}/application`
                   )
                 }
-                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+                className="cursor-pointer hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
               >
                 Back
               </button>
@@ -594,7 +635,7 @@ function SchedulePageContent() {
                 type="button"
                 onClick={handleSubmitClick}
                 disabled={!selectedSlot}
-                className={`whitespace-nowrap font-inter text-sm font-semibold px-15 py-3 rounded-lg border-2 transition-all duration-150 active:scale-95 ${
+                className={`cursor-pointer whitespace-nowrap font-inter text-sm font-semibold px-15 py-3 rounded-lg border-2 transition-all duration-150 active:scale-95 ${
                   selectedSlot
                     ? "text-[#134687] border-[#134687] bg-white hover:bg-[#B1CDF0]"
                     : "text-gray-400 border-gray-300 bg-gray-100 cursor-not-allowed"

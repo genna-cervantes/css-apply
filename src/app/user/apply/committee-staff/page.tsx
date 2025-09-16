@@ -183,8 +183,9 @@ export default function StaffApplication() {
                         <Image
                           src={getCommitteeImage(selectedRole)}
                           alt={
-                            committeeRolesRequirements.find((r) => r.id === selectedRole)
-                              ?.title || "Committee"
+                            committeeRolesRequirements.find(
+                              (r) => r.id === selectedRole
+                            )?.title || "Committee"
                           }
                           fill
                           sizes="(max-width: 1024px) 100vw, 40vw"
@@ -222,7 +223,7 @@ export default function StaffApplication() {
               <button
                 type="button"
                 onClick={() => router.push("/user")}
-                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+                className="cursor-pointer hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
               >
                 Back
               </button>
@@ -234,11 +235,11 @@ export default function StaffApplication() {
                       `/user/apply/committee-staff/${selectedRole}/application`
                     )
                   }
-                  className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
+                  className="cursor-pointer whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
                 >
                   Apply
                 </button>
-              )}  
+              )}
             </div>
           </div>
         </div>
