@@ -7,12 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { useEffect, useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 function HomeContent() {
   // Auth button state and handler (migrated from old LoginButton)
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const callbackUrl = searchParams.get("callbackUrl") || "/user";
 
@@ -27,14 +28,16 @@ function HomeContent() {
       if (result?.error) {
         console.error("Sign-in error:", result.error);
         // Redirect to error page with error details
-        window.location.href = `/auth/error?error=${encodeURIComponent(result.error)}`;
+        router.push(`/auth/error?error=${encodeURIComponent(result.error)}`);
       } else if (result?.ok) {
-        // Successful sign-in, redirect manually
-        window.location.href = callbackUrl;
+        // Successful sign-in, wait a moment for session to be established
+        setTimeout(() => {
+          router.push(callbackUrl);
+        }, 100);
       }
     } catch (error) {
       console.error("Sign-in error:", error);
-      window.location.href = `/auth/error?error=Default`;
+      router.push(`/auth/error?error=Default`);
     } finally {
       setIsLoggingIn(false);
     }
@@ -50,13 +53,16 @@ function HomeContent() {
       
       if (result?.error) {
         console.error("Sign-in error:", result.error);
-        window.location.href = `/auth/error?error=${encodeURIComponent(result.error)}`;
+        router.push(`/auth/error?error=${encodeURIComponent(result.error)}`);
       } else if (result?.ok) {
-        window.location.href = targetPath;
+        // Wait a moment for session to be established
+        setTimeout(() => {
+          router.push(targetPath);
+        }, 100);
       }
     } catch (error) {
       console.error("Sign-in error:", error);
-      window.location.href = `/auth/error?error=Default`;
+      router.push(`/auth/error?error=Default`);
     } finally {
       setIsLoggingIn(false);
     }
