@@ -21,43 +21,38 @@ export default function UserDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
 
-  useEffect(() => {
-    if (status === "authenticated" && !hasCheckedApplications) {
-      const checkApplications = async () => {
-        try {
-          const response = await fetch("/api/applications/check-existing");
-          if (response.ok) {
-            const data = await response.json();
+  if (status === "authenticated" && !hasCheckedApplications) {
+    const checkApplications = async () => {
+      try {
+        const response = await fetch("/api/applications/check-existing");
+        if (response.ok) {
+          const data = await response.json();
 
-            // Redirect based on existing applications
-            if (data.hasMemberApplication) {
-              router.push("/user/apply/member/progress");
-              return;
-            } else if (data.hasCommitteeApplication) {
-              const committeeId = data.applications.committee?.firstOptionCommittee;
-              if (committeeId) {
-                router.push(`/user/apply/committee-staff/${committeeId}/progress`);
-                return;
-              }
-            } else if (data.hasEAApplication) {
-              const ebRole = data.applications.ea?.firstOptionEb;
-              if (ebRole) {
-                router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
-                return;
-              }
+          // Redirect based on existing applications
+          if (data.hasMemberApplication) {
+            router.push("/user/apply/member/progress");
+          } else if (data.hasCommitteeApplication) {
+            const committeeId = data.applications.committee?.firstOptionCommittee;
+            if (committeeId) {
+              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+            }
+          } else if (data.hasEAApplication) {
+            const ebRole = data.applications.ea?.firstOptionEb;
+            if (ebRole) {
+              router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
             }
           }
-        } catch (error) {
-          console.error("Error checking applications:", error);
-        } finally {
-          setHasCheckedApplications(true);
-          setIsLoading(false);
         }
-      };
+      } catch (error) {
+        console.error("Error checking applications:", error);
+      } finally {
+        setHasCheckedApplications(true);
+        setIsLoading(false);
+      }
+    };
 
-      checkApplications();
-    }
-  }, [status, hasCheckedApplications, router]);
+    checkApplications();
+  }
 
   // Handle authentication status changes
   useEffect(() => {
@@ -69,12 +64,9 @@ export default function UserDashboard() {
     }
 
     if (status === "authenticated" && session) {
-      // Only set loading to false if we're not checking applications
-      if (hasCheckedApplications) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
-  }, [session, status, router, hasCheckedApplications]);
+  }, [session, status, router]);
 
   if (session?.user?.email.match(/\.cics@ust\.edu\.ph$/) && 
       session?.user?.role !== 'admin' && 
