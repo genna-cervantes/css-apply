@@ -31,41 +31,132 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const skip = (page - 1) * limit;
 
-    if (type === 'member') {
-      const whereClause: Record<string, unknown> = {};
-      
-      // Filter by status if provided
-      if (status === 'accepted') {
-        whereClause.hasAccepted = true;
-      } else if (status === 'pending') {
-        whereClause.hasAccepted = false;
-      } else if (status === 'rejected') {
-        whereClause.hasAccepted = false;
-      }
-      // If status is 'all' or not provided, no filter is applied
+     if (type === 'member') {
+       let memberApplications;
+       let totalCount;
+       
+       if (status === 'accepted') {
+         // Get accepted applications
+         totalCount = await prisma.memberApplication.count({
+           where: { hasAccepted: true },
+         });
 
-      // Get total count for pagination
-      const totalCount = await prisma.memberApplication.count({
-        where: whereClause,
-      });
+         memberApplications = await prisma.memberApplication.findMany({
+           where: { hasAccepted: true },
+           orderBy: { createdAt: "desc" },
+           skip: skip,
+           take: limit,
+           include: {
+             user: {
+               select: {
+                 id: true,
+                 name: true,
+                 email: true,
+                 studentNumber: true,
+                 section: true,
+               },
+             },
+           },
+         });
+       } else if (status === 'pending') {
+         // Get pending applications (hasAccepted: false AND createdAt = updatedAt)
+         const rawQuery = `
+           SELECT * FROM "MemberApplication" 
+           WHERE "hasAccepted" = false 
+           AND "createdAt" = "updatedAt"
+           ORDER BY "createdAt" DESC
+           LIMIT ${limit} OFFSET ${skip}
+         `;
+         
+         const countQuery = `
+           SELECT COUNT(*) as count FROM "MemberApplication" 
+           WHERE "hasAccepted" = false 
+           AND "createdAt" = "updatedAt"
+         `;
 
-      const memberApplications = await prisma.memberApplication.findMany({
-        where: whereClause,
-        orderBy: { createdAt: "desc" },
-        skip: skip,
-        take: limit,
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              studentNumber: true,
-              section: true,
-            },
-          },
-        },
-      });
+         const [applications, countResult] = await Promise.all([
+           prisma.$queryRawUnsafe(rawQuery),
+           prisma.$queryRawUnsafe(countQuery)
+         ]);
+
+         totalCount = Number((countResult as any)[0].count);
+         
+         // Get user data for each application
+         memberApplications = await Promise.all(
+           (applications as any[]).map(async (app) => {
+             const user = await prisma.user.findUnique({
+               where: { studentNumber: app.studentNumber },
+               select: {
+                 id: true,
+                 name: true,
+                 email: true,
+                 studentNumber: true,
+                 section: true,
+               },
+             });
+             return { ...app, user };
+           })
+         );
+       } else if (status === 'rejected') {
+         // Get rejected applications (hasAccepted: false AND createdAt != updatedAt)
+         const rawQuery = `
+           SELECT * FROM "MemberApplication" 
+           WHERE "hasAccepted" = false 
+           AND "createdAt" != "updatedAt"
+           ORDER BY "createdAt" DESC
+           LIMIT ${limit} OFFSET ${skip}
+         `;
+         
+         const countQuery = `
+           SELECT COUNT(*) as count FROM "MemberApplication" 
+           WHERE "hasAccepted" = false 
+           AND "createdAt" != "updatedAt"
+         `;
+
+         const [applications, countResult] = await Promise.all([
+           prisma.$queryRawUnsafe(rawQuery),
+           prisma.$queryRawUnsafe(countQuery)
+         ]);
+
+         totalCount = Number((countResult as any)[0].count);
+         
+         // Get user data for each application
+         memberApplications = await Promise.all(
+           (applications as any[]).map(async (app) => {
+             const user = await prisma.user.findUnique({
+               where: { studentNumber: app.studentNumber },
+               select: {
+                 id: true,
+                 name: true,
+                 email: true,
+                 studentNumber: true,
+                 section: true,
+               },
+             });
+             return { ...app, user };
+           })
+         );
+       } else {
+         // Get all applications
+         totalCount = await prisma.memberApplication.count();
+
+         memberApplications = await prisma.memberApplication.findMany({
+           orderBy: { createdAt: "desc" },
+           skip: skip,
+           take: limit,
+           include: {
+             user: {
+               select: {
+                 id: true,
+                 name: true,
+                 email: true,
+                 studentNumber: true,
+                 section: true,
+               },
+             },
+           },
+         });
+       }
 
       return NextResponse.json({
         success: true,
@@ -99,8 +190,11 @@ export async function GET(request: NextRequest) {
       } else if (status === 'no-schedule') {
         whereClause.OR = [
           { interviewSlotDay: null },
-          { interviewSlotTimeStart: null }
+          { interviewSlotTimeStart: null },
+          { interviewSlotDay: '' },
+          { interviewSlotTimeStart: '' }
         ];
+        console.log('No-schedule filter applied for EA applications:', whereClause);
       }
       // If status is 'all' or not provided, no filter is applied
 
@@ -126,6 +220,13 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+
+      if (status === 'no-schedule') {
+        console.log(`Found ${eaApplications.length} EA applications with no schedule`);
+        eaApplications.forEach(app => {
+          console.log(`EA App ${app.id}: day=${app.interviewSlotDay}, time=${app.interviewSlotTimeStart}`);
+        });
+      }
 
       // Add CV download links for EA applications
       const eaApplicationsWithCvLinks = await Promise.all(
@@ -173,8 +274,11 @@ export async function GET(request: NextRequest) {
       } else if (status === 'no-schedule') {
         whereClause.OR = [
           { interviewSlotDay: null },
-          { interviewSlotTimeStart: null }
+          { interviewSlotTimeStart: null },
+          { interviewSlotDay: '' },
+          { interviewSlotTimeStart: '' }
         ];
+        console.log('No-schedule filter applied for Committee applications:', whereClause);
       }
       // If status is 'all' or not provided, no filter is applied
 
@@ -200,6 +304,13 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+
+      if (status === 'no-schedule') {
+        console.log(`Found ${committeeApplications.length} Committee applications with no schedule`);
+        committeeApplications.forEach(app => {
+          console.log(`Committee App ${app.id}: day=${app.interviewSlotDay}, time=${app.interviewSlotTimeStart}`);
+        });
+      }
 
       // Add CV and Portfolio download links for Committee applications
       const committeeApplicationsWithCvLinks = await Promise.all(

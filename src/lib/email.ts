@@ -171,7 +171,7 @@ export const emailTemplates = {
                     <h3 style="color: #1f2937; margin-top: 0;">Application Details:</h3>
                     <p style="margin: 5px 0;"><strong>Student Number:</strong> ${studentNumber}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
-                    <p style="margin: 5px 0;"><strong>EB Role:</strong> ${capitalizeWords(ebRole)}</p>
+                    <p style="margin: 5px 0;"><strong>EA Role:</strong> ${capitalizeWords(ebRole)}</p>
                     <p style="margin: 5px 0;"><strong>First Choice:</strong> ${capitalizeWords(firstOption)}</p>
                     <p style="margin: 5px 0;"><strong>Second Choice:</strong> ${capitalizeWords(secondOption)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> Under Review</p>
@@ -311,7 +311,7 @@ export const emailTemplates = {
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     We are thrilled to inform you that your executive assistant application has been <strong style="color: #059669;">ACCEPTED</strong>! 
-                    Welcome to the Computer Science Society Executive Board!
+                    Welcome to the Computer Science Society Executive Assistant!
                 </p>
                 
                 <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -319,13 +319,13 @@ export const emailTemplates = {
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
-                    <p style="margin: 5px 0;"><strong>EB Role:</strong> ${capitalizeWords(ebRole)}</p>
+                    <p style="margin: 5px 0;"><strong>EA Role:</strong> ${capitalizeWords(ebRole)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
                 </div>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Your Member ID (<strong>${userId.toUpperCase()}</strong>) is now your official identifier within the organization. 
-                    Please keep this information safe as you'll need it for executive board activities and events.
+                    Please keep this information safe as you'll need it for executive assistant activities and events.
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
@@ -398,7 +398,7 @@ export const emailTemplates = {
                 <h2 style="color: #1f2937;">Hello ${userName},</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Thank you for your interest in joining the Computer Science Society Executive Board. 
+                    Thank you for your interest in joining the Computer Science Society Executive Assistant. 
                     After careful consideration, we regret to inform you that your application for 
                     <strong>${capitalizeWords(ebRole)} Executive Assistant</strong> has not been successful this time.
                 </p>
@@ -407,7 +407,7 @@ export const emailTemplates = {
                     <h3 style="color: #dc2626; margin-top: 0;">📋 Application Update:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
-                    <p style="margin: 5px 0;"><strong>EB Role:</strong> ${capitalizeWords(ebRole)}</p>
+                    <p style="margin: 5px 0;"><strong>EA Role:</strong> ${capitalizeWords(ebRole)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #dc2626; font-weight: bold;">NOT SELECTED</span></p>
                 </div>
                 
@@ -462,7 +462,7 @@ export const emailTemplates = {
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Please let us know if you accept this redirection or if you have any questions about this change.
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: genna.cervantes.cics@ust.edu.ph.
                 </p>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
@@ -487,14 +487,14 @@ export const emailTemplates = {
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     We have reviewed your executive assistant application and would like to offer you an opportunity 
-                    with a different EB role that we believe would be a better fit for your skills and interests.
+                    with a different EA role that we believe would be a better fit for your skills and interests.
                 </p>
                 
                 <div style="background-color: #fef3c7; border: 2px solid #d97706; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #d97706; margin-top: 0;">🔄 Application Redirected:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
-                    <p style="margin: 5px 0;"><strong>Original EB Role:</strong> ${capitalizeWords(originalEbRole)}</p>
+                    <p style="margin: 5px 0;"><strong>Original EA Role:</strong> ${capitalizeWords(originalEbRole)}</p>
                     <p style="margin: 5px 0;"><strong>Redirected to:</strong> ${capitalizeWords(redirectedEbRole)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold;">REDIRECTED</span></p>
                 </div>
@@ -506,7 +506,7 @@ export const emailTemplates = {
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Please let us know if you accept this redirection or if you have any questions about this change.
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: genna.cervantes.cics@ust.edu.ph.
                 </p>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
@@ -575,7 +575,7 @@ export const emailTemplates = {
                 <h2 style="color: #1f2937;">Hello ${userName},</h2>
 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Thank you for your interest in joining the Computer Science Society Executive Board. 
+                    Thank you for your interest in joining the Computer Science Society Executive Assistant. 
                     We are pleased to inform you that your application for 
                     <strong>${capitalizeWords(ebRole)} Executive Assistant</strong> is now under evaluation.
                 </p>
@@ -584,13 +584,13 @@ export const emailTemplates = {
                     <h3 style="color: #7c3aed; margin-top: 0;">📋 Evaluation Status:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
-                    <p style="margin: 5px 0;"><strong>EB Role:</strong> ${capitalizeWords(ebRole)}</p>
+                    <p style="margin: 5px 0;"><strong>EA Role:</strong> ${capitalizeWords(ebRole)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #7c3aed; font-weight: bold;">UNDER EVALUATION</span></p>
                 </div>
 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Our team is currently reviewing your application, including your qualifications, 
-                    experience, and fit for the executive board position. This process typically takes a few days.
+                    experience, and fit for the executive assistant position. This process typically takes a few days.
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
