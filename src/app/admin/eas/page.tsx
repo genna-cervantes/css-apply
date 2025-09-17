@@ -180,44 +180,41 @@ const EAs = () => {
               <p className="text-gray-500 text-lg">No executive assistant applications found</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {eas.map((ea) => {
                 const firstEB = roles.find(r => r.id === ea.firstOptionEb);
                 const secondEB = roles.find(r => r.id === ea.secondOptionEb);
                 
                 return (
-                  <div key={ea.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div key={ea.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-800">{ea.user.name}</h3>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-base font-semibold text-gray-800 truncate">{ea.user.name}</h3>
                           {getStatusBadge(ea)}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          <p>Student Number: {ea.studentNumber}</p>
-                          <p>Section: {ea.user.section}</p>
-                          <p>Email: {ea.user.email}</p>
-                          <p>First Choice: {firstEB?.title}</p>
-                          <p>Second Choice: {secondEB?.title}</p>
+                        <div className="text-xs text-gray-600 space-y-0.5">
+                          <div>Student #: {ea.studentNumber} | Section: {ea.user.section}</div>
+                          <div>Email: {ea.user.email}</div>
+                          <div>First Choice: {firstEB?.title}</div>
+                          <div>Second Choice: {secondEB?.title}</div>
                           {ea.interviewSlotDay && (
-                            <p>Interview: {ea.interviewSlotDay} at {ea.interviewSlotTimeStart}</p>
+                            <div>Interview: {ea.interviewSlotDay} at {ea.interviewSlotTimeStart}</div>
                           )}
                           {ea.redirection && (
-                            <p>Redirected to: {ea.redirection}</p>
+                            <div>Redirected to: {ea.redirection}</div>
                           )}
+                          <div>Applied: {new Date(ea.createdAt).toLocaleDateString()}</div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Applied: {new Date(ea.createdAt).toLocaleDateString()}
-                        </p>
                       </div>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1 ml-3">
                         {ea.cvDownloadUrl && (
                           <button
                             onClick={() => handleDownloadCV(ea)}
-                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                            className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
                           >
-                            <Download size={16} />
-                            Download CV
+                            <Download size={12} />
+                            CV
                           </button>
                         )}
                       </div>

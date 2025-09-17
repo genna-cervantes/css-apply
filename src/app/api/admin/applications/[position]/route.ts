@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { getPositionFromRoleId } from "@/lib/eb-mapping";
 
 // GET all applications with filtering
 export async function GET(
@@ -28,12 +27,6 @@ export async function GET(
       }
   
       const { position } = await params;
-      // get committee applications
-      const { committees } = await prisma.eBProfile.findFirstOrThrow({
-        where: {
-          position: position,
-        },
-      });
   
       const applications: {committee: {
           status: string | null;
@@ -71,8 +64,9 @@ export async function GET(
   
       const commApplications = await prisma.committeeApplication.findMany({
         where: {
-          firstOptionCommittee: {
-            in: committees,
+          interviewBy: {
+            equals: position,
+            mode: 'insensitive'
           }
         },
         orderBy: { createdAt: "desc" },
@@ -86,8 +80,8 @@ export async function GET(
       // get ea applications
       const eAApplications = await prisma.eAApplication.findMany({
           where: {
-              firstOptionEb: {
-                  equals: getPositionFromRoleId(position),
+              interviewBy: {
+                  equals: position,
                   mode: 'insensitive'
               }
           },
@@ -109,14 +103,41 @@ export async function GET(
         },
       });
 
-      applications.committee = commApplications.map(application => ({
-        ...application,
-        type: 'committee',
-      }));
-      applications.ea = eAApplications.map(application => ({
-        ...application,
-        type: 'ea',
-      }));
+      // Add CV and Portfolio download links for Committee applications
+      applications.committee = await Promise.all(
+        commApplications.map(async (application) => {
+          const cvDownloadUrl = application.supabaseFilePath 
+            ? `/api/admin/cv-download?applicationId=${application.id}&type=committee`
+            : null;
+          
+          const portfolioDownloadUrl = application.portfolioLink 
+            ? `/api/admin/portfolio-download?applicationId=${application.id}`
+            : null;
+          
+          return {
+            ...application,
+            type: 'committee',
+            cvDownloadUrl,
+            portfolioDownloadUrl,
+          };
+        })
+      );
+
+      // Add CV download links for EA applications
+      applications.ea = await Promise.all(
+        eAApplications.map(async (application) => {
+          const cvDownloadUrl = application.supabaseFilePath 
+            ? `/api/admin/cv-download?applicationId=${application.id}&type=ea`
+            : null;
+          
+          return {
+            ...application,
+            type: 'ea',
+            cvDownloadUrl,
+          };
+        })
+      );
+
       applications.member = memberApplications.map(application => ({
         ...application,
         type: 'member',

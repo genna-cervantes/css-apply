@@ -5,9 +5,21 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
 import SidebarContent from '@/components/AdminSidebar';
-import { committeeRoles } from '@/data/committeeRoles';
+import { committeeRoles, committeeRolesSubmitted } from '@/data/committeeRoles';
 import { roles } from '@/data/ebRoles';
 import { LucideChevronDown, LucideChevronUp } from "lucide-react";
+
+// Helper function to get committee full name
+const getCommitteeFullName = (committeeId: string): string => {
+  const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
+  return committee ? committee.title : committeeId;
+};
+
+// Helper function to capitalize first letter
+const capitalizeFirstLetter = (str: string): string => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
 interface Application {
   id: string;
@@ -29,7 +41,10 @@ interface Application {
   interviewSlotDay?: string;
   interviewSlotTimeStart?: string;
   interviewSlotTimeEnd?: string;
+  interviewBy?: string;
   cvUrl?: string;
+  cvDownloadUrl?: string;
+  portfolioDownloadUrl?: string;
   createdAt: string;
   type: 'committee' | 'ea' | 'member';
   cv?: string;
@@ -45,15 +60,14 @@ const Applications = () => {
   const router = useRouter();
   const [applications, setApplications] = useState<{committee: Application[], ea: Application[], member: Application[]}>({committee: [], ea: [], member: []});
   const [loading, setLoading] = useState(false);
-  const [selectedType] = useState<'member' | 'committee' | 'ea'>('member');
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [showRedirectModal, setShowRedirectModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [redirectTo, setRedirectTo] = useState('');
   const [ebData, setEbData] = useState<{position: string} | null>(null);
-  const [showCommitteeApplications, setShowCommitteeApplications] = useState(true);
-  const [showEaApplications, setShowEaApplications] = useState(true);
-  const [showMemberApplications, setShowMemberApplications] = useState(true);
+  const [showCommitteeApplications, setShowCommitteeApplications] = useState(false);
+  const [showEaApplications, setShowEaApplications] = useState(false);
+  const [showMemberApplications, setShowMemberApplications] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Memoized EB data fetching with caching
@@ -176,8 +190,6 @@ const Applications = () => {
     if (application.type === 'member') {
       if (application.hasAccepted === true) {
         return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
-      } else if (application.hasAccepted === false) {
-        return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
       } else {
         return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
       }
@@ -187,8 +199,6 @@ const Applications = () => {
       return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
     } else if (application.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
-    } else if (application.status === 'redirected') {
-      return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
     } else if (application.status === 'evaluating') {
       return <span className="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">Under Evaluation</span>;
     } else {
@@ -196,45 +206,76 @@ const Applications = () => {
     }
   }, []);
 
-  // Memoized application details component
-  const getApplicationDetails = useCallback((application: Application) => {
-    if (selectedType === 'member') {
-      return (
-        <div className="text-sm text-gray-600">
-          <p>Student Number: {application.studentNumber}</p>
-          <p>Section: {application.user.section}</p>
-        </div>
-      );
-    } else if (selectedType === 'committee') {
-      const firstCommittee = committeeRoles.find(c => c.id === application.firstOptionCommittee);
-      const secondCommittee = committeeRoles.find(c => c.id === application.secondOptionCommittee);
-      return (
-        <div className="text-sm text-gray-600">
-          <p>Student Number: {application.studentNumber}</p>
-          <p>Section: {application.user.section}</p>
-          <p>First Choice: {firstCommittee?.title}</p>
-          <p>Second Choice: {secondCommittee?.title}</p>
-          {application.interviewSlotDay && (
-            <p>Interview: {application.interviewSlotDay} at {application.interviewSlotTimeStart}</p>
-          )}
-        </div>
-      );
-    } else if (selectedType === 'ea') {
-      const firstEB = roles.find(r => r.id === application.firstOptionEb);
-      const secondEB = roles.find(r => r.id === application.secondOptionEb);
-      return (
-        <div className="text-sm text-gray-600">
-          <p>Student Number: {application.studentNumber}</p>
-          <p>Section: {application.user.section}</p>
-          <p>First Choice: {firstEB?.title}</p>
-          <p>Second Choice: {secondEB?.title}</p>
-          {application.interviewSlotDay && (
-            <p>Interview: {application.interviewSlotDay} at {application.interviewSlotTimeStart}</p>
-          )}
-        </div>
-      );
+
+  const handleDownloadCV = async (application: Application) => {
+    if (!application.cvDownloadUrl) {
+      alert('CV not available for download');
+      return;
     }
-  }, [selectedType]);
+
+    try {
+      const response = await fetch(application.cvDownloadUrl);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.downloadUrl) {
+          // Create a temporary link to download the file
+          const link = document.createElement('a');
+          link.href = data.downloadUrl;
+          link.download = data.fileName || `${application.user.name}_CV.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          alert('Failed to generate download link');
+        }
+      } else {
+        const errorData = await response.json();
+        if (response.status === 404) {
+          alert('CV file not found in storage');
+        } else {
+          alert(errorData.error || 'Failed to download CV');
+        }
+      }
+    } catch (error) {
+      console.error('Error downloading CV:', error);
+      alert('Error downloading CV');
+    }
+  };
+
+  const handleDownloadPortfolio = async (application: Application) => {
+    if (!application.portfolioDownloadUrl) {
+      alert('Portfolio not available for download');
+      return;
+    }
+
+    try {
+      const response = await fetch(application.portfolioDownloadUrl);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.downloadUrl) {
+          // Create a temporary link to download the file
+          const link = document.createElement('a');
+          link.href = data.downloadUrl;
+          link.download = data.fileName || `${application.user.name}_Portfolio.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          alert('Failed to generate download link');
+        }
+      } else {
+        const errorData = await response.json();
+        if (response.status === 404) {
+          alert('Portfolio file not found in storage');
+        } else {
+          alert(errorData.error || 'Failed to download Portfolio');
+        }
+      }
+    } catch (error) {
+      console.error('Error downloading Portfolio:', error);
+      alert('Error downloading Portfolio');
+    }
+  };
 
   // Memoized application counts
   const applicationCounts = useMemo(() => ({
@@ -287,11 +328,11 @@ const Applications = () => {
             </div>
           ) : (
             <>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center bg-green-600 text-white p-4 rounded-md">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center bg-green-600 text-white p-3 rounded-md">
                 <div className="flex gap-2 items-center">
-                  <h2 className="font-semibold">Member Applications</h2>
-                  <p>({applicationCounts.member})</p>
+                  <h2 className="font-semibold text-sm">Member Applications</h2>
+                  <p className="text-xs">({applicationCounts.member})</p>
                 </div>
                 <button onClick={() => setShowMemberApplications(!showMemberApplications)}>
                   {!showMemberApplications ? <LucideChevronUp /> : <LucideChevronDown />}
@@ -299,44 +340,41 @@ const Applications = () => {
               </div>
 
               {showMemberApplications && applications.member.map((application) => (
-                <div key={application.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-800">{application.user.name}</h3>
+                <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-gray-800 truncate">{application.user.name}</h3>
                         {getStatusBadge(application)}
                       </div>
-                      <div className="text-sm text-gray-600">
-                        <p>Student Number: {application.studentNumber}</p>
-                        <p>Section: {application.user.section}</p>
-                        <p>Email: {application.user.email}</p>
+                      <div className="text-xs text-gray-600 space-y-0.5">
+                        <div>Student #: {application.studentNumber} | Section: {application.user.section}</div>
+                        <div>Email: {application.user.email}</div>
+                        <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
                       </div>
-                      <p className="text-xs text-gray-500 mt-4">
-                        Applied: {new Date(application.createdAt).toLocaleDateString()}
-                      </p>
                     </div>
 
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex flex-col items-end gap-2 ml-3">
                       {(!application.hasAccepted) && (
-                        <>
+                        <div className="flex gap-2">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
                           >
                             {processingId === application.id ? 'Processing...' : 'Accept'}
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
                           >
                             {processingId === application.id ? 'Processing...' : 'Reject'}
                           </button>
-                        </>
+                        </div>
                       )}
                       {application.hasAccepted && (
-                        <div className="text-sm text-green-600 font-semibold">
+                        <div className="text-xs text-green-600 font-semibold text-right">
                           Member ID: {application.user.id.toUpperCase()}
                         </div>
                       )}
@@ -346,11 +384,11 @@ const Applications = () => {
               ))}
             </div>
 
-            <div className="space-y-4 mt-6">
-              <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-md">
+            <div className="space-y-3 mt-4">
+              <div className="flex justify-between items-center bg-blue-600 text-white p-3 rounded-md">
                 <div className="flex gap-2 items-center">
-                  <h2 className="font-semibold">Committee Applications</h2>
-                  <p>({applicationCounts.committee})</p>
+                  <h2 className="font-semibold text-sm">Committee Applications</h2>
+                  <p className="text-xs">({applicationCounts.committee})</p>
                 </div>
                 <button onClick={() => setShowCommitteeApplications(!showCommitteeApplications)}>
                   {!showCommitteeApplications ? <LucideChevronUp /> : <LucideChevronDown />}
@@ -358,54 +396,103 @@ const Applications = () => {
               </div>
 
               {showCommitteeApplications && applications.committee.map((application) => (
-                <div key={application.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-800">{application.user.name}</h3>
+                <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-gray-800 truncate">{application.user.name}</h3>
                         {getStatusBadge(application)}
                       </div>
-                      {getApplicationDetails(application)}
-                      <div className="mt-2">
-                        <h2 className="text-sm font-semibold text-gray-800">Meeting Details: </h2>
-                        <p className="text-xs text-gray-500">{application.interviewSlotDay} at {application.interviewSlotTimeStart} - {application.interviewSlotTimeEnd}</p>
-                        <button className="px-3 py-1 mt-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">Join Meeting</button>
+                      <div className="text-xs text-gray-600 space-y-0.5 mb-2">
+                        <div>Student #: {application.studentNumber} | Section: {application.user.section}</div>
+                        <div>Email: {application.user.email}</div>
+                        <div>First Choice: {getCommitteeFullName(application.firstOptionCommittee || '')}</div>
+                        <div>Second Choice: {getCommitteeFullName(application.secondOptionCommittee || '')}</div>
+                        <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
                       </div>
-                      <p className="text-xs text-gray-500 mt-4">
-                        Applied: {new Date(application.createdAt).toLocaleDateString()}
-                      </p>
+                      
+                      {/* Meeting Details */}
+                      <div className="text-xs text-gray-600 mb-2">
+                        <div className="font-medium">Interview: {application.interviewSlotDay} at {application.interviewSlotTimeStart} - {application.interviewSlotTimeEnd}</div>
+                        {application.interviewBy && (
+                          <div>Interviewer: {application.interviewBy}</div>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="bg-blue-200 p-2 rounded-md text-sm text-gray-500">
-                          Second Option: {application.secondOptionCommittee}
+                    <div className="flex flex-col items-end gap-2 ml-3">
+                      {/* Download Buttons */}
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => handleDownloadCV(application)}
+                          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                        >
+                          CV
+                        </button>
+                        {application.portfolioDownloadUrl && (
+                          <button 
+                            onClick={() => handleDownloadPortfolio(application)}
+                            className="px-2 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700"
+                          >
+                            Portfolio
+                          </button>
+                        )}
                       </div>
-                      <a target="_blank" href={application.cv} className="px-3 py-1 mt-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">Open CV</a>
-                    </div>
-                    
-                    <div className="flex gap-2 ml-4">
+
+                      {/* Join Meeting Button */}
+                      {application.interviewBy ? (
+                        <a 
+                          href={`/api/admin/eb-profiles/${application.interviewBy}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            try {
+                              const response = await fetch(`/api/admin/eb-profiles/by-position?position=${encodeURIComponent(application.interviewBy || '')}`);
+                              const data = await response.json();
+                              if (data.success && data.ebProfile?.meetingLink) {
+                                window.open(data.ebProfile.meetingLink, '_blank', 'noopener,noreferrer');
+                              } else {
+                                alert('Meeting link not available');
+                              }
+                            } catch (error) {
+                              console.error('Error fetching meeting link:', error);
+                              alert('Failed to get meeting link');
+                            }
+                          }}
+                        >
+                          Join Meeting
+                        </a>
+                      ) : (
+                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed" disabled>
+                          No Interviewer
+                        </button>
+                      )}
+
+                      {/* Action Buttons */}
                       {(!application.status || application.status === 'pending') && (
-                        <>
+                        <div className="flex gap-1 flex-wrap">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'evaluate')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 disabled:opacity-50"
                           >
                             {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                            Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                            Reject
                           </button>
                           <button
                             onClick={() => {
@@ -413,27 +500,27 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-yellow-600 text-white text-sm rounded-md hover:bg-yellow-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
                           >
                             Redirect
                           </button>
-                        </>
+                        </div>
                       )}
-                      {(application.status === 'evaluating' || application.status === 'failed' || application.status === 'redirected') && !application.hasAccepted && (
-                        <>
+                      {(application.status === 'evaluating' || application.status === 'failed') && !application.hasAccepted && (
+                        <div className="flex gap-1 flex-wrap">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                            Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                            Reject
                           </button>
                           <button
                             onClick={() => {
@@ -441,22 +528,22 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-yellow-600 text-white text-sm rounded-md hover:bg-yellow-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
                           >
                             Redirect
                           </button>
-                        </>
+                        </div>
                       )}
                       {application.hasAccepted && (
-                        <div className="text-sm text-green-600 font-semibold">
+                        <div className="text-xs text-green-600 font-semibold text-right">
                           Member ID: {application.user.id.toUpperCase()}
                           {application.redirection ? (
-                            <div className="text-xs text-blue-600">
-                              Redirected to: {application.redirection}
+                            <div className="text-blue-600">
+                              Accepted at: {getCommitteeFullName(application.redirection)}
                             </div>
                           ) : (
-                            <div className="text-xs text-green-600">
-                              Accepted at: {application.firstOptionCommittee}
+                            <div className="text-green-600">
+                              Accepted at: {getCommitteeFullName(application.firstOptionCommittee || '')}
                             </div>
                           )}
                         </div>
@@ -467,11 +554,11 @@ const Applications = () => {
               ))}
             </div>
 
-            <div className="space-y-4 mt-6">
-              <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-md">
+            <div className="space-y-3 mt-4">
+              <div className="flex justify-between items-center bg-blue-600 text-white p-3 rounded-md">
                 <div className="flex gap-2 items-center">
-                  <h2 className="font-semibold">Executive Assistant Applications</h2>
-                  <p>({applicationCounts.ea})</p>
+                  <h2 className="font-semibold text-sm">Executive Assistant Applications</h2>
+                  <p className="text-xs">({applicationCounts.ea})</p>
                 </div>
                 <button onClick={() => setShowEaApplications(!showEaApplications)}>
                   {!showEaApplications ? <LucideChevronUp /> : <LucideChevronDown />}
@@ -479,49 +566,64 @@ const Applications = () => {
               </div>
 
               {showEaApplications && applications.ea.map((application) => (
-                <div key={application.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-800">{application.user.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-gray-800 truncate">{application.user.name}</h3>
                         {getStatusBadge(application)}
                       </div>
-                      {getApplicationDetails(application)}
-                      <p className="text-xs text-gray-500 mt-2">
-                        Applied: {new Date(application.createdAt).toLocaleDateString()}
-                      </p>
+                      <div className="text-xs text-gray-600 space-y-0.5 mb-2">
+                        <div>Student #: {application.studentNumber} | Section: {application.user.section}</div>
+                        <div>Email: {application.user.email}</div>
+                        <div>First Choice: {capitalizeFirstLetter(application.firstOptionEb || '')}</div>
+                        <div>Second Choice: {capitalizeFirstLetter(application.secondOptionEb || '')}</div>
+                        <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
+                      </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="bg-blue-200 p-2 rounded-md text-sm text-gray-500">
-                          Second Option: {application.secondOptionEb}
+                    <div className="flex flex-col items-end gap-2 ml-3">
+                      {/* Download Buttons */}
+                      <div className="flex gap-1">
+                        <button 
+                          onClick={() => handleDownloadCV(application)}
+                          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                        >
+                          CV
+                        </button>
+                        {application.portfolioDownloadUrl && (
+                          <button 
+                            onClick={() => handleDownloadPortfolio(application)}
+                            className="px-2 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700"
+                          >
+                            Portfolio
+                          </button>
+                        )}
                       </div>
-                      <a target="_blank" href={application.cv} className="px-3 py-1 mt-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50">Open CV</a>
-                    </div>
-                    
-                    <div className="flex gap-2 ml-4">
+
+                      {/* Action Buttons */}
                       {(!application.status || application.status === 'pending') && (
-                        <>
+                        <div className="flex gap-1 flex-wrap">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'evaluate')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 disabled:opacity-50"
                           >
                             {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                            Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                            Reject
                           </button>
                           <button
                             onClick={() => {
@@ -529,27 +631,27 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
                           >
                             Redirect
                           </button>
-                        </>
+                        </div>
                       )}
-                      {(application.status === 'evaluating' || application.status === 'failed' || application.status === 'redirected') && !application.hasAccepted && (
-                        <>
+                      {(application.status === 'evaluating' || application.status === 'failed') && !application.hasAccepted && (
+                        <div className="flex gap-1 flex-wrap">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                            Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                            Reject
                           </button>
                           <button
                             onClick={() => {
@@ -557,22 +659,22 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
                           >
                             Redirect
                           </button>
-                        </>
+                        </div>
                       )}
                       {application.hasAccepted && (
-                        <div className="text-sm text-green-600 font-semibold">
+                        <div className="text-xs text-green-600 font-semibold text-right">
                           Member ID: {application.user.id.toUpperCase()}
                           {application.redirection ? (
-                            <div className="text-xs text-blue-600">
-                              Redirected to: {application.redirection}
+                            <div className="text-blue-600">
+                              Accepted at: {getCommitteeFullName(application.redirection)}
                             </div>
                           ) : (
-                            <div className="text-xs text-green-600">
-                              Accepted at: {application.firstOptionEb}
+                            <div className="text-green-600">
+                              Accepted at: {getCommitteeFullName(application.firstOptionEb || '')}
                             </div>
                           )}
                         </div>

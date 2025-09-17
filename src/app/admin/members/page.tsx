@@ -124,34 +124,29 @@ const Members = () => {
               <p className="text-gray-500 text-lg">No members found</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {members.map((member) => (
-                <div key={member.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={member.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-800">{member.user.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-gray-800 truncate">{member.user.name}</h3>
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                           member.hasAccepted === true
                             ? 'text-green-800 bg-green-100' 
-                            : member.hasAccepted === false
-                            ? 'text-red-800 bg-red-100'
                             : 'text-yellow-800 bg-yellow-100'
                         }`}>
-                          {member.hasAccepted === true ? 'Accepted' : member.hasAccepted === false ? 'Rejected' : 'Pending'}
+                          {member.hasAccepted === true ? 'Accepted' : 'Pending'}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        <p>Student Number: {member.studentNumber}</p>
-                        <p>Section: {member.user.section}</p>
-                        <p>Email: {member.user.email}</p>
+                      <div className="text-xs text-gray-600 space-y-0.5">
+                        <div>Student #: {member.studentNumber} | Section: {member.user.section}</div>
+                        <div>Email: {member.user.email}</div>
                         {member.paymentProof && (
-                          <p>Payment Proof: {member.paymentProof}</p>
+                          <div>Payment Proof: {member.paymentProof}</div>
                         )}
+                        <div>Applied: {new Date(member.createdAt).toLocaleDateString()}</div>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Applied: {new Date(member.createdAt).toLocaleDateString()}
-                      </p>
                     </div>
                   </div>
                 </div>

@@ -26,7 +26,9 @@ interface CommitteeStaff {
   interviewSlotDay?: string;
   interviewSlotTimeStart?: string;
   interviewSlotTimeEnd?: string;
+  interviewBy?: string;
   cvDownloadUrl?: string;
+  portfolioDownloadUrl?: string;
   createdAt: string;
 }
 
@@ -120,6 +122,41 @@ const Staffs = () => {
     }
   };
 
+  const handleDownloadPortfolio = async (staff: CommitteeStaff) => {
+    if (!staff.portfolioDownloadUrl) {
+      alert('Portfolio not available for download');
+      return;
+    }
+
+    try {
+      const response = await fetch(staff.portfolioDownloadUrl);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.downloadUrl) {
+          // Create a temporary link to download the file
+          const link = document.createElement('a');
+          link.href = data.downloadUrl;
+          link.download = data.fileName || `${staff.user.name}_Portfolio.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          alert('Failed to generate download link');
+        }
+      } else {
+        const errorData = await response.json();
+        if (response.status === 404) {
+          alert('Portfolio file not found in storage');
+        } else {
+          alert(errorData.error || 'Failed to download Portfolio');
+        }
+      }
+    } catch (error) {
+      console.error('Error downloading Portfolio:', error);
+      alert('Error downloading Portfolio');
+    }
+  };
+
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -180,44 +217,50 @@ const Staffs = () => {
               <p className="text-gray-500 text-lg">No committee staff applications found</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {staffs.map((staff) => {
                 const firstCommittee = committeeRoles.find(c => c.id === staff.firstOptionCommittee);
                 const secondCommittee = committeeRoles.find(c => c.id === staff.secondOptionCommittee);
                 
                 return (
-                  <div key={staff.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div key={staff.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-800">{staff.user.name}</h3>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-base font-semibold text-gray-800 truncate">{staff.user.name}</h3>
                           {getStatusBadge(staff)}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          <p>Student Number: {staff.studentNumber}</p>
-                          <p>Section: {staff.user.section}</p>
-                          <p>Email: {staff.user.email}</p>
-                          <p>First Choice: {firstCommittee?.title}</p>
-                          <p>Second Choice: {secondCommittee?.title}</p>
+                        <div className="text-xs text-gray-600 space-y-0.5">
+                          <div>Student #: {staff.studentNumber} | Section: {staff.user.section}</div>
+                          <div>Email: {staff.user.email}</div>
+                          <div>First Choice: {firstCommittee?.title}</div>
+                          <div>Second Choice: {secondCommittee?.title}</div>
                           {staff.interviewSlotDay && (
-                            <p>Interview: {staff.interviewSlotDay} at {staff.interviewSlotTimeStart}</p>
+                            <div>Interview: {staff.interviewSlotDay} at {staff.interviewSlotTimeStart}</div>
                           )}
                           {staff.redirection && (
-                            <p>Redirected to: {staff.redirection}</p>
+                            <div>Redirected to: {staff.redirection}</div>
                           )}
+                          <div>Applied: {new Date(staff.createdAt).toLocaleDateString()}</div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Applied: {new Date(staff.createdAt).toLocaleDateString()}
-                        </p>
                       </div>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-1 ml-3">
                         {staff.cvDownloadUrl && (
                           <button
                             onClick={() => handleDownloadCV(staff)}
-                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                            className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
                           >
-                            <Download size={16} />
-                            Download CV
+                            <Download size={12} />
+                            CV
+                          </button>
+                        )}
+                        {staff.portfolioDownloadUrl && (
+                          <button
+                            onClick={() => handleDownloadPortfolio(staff)}
+                            className="flex items-center gap-1 px-2 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700 transition-colors"
+                          >
+                            <Download size={12} />
+                            Portfolio
                           </button>
                         )}
                       </div>

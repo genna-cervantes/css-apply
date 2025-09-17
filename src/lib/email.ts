@@ -15,6 +15,24 @@ const capitalizeWords = (input: string): string => {
     return input.replace(/\b\w/g, (ch) => ch.toUpperCase());
 };
 
+// Map committee IDs to their proper full names
+const getCommitteeFullName = (committeeId: string): string => {
+    const committeeMap: { [key: string]: string } = {
+        'academics': 'Academics Committee',
+        'community': 'Community Development Committee',
+        'creatives': 'Creatives & Technical Committee',
+        'documentation': 'Documentation Committee',
+        'external': 'External Affairs Committee',
+        'finance': 'Finance Committee',
+        'logistics': 'Logistics Committee',
+        'publicity': 'Publicity Committee',
+        'sports': 'Sports & Talent Committee',
+        'technology': 'Technology Development Committee'
+    };
+    
+    return committeeMap[committeeId] || capitalizeWords(committeeId) + ' Committee';
+};
+
 export const sendEmail = async (to: string, subject: string, html: string) => {
     try {
         const sendSmtpEmail = new brevo.SendSmtpEmail();
@@ -96,15 +114,15 @@ export const emailTemplates = {
                     <h3 style="color: #1f2937; margin-top: 0;">Application Details:</h3>
                     <p style="margin: 5px 0;"><strong>Student Number:</strong> ${studentNumber}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
-                    <p style="margin: 5px 0;"><strong>First Choice:</strong> ${capitalizeWords(firstOption)} Committee</p>
-                    <p style="margin: 5px 0;"><strong>Second Choice:</strong> ${capitalizeWords(secondOption)} Committee</p>
+                    <p style="margin: 5px 0;"><strong>First Choice:</strong> ${getCommitteeFullName(firstOption)}</p>
+                    <p style="margin: 5px 0;"><strong>Second Choice:</strong> ${getCommitteeFullName(secondOption)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> Under Review</p>
                 </div>
                 
                 ${meetingLink ? `
                 <div style="background-color: #e0f2fe; border: 2px solid #0284c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #0284c7; margin-top: 0;">📅 Interview Information:</h3>
-                    <p style="margin: 5px 0; color: #0c4a6e;"><strong>Interviewer:</strong> ${interviewer ? capitalizeWords(interviewer) : `${capitalizeWords(firstOption)} Committee Head`}</p>
+                    <p style="margin: 5px 0; color: #0c4a6e;"><strong>Interviewer:</strong> ${interviewer ? capitalizeWords(interviewer) : `${getCommitteeFullName(firstOption)} Head`}</p>
                     <p style="margin: 5px 0; color: #0c4a6e;"><strong>Meeting Link:</strong></p>
                     <div style="margin: 10px 0;">
                         <a href="${meetingLink}" target="_blank" style="display: inline-block; background-color: #0284c7; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
@@ -257,7 +275,7 @@ export const emailTemplates = {
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
-                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${capitalizeWords(committee)} Committee</p>
+                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${getCommitteeFullName(committee)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
                 </div>
                 
@@ -267,7 +285,7 @@ export const emailTemplates = {
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    As a member of the ${capitalizeWords(committee)} Committee, you'll be involved in exciting projects and initiatives. 
+                    As a member of the ${getCommitteeFullName(committee)}, you'll be involved in exciting projects and initiatives. 
                     We look forward to working with you!
                 </p>
                 
@@ -339,14 +357,14 @@ export const emailTemplates = {
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for your interest in joining the Computer Science Society Committee Staff. 
                     After careful consideration, we regret to inform you that your application for the 
-                    <strong>${capitalizeWords(committee)} Committee</strong> has not been successful this time.
+                    <strong>${getCommitteeFullName(committee)}</strong> has not been successful this time.
                 </p>
                 
                 <div style="background-color: #fef2f2; border: 2px solid #dc2626; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #dc2626; margin-top: 0;">📋 Application Update:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
-                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${capitalizeWords(committee)} Committee</p>
+                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${getCommitteeFullName(committee)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #dc2626; font-weight: bold;">NOT SELECTED</span></p>
                 </div>
                 
@@ -432,15 +450,15 @@ export const emailTemplates = {
                     <h3 style="color: #d97706; margin-top: 0;">🔄 Application Redirected:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
-                    <p style="margin: 5px 0;"><strong>Original Committee:</strong> ${capitalizeWords(originalCommittee)} Committee</p>
-                    <p style="margin: 5px 0;"><strong>Redirected to:</strong> ${capitalizeWords(redirectedCommittee)} Committee</p>
+                    <p style="margin: 5px 0;"><strong>Original Committee:</strong> ${getCommitteeFullName(originalCommittee)}</p>
+                    <p style="margin: 5px 0;"><strong>Redirected to:</strong> ${getCommitteeFullName(redirectedCommittee)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold;">REDIRECTED</span></p>
                 </div>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     This redirection is based on our assessment of your qualifications and the current needs 
                     of our committees. We believe you will have a great opportunity to contribute to the 
-                    <strong>${capitalizeWords(redirectedCommittee)} Committee</strong>.
+                    <strong>${getCommitteeFullName(redirectedCommittee)}</strong>.
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
@@ -515,14 +533,14 @@ export const emailTemplates = {
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for your interest in joining the Computer Science Society Committee Staff. 
                     We are pleased to inform you that your application for the 
-                    <strong>${capitalizeWords(committee)} Committee</strong> is now under evaluation.
+                    <strong>${getCommitteeFullName(committee)}</strong> is now under evaluation.
                 </p>
                 
                 <div style="background-color: #f3e8ff; border: 2px solid #7c3aed; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #7c3aed; margin-top: 0;">📋 Evaluation Status:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
-                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${capitalizeWords(committee)} Committee</p>
+                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${getCommitteeFullName(committee)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #7c3aed; font-weight: bold;">UNDER EVALUATION</span></p>
                 </div>
 

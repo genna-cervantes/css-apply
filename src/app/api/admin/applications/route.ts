@@ -151,16 +151,21 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      // Add CV download links for Committee applications
+      // Add CV and Portfolio download links for Committee applications
       const committeeApplicationsWithCvLinks = await Promise.all(
         committeeApplications.map(async (app) => {
           const cvDownloadUrl = app.supabaseFilePath 
             ? `/api/admin/cv-download?applicationId=${app.id}&type=committee`
             : null;
           
+          const portfolioDownloadUrl = app.portfolioLink 
+            ? `/api/admin/portfolio-download?applicationId=${app.id}`
+            : null;
+          
           return {
             ...app,
             cvDownloadUrl,
+            portfolioDownloadUrl,
           };
         })
       );
@@ -293,7 +298,8 @@ export async function PUT(request: NextRequest) {
         updateData.hasAccepted = false;
         updateData.status = "failed";
       } else if (action === "redirect" && redirection) {
-        updateData.status = "redirected";
+        updateData.hasAccepted = true;
+        updateData.status = "passed";
         updateData.redirection = redirection;
       } else if (action === "evaluate") {
         updateData.status = "evaluating";
@@ -333,14 +339,14 @@ export async function PUT(request: NextRequest) {
             );
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
             console.log(`Rejection email sent to ${updatedApplication.user.email} for committee application`);
-          } else if (action === "redirect" && updatedApplication?.firstOptionCommittee && redirection) {
-            const emailTemplate = emailTemplates.committeeRedirected(
+          } else if (action === "redirect" && updatedApplication?.user?.id && redirection) {
+            const emailTemplate = emailTemplates.committeeAccepted(
               updatedApplication.user.name,
-              updatedApplication.firstOptionCommittee,
+              updatedApplication.user.id,
               redirection
             );
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
-            console.log(`Redirection email sent to ${updatedApplication.user.email} for committee application`);
+            console.log(`Acceptance email sent to ${updatedApplication.user.email} for committee application (redirected to ${redirection})`);
           } else if (action === "evaluate" && updatedApplication?.firstOptionCommittee) {
             const emailTemplate = emailTemplates.committeeEvaluating(
               updatedApplication.user.name,
@@ -364,7 +370,8 @@ export async function PUT(request: NextRequest) {
         updateData.hasAccepted = false;
         updateData.status = "failed";
       } else if (action === "redirect" && redirection) {
-        updateData.status = "redirected";
+        updateData.hasAccepted = true;
+        updateData.status = "passed";
         updateData.redirection = redirection;
       } else if (action === "evaluate") {
         updateData.status = "evaluating";
@@ -404,14 +411,14 @@ export async function PUT(request: NextRequest) {
             );
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
             console.log(`Rejection email sent to ${updatedApplication.user.email} for EA application`);
-          } else if (action === "redirect" && updatedApplication?.ebRole && redirection) {
-            const emailTemplate = emailTemplates.executiveAssistantRedirected(
+          } else if (action === "redirect" && updatedApplication?.user?.id && redirection) {
+            const emailTemplate = emailTemplates.executiveAssistantAccepted(
               updatedApplication.user.name,
-              updatedApplication.ebRole,
+              updatedApplication.user.id,
               redirection
             );
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
-            console.log(`Redirection email sent to ${updatedApplication.user.email} for EA application`);
+            console.log(`Acceptance email sent to ${updatedApplication.user.email} for EA application (redirected to ${redirection})`);
           } else if (action === "evaluate" && updatedApplication?.ebRole) {
             const emailTemplate = emailTemplates.executiveAssistantEvaluating(
               updatedApplication.user.name,

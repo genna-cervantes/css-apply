@@ -155,10 +155,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get public URL
-        const { data: urlData } = supabase.storage
+        // Get signed URL for secure access (works with private buckets)
+        const { data: urlData, error: urlError } = await supabase.storage
             .from(bucketName)
-            .getPublicUrl(filePath);
+            .createSignedUrl(filePath, 3600);
+
+        if (urlError) {
+            console.error('Error creating signed URL:', urlError);
+            return NextResponse.json(
+                { error: 'Failed to create file access URL' },
+                { status: 500 }
+            );
+        }
 
         // Delete old file if it exists
         if (oldFilePath) {
@@ -187,7 +195,7 @@ export async function POST(request: NextRequest) {
             if (applicationType === 'ea') {
                 // Update EA application - only CV is supported for EA
                 const updateAppData = {
-                    cv: urlData.publicUrl,
+                    cv: urlData.signedUrl,
                     supabaseFilePath: filePath
                 };
 
@@ -201,11 +209,11 @@ export async function POST(request: NextRequest) {
                 // Update committee application - supports both CV and portfolio
                 const updateAppData = fileType === 'cv' 
                     ? { 
-                        cv: urlData.publicUrl,
+                        cv: urlData.signedUrl,
                         supabaseFilePath: filePath
                     }
                     : {
-                        portfolioLink: urlData.publicUrl,
+                        portfolioLink: urlData.signedUrl,
                         supabaseFilePath: filePath
                     };
 
@@ -223,7 +231,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            url: urlData.publicUrl,
+            url: urlData.signedUrl,
             filePath: filePath,
             message: 'File uploaded successfully'
         });
