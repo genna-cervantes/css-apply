@@ -21,16 +21,32 @@ export default function UserDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [error, setError] = useState("");
-  const [retryCount, setRetryCount] = useState(0);
 
   const checkApplications = useCallback(async () => {
     try {
       console.log("UserDashboard: Checking existing applications...");
       setError("");
       
+      // Check if we have application data in session first (optimistic loading)
+      if (session?.user?.hasMemberApplication || session?.user?.hasEAApplication || session?.user?.hasCommitteeApplication) {
+        if (session.user.hasMemberApplication) {
+          router.push("/user/apply/member/progress");
+          return;
+        } else if (session.user.hasCommitteeApplication) {
+          // We still need to fetch the committee ID, so continue with API call
+        } else if (session.user.hasEAApplication) {
+          // We still need to fetch the EB role, so continue with API call
+        }
+      } else if (session?.user && !session.user.hasMemberApplication && !session.user.hasEAApplication && !session.user.hasCommitteeApplication) {
+        // User has no applications, skip API call and show dashboard immediately
+        setHasCheckedApplications(true);
+        setIsLoading(false);
+        return;
+      }
+      
       // Add a timeout to prevent hanging
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
       
       const response = await fetch("/api/applications/check-existing", {
         signal: controller.signal
@@ -40,24 +56,20 @@ export default function UserDashboard() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log("UserDashboard: Application check response:", data);
 
         // Redirect based on existing applications
         if (data.hasMemberApplication) {
-          console.log("UserDashboard: Redirecting to member progress");
           router.push("/user/apply/member/progress");
           return;
         } else if (data.hasCommitteeApplication) {
           const committeeId = data.applications.committee?.firstOptionCommittee;
           if (committeeId) {
-            console.log("UserDashboard: Redirecting to committee progress:", committeeId);
             router.push(`/user/apply/committee-staff/${committeeId}/progress`);
             return;
           }
         } else if (data.hasEAApplication) {
           const ebRole = data.applications.ea?.firstOptionEb;
           if (ebRole) {
-            console.log("UserDashboard: Redirecting to EA progress:", ebRole);
             router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
             return;
           }
@@ -83,7 +95,7 @@ export default function UserDashboard() {
       setHasCheckedApplications(true);
       setIsLoading(false);
     }
-  }, [router]);
+  }, [router, session?.user]);
 
   // Fallback mechanism for existing users who might be stuck
   useEffect(() => {
@@ -92,7 +104,7 @@ export default function UserDashboard() {
         setHasCheckedApplications(true);
         setIsLoading(false);
         setError("");
-      }, 15000); // 15 second fallback
+      }, 8000); // 8 second fallback
 
       return () => clearTimeout(fallbackTimer);
     }

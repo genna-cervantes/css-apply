@@ -16,9 +16,23 @@ export async function GET() {
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
             include: {
-                memberApplication: true,
-                committeeApplication: true,
-                eaApplication: true
+                memberApplication: {
+                    select: {
+                        id: true
+                    }
+                },
+                committeeApplication: {
+                    select: {
+                        id: true,
+                        firstOptionCommittee: true
+                    }
+                },
+                eaApplication: {
+                    select: {
+                        id: true,
+                        firstOptionEb: true
+                    }
+                }
             }
         });
 

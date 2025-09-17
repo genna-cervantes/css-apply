@@ -53,10 +53,10 @@ const MobileSidebar = ({ children }: MobileSidebarProps) => {
         {children}
       </div>
 
-      {/* to have a dark bg when hamburger menu is open */}
+      {/* to have a blurred bg when hamburger menu is open */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden"
+          className="fixed inset-0 backdrop-blur-sm bg-white/20 z-30 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
