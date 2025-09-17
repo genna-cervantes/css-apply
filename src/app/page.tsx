@@ -156,12 +156,7 @@ function HomeContent() {
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/nomuPH",
     },
-    {
-      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/Sumu.jpg",
-      alt: "Sumu",
-      size: "h-20 w-20",
-      facebookUrl: "https://www.facebook.com/sumuph",
-    },
+
     {
       src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/TheCatalyst.jpg",
       alt: "TheCatalyst",
@@ -616,7 +611,8 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-center"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic1.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic1.png')",
             }}
           >
             <div className="p-5 ml-4 sm:ml-10 sm:w-[60%] md:w-[40%] md:ml-10 text-left text-white border-l-4 border-white">
@@ -634,7 +630,8 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic2.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic2.png')",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-1/2 sm:ml-4 md:ml-6">
@@ -654,7 +651,8 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic3.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic3.png')",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -673,7 +671,8 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic4.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic4.png')",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -700,7 +699,8 @@ function HomeContent() {
           <div
             className="w-[28%] h-full bg-cover bg-center flex items-center pl-10"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic1.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic1.png')",
             }}
           >
             <div className="flex flex-col justify-end text-left text-white border-l-4 border-white h-[80%] w-[70%] pl-3 ">
@@ -718,7 +718,8 @@ function HomeContent() {
           <div
             className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic2.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic2.png')",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
@@ -734,7 +735,8 @@ function HomeContent() {
           <div
             className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic3.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic3.png')",
             }}
           >
             <div className="font-inter text-left text-white w-[83%] mb-14 ml-5 ">
@@ -750,7 +752,8 @@ function HomeContent() {
           <div
             className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
-              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic4.png')",
+              backgroundImage:
+                "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic4.png')",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
