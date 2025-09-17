@@ -203,13 +203,19 @@ const Schedule = () => {
     }
   };
 
-  const handleEventClick = (clickInfo: {event: {id: string}}) => {
+  const handleEventClick = (clickInfo: {event: {id: string; extendedProps?: {fullName?: string; timeSlot?: string}}}) => {
     // Only allow removal of unavailable slots, not interview slots
     const eventId = clickInfo.event.id;
 
     // Check if this is an interview slot (starts with "interview-")
     if (eventId.startsWith("interview-")) {
-      alert("Interview slots cannot be removed directly. They are managed through applications.");
+      const fullName = clickInfo.event.extendedProps?.fullName;
+      const timeSlot = clickInfo.event.extendedProps?.timeSlot;
+      if (fullName) {
+        alert(`Interview: ${timeSlot}\nApplicant: ${fullName}`);
+      } else {
+        alert("Interview slots cannot be removed directly. They are managed through applications.");
+      }
       return;
     }
 
@@ -247,9 +253,14 @@ const Schedule = () => {
       const startDateTime = new Date(`${slot.day}T${slot.timeStart}:00`);
       const endDateTime = new Date(`${slot.day}T${slot.timeEnd}:00`);
 
+      // Create a shorter title to prevent overflow
+      const shortName = slot.name.length > 15 ? `${slot.name.substring(0, 12)}...` : slot.name;
+      const timeSlot = `${slot.timeStart}-${slot.timeEnd}`;
+      const title = shortName; // Just show the name, FullCalendar handles the time display
+
       return {
         id: `interview-${slot.id}`,
-        title: `${slot.name}`, // Show text
+        title: title,
         start: startDateTime,
         end: endDateTime,
         backgroundColor: "#dc2626", // Red color for interviews
@@ -257,6 +268,10 @@ const Schedule = () => {
         textColor: "white",
         display: "block",
         classNames: "interview-event", // Add custom class
+        extendedProps: {
+          fullName: slot.name, // Store full name for tooltip
+          timeSlot: timeSlot
+        }
       };
     });
 
@@ -527,6 +542,59 @@ const Schedule = () => {
 
                 {/* FullCalendar Component */}
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <style jsx global>{`
+                    .fc-event {
+                      border-radius: 3px;
+                      margin: 1px 0;
+                      min-height: 20px;
+                      font-size: 9px !important;
+                    }
+                    .fc-event-title-container {
+                      overflow: hidden;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: flex-start;
+                    }
+                    .fc-event-time {
+                      font-size: 9px !important;
+                      font-weight: normal !important;
+                      margin-bottom: 0px !important;
+                      line-height: 1.1 !important;
+                    }
+                    .fc-event-title {
+                      font-size: 9px !important;
+                      margin-top: 0px !important;
+                      line-height: 1.1 !important;
+                      font-weight: normal !important;
+                    }
+                    .fc-event-main {
+                      font-size: 9px !important;
+                    }
+                    .fc-event-content {
+                      font-size: 9px !important;
+                    }
+                    .fc-event-body {
+                      font-size: 9px !important;
+                    }
+                    .interview-event .fc-event-title {
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      white-space: nowrap;
+                      font-size: 9px !important;
+                      line-height: 1.1 !important;
+                      padding: 1px 3px;
+                      margin-top: 0px !important;
+                    }
+                    .unavailable-event .fc-event-title {
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      white-space: nowrap;
+                      font-size: 9px !important;
+                      line-height: 1.1 !important;
+                      padding: 1px 3px;
+                      margin-top: 0px !important;
+                    }
+                  `}</style>
                   <FullCalendar
                     ref={calendarRef}
                     plugins={[timeGridPlugin, interactionPlugin]}
@@ -551,6 +619,12 @@ const Schedule = () => {
                     select={handleDateSelect}
                     eventClick={handleEventClick}
                     selectOverlap={false}
+                    eventDisplay="block"
+                    eventTimeFormat={{
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false
+                    }}
                     selectConstraint={{
                       start: "2025-09-16",
                       end: "2025-09-27",
@@ -567,7 +641,6 @@ const Schedule = () => {
                       startTime: "07:00",
                       endTime: "21:00",
                     }}
-                    eventDisplay="block"
                     eventTextColor="white"
                     eventBackgroundColor="#134687"
                     eventBorderColor="#0f3a6b"
@@ -577,11 +650,6 @@ const Schedule = () => {
                       month: "short",
                     }}
                     slotLabelFormat={{
-                      hour: "numeric",
-                      minute: "2-digit",
-                      hour12: true,
-                    }}
-                    eventTimeFormat={{
                       hour: "numeric",
                       minute: "2-digit",
                       hour12: true,

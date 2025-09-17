@@ -350,7 +350,16 @@ const Applications = () => {
                       <div className="text-xs text-gray-600 space-y-0.5">
                         <div>Student #: {application.studentNumber} | Section: {application.user.section}</div>
                         <div>Email: {application.user.email}</div>
-                        <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
+                        <div>
+                          {application.interviewSlotDay && application.interviewSlotTimeStart && application.interviewSlotTimeEnd ? (
+                            <div>
+                              <div>Interview: {new Date(application.interviewSlotDay).toLocaleDateString()}</div>
+                              <div>Time: {application.interviewSlotTimeStart} - {application.interviewSlotTimeEnd}</div>
+                            </div>
+                          ) : (
+                            <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -408,7 +417,16 @@ const Applications = () => {
                         <div>Email: {application.user.email}</div>
                         <div>First Choice: {getCommitteeFullName(application.firstOptionCommittee || '')}</div>
                         <div>Second Choice: {getCommitteeFullName(application.secondOptionCommittee || '')}</div>
-                        <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
+                        <div>
+                          {application.interviewSlotDay && application.interviewSlotTimeStart && application.interviewSlotTimeEnd ? (
+                            <div>
+                              <div>Interview: {new Date(application.interviewSlotDay).toLocaleDateString()}</div>
+                              <div>Time: {application.interviewSlotTimeStart} - {application.interviewSlotTimeEnd}</div>
+                            </div>
+                          ) : (
+                            <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
+                          )}
+                        </div>
                       </div>
                       
                       {/* Meeting Details */}
@@ -578,7 +596,16 @@ const Applications = () => {
                         <div>Email: {application.user.email}</div>
                         <div>First Choice: {capitalizeFirstLetter(application.firstOptionEb || '')}</div>
                         <div>Second Choice: {capitalizeFirstLetter(application.secondOptionEb || '')}</div>
-                        <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
+                        <div>
+                          {application.interviewSlotDay && application.interviewSlotTimeStart && application.interviewSlotTimeEnd ? (
+                            <div>
+                              <div>Interview: {new Date(application.interviewSlotDay).toLocaleDateString()}</div>
+                              <div>Time: {application.interviewSlotTimeStart} - {application.interviewSlotTimeEnd}</div>
+                            </div>
+                          ) : (
+                            <div>Applied: {new Date(application.createdAt).toLocaleDateString()}</div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
