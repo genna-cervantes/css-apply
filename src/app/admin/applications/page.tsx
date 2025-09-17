@@ -601,6 +601,37 @@ const Applications = () => {
                         )}
                       </div>
 
+                      {/* Join Meeting Button */}
+                      {application.interviewBy ? (
+                        <a 
+                          href={`/api/admin/eb-profiles/${application.interviewBy}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center"
+                          onClick={async (e) => {
+                            e.preventDefault();
+                            try {
+                              const response = await fetch(`/api/admin/eb-profiles/by-position?position=${encodeURIComponent(application.interviewBy || '')}`);
+                              const data = await response.json();
+                              if (data.success && data.ebProfile?.meetingLink) {
+                                window.open(data.ebProfile.meetingLink, '_blank', 'noopener,noreferrer');
+                              } else {
+                                alert('Meeting link not available');
+                              }
+                            } catch (error) {
+                              console.error('Error fetching meeting link:', error);
+                              alert('Failed to get meeting link');
+                            }
+                          }}
+                        >
+                          Join Meeting
+                        </a>
+                      ) : (
+                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed" disabled>
+                          No Interviewer
+                        </button>
+                      )}
+
                       {/* Action Buttons */}
                       {(!application.status || application.status === 'pending') && (
                         <div className="flex gap-1 flex-wrap">

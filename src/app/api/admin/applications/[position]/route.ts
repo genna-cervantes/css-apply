@@ -28,7 +28,7 @@ export async function GET(
       }
   
       const { position } = await params;
-  
+
       const applications: {committee: {
           status: string | null;
           id: string;

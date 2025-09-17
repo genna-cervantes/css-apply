@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { getPositionTitle } from '@/lib/eb-mapping';
+import { getPositionTitle, getRoleId } from '@/lib/eb-mapping';
 
 // GET all available interview slots
 export async function GET(request: NextRequest, { params }: { params: Promise<{ position: string }> }) {
@@ -68,6 +68,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
                             equals: position,
                             mode: 'insensitive'
                         }
+                    },
+                    {
+                        interviewBy: {
+                            equals: getRoleId(position),
+                            mode: 'insensitive'
+                        }
+                    },
+                    {
+                        interviewBy: {
+                            equals: getRoleId(normalizedPosition),
+                            mode: 'insensitive'
+                        }
                     }
                 ]
             },
@@ -76,6 +88,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
                 interviewSlotDay: true,
                 interviewSlotTimeStart: true,
                 interviewSlotTimeEnd: true,
+                interviewBy: true,
                 user: {
                     select: {
                         name: true
