@@ -10,7 +10,7 @@ import SidebarContent from "@/components/AdminSidebar";
 //   addUnavailableSlot,
 //   removeUnavailableSlot,
 // } from "@/data/unavailableSlots";
-import { CalendarPlus, Calendar, Clock, X } from "lucide-react";
+import { CalendarPlus, Calendar, Clock, X, ChevronDown, ChevronUp } from "lucide-react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -23,6 +23,7 @@ const Schedule = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showUnavailableBlocks, setShowUnavailableBlocks] = useState(false);
   const [unavailableTimeSlots, setUnavailableTimeSlots] = useState<
     Array<{
       id: string;
@@ -350,6 +351,13 @@ const Schedule = () => {
     }
   }, [status, session?.user?.role, session?.user?.dbId, isInitialized, getEBData, fetchSlots, router]);
 
+  // Auto-show calendar when data is loaded
+  useEffect(() => {
+    if (!scheduleIsLoading && (interviewSlots.length > 0 || unavailableTimeSlots.length > 0)) {
+      setShowCalendar(true);
+    }
+  }, [scheduleIsLoading, interviewSlots.length, unavailableTimeSlots.length]);
+
   const handleCreateSlot = async () => {
     if (unavailableTimeSlots.length === 0) {
       alert("Please select time slots to mark as unavailable");
@@ -401,8 +409,8 @@ const Schedule = () => {
     }
   };
 
-  // Only show loading for initial load
-  if (status === "loading" || (scheduleIsLoading && !isInitialized)) {
+  // Show loading for initial load or when data is being fetched
+  if (status === "loading" || scheduleIsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center">
@@ -455,7 +463,7 @@ const Schedule = () => {
             className="bg-gray-50 rounded-lg border border-gray-200 p-4 md:p-8"
             style={{ minHeight: "calc(100vh - 400px)" }}
           >
-            {!showCalendar ? (
+            {!showCalendar && !scheduleIsLoading ? (
               <div className="flex flex-col items-center justify-center h-full px-2">
                 {/* big calendar icon */}
                 <div className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6">
@@ -477,6 +485,11 @@ const Schedule = () => {
                 >
                   Set Unavailable Times
                 </button>
+              </div>
+            ) : scheduleIsLoading ? (
+              <div className="flex flex-col items-center justify-center h-full px-2">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
+                <p className="text-sm text-gray-600">Loading schedule data...</p>
               </div>
             ) : (
               <div className="space-y-4 md:space-y-6">
@@ -665,44 +678,56 @@ const Schedule = () => {
                 {/* Selected Unavailable Time Slots */}
                 {unavailableTimeSlots.length > 0 && (
                   <div>
-                    <h4 className="text-xs md:text-sm font-medium text-gray-700 mb-2">
-                      Selected Unavailable Time Blocks (
-                      {unavailableTimeSlots.length})
-                    </h4>
-                    <div className="flex flex-wrap gap-1.5 md:gap-2 overflow-hidden">
-                      {unavailableTimeSlots.map((slot) => {
-                        const formatted = formatDateTime(
-                          slot.date,
-                          slot.timeSlot
-                        );
-                        return (
-                          <div
-                            key={slot.id}
-                            className="time-block flex items-center gap-1 md:gap-2 bg-[#134687] text-white px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs shadow-sm"
-                          >
-                            <Clock className="w-2.5 h-2.5 md:w-3 md:h-3 text-blue-200 flex-shrink-0" />
-                            <div className="time-block-text flex flex-col min-w-0 flex-1">
-                              <span className="font-medium text-xs">
-                                {formatted.dayName}, {formatted.monthDay}
-                              </span>
-                              <span className="text-blue-100 text-xs">
-                                {formatted.startTime} - {formatted.endTime}
-                              </span>
-                            </div>
-                            <button
-                              onClick={() =>
-                                setUnavailableTimeSlots((prev) =>
-                                  prev.filter((s) => s.id !== slot.id)
-                                )
-                              }
-                              className="ml-1 hover:bg-[#0f3a6b] rounded-full p-0.5 md:p-1 transition-colors flex-shrink-0"
+                    <button
+                      onClick={() => setShowUnavailableBlocks(!showUnavailableBlocks)}
+                      className="flex items-center justify-between w-full text-left mb-2 hover:bg-gray-50 rounded-md p-2 -m-2 transition-colors"
+                    >
+                      <h4 className="text-xs md:text-sm font-medium text-gray-700">
+                        Selected Unavailable Time Blocks ({unavailableTimeSlots.length})
+                      </h4>
+                      {showUnavailableBlocks ? (
+                        <ChevronUp className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                      )}
+                    </button>
+                    
+                    {showUnavailableBlocks && (
+                      <div className="flex flex-wrap gap-1.5 md:gap-2 overflow-hidden">
+                        {unavailableTimeSlots.map((slot) => {
+                          const formatted = formatDateTime(
+                            slot.date,
+                            slot.timeSlot
+                          );
+                          return (
+                            <div
+                              key={slot.id}
+                              className="time-block flex items-center gap-1 md:gap-2 bg-[#134687] text-white px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-xs shadow-sm"
                             >
-                              <X className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
+                              <Clock className="w-2.5 h-2.5 md:w-3 md:h-3 text-blue-200 flex-shrink-0" />
+                              <div className="time-block-text flex flex-col min-w-0 flex-1">
+                                <span className="font-medium text-xs">
+                                  {formatted.dayName}, {formatted.monthDay}
+                                </span>
+                                <span className="text-blue-100 text-xs">
+                                  {formatted.startTime} - {formatted.endTime}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() =>
+                                  setUnavailableTimeSlots((prev) =>
+                                    prev.filter((s) => s.id !== slot.id)
+                                  )
+                                }
+                                className="ml-1 hover:bg-[#0f3a6b] rounded-full p-0.5 md:p-1 transition-colors flex-shrink-0"
+                              >
+                                <X className="w-2.5 h-2.5 md:w-3 md:h-3" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
 

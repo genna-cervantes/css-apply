@@ -274,19 +274,19 @@ export default function SuperAdminDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
                 EB Management Dashboard
               </h1>
               <p className="text-gray-600">
                 Manage user roles and EB permissions
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <button
                 onClick={() => router.push('/admin')}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto"
               >
                 <svg className="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -328,10 +328,10 @@ export default function SuperAdminDashboard() {
 
         {/* Action Buttons */}
         {pendingChanges.length > 0 && (
-          <div className="mb-6 flex gap-3">
+          <div className="mb-6 flex flex-col sm:flex-row gap-3">
             <button
               onClick={confirmRoleChanges}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto"
             >
               <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -340,7 +340,7 @@ export default function SuperAdminDashboard() {
             </button>
             <button
               onClick={cancelRoleChanges}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto"
             >
               <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -368,9 +368,10 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
 
-        {/* Users Table */}
+        {/* Users List - Mobile Cards / Desktop Table */}
         <div className="bg-white shadow overflow-hidden rounded-lg">
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -503,6 +504,140 @@ export default function SuperAdminDashboard() {
                 })}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="lg:hidden">
+            <div className="divide-y divide-gray-200">
+              {filteredUsers.map((user) => {
+                const pendingRole = getPendingRoleForUser(user.id)
+                const displayRole = pendingRole || user.role
+                
+                return (
+                  <div key={user.id} className="p-4 hover:bg-gray-50">
+                    <div className="flex flex-col space-y-3">
+                      {/* User Info */}
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <span className="text-indigo-800 font-semibold">
+                              {user.name[0]?.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 truncate">
+                            {user.name}
+                          </div>
+                          <div className="text-sm text-gray-500 truncate">
+                            {user.email}
+                          </div>
+                          {user.studentNumber && (
+                            <div className="text-sm text-gray-500">
+                              {user.studentNumber}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Role Information */}
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500">Current Role:</span>
+                          <div className="flex items-center space-x-2">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeClass(user.role)}`}>
+                              {user.role}
+                            </span>
+                            {pendingRole && (
+                              <span className="text-xs text-indigo-600">
+                                (Changing...)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500">New Role:</span>
+                          <select
+                            value={displayRole}
+                            onChange={(e) => handleRoleChange(user.id, user.role, e.target.value)}
+                            className="block w-32 pl-2 pr-8 py-1 text-xs border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                          >
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="super_admin">Super Admin</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* EB Information */}
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium text-gray-500">EB Position:</span>
+                          {user.ebProfile?.position ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              {user.ebProfile.position}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 text-xs">-</span>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col space-y-1">
+                          <span className="text-xs font-medium text-gray-500">Committees:</span>
+                          {user.ebProfile?.committees.length ? (
+                            <div className="flex flex-wrap gap-1">
+                              {user.ebProfile.committees.slice(0, 3).map(committee => (
+                                <span key={committee} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                  {committee}
+                                </span>
+                              ))}
+                              {user.ebProfile.committees.length > 3 && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                  +{user.ebProfile.committees.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-xs">-</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
+                        <span className="text-xs font-medium text-gray-500">Actions:</span>
+                        <div className="flex flex-wrap gap-2">
+                          {user.ebProfile ? (
+                            <>
+                              <button
+                                onClick={() => handleMakeEb(user)}
+                                className="px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100"
+                              >
+                                Edit EB
+                              </button>
+                              <button
+                                onClick={() => handleRemoveEb(user.id)}
+                                className="px-3 py-1 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100"
+                              >
+                                Remove EB
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => handleMakeEb(user)}
+                              className="px-3 py-1 text-xs font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100"
+                            >
+                              Make EB
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
 

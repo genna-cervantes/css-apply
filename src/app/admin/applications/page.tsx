@@ -285,8 +285,8 @@ const Applications = () => {
     total: applications.member.length + applications.committee.length + applications.ea.length
   }), [applications]);
 
-  // Show loading only for initial load
-  if (loading && !isInitialized) {
+  // Show loading for initial load or when data is being fetched
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center">
@@ -341,7 +341,7 @@ const Applications = () => {
 
               {showMemberApplications && applications.member.map((application) => (
                 <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-base font-semibold text-gray-800 truncate">{application.user.name}</h3>
@@ -363,9 +363,9 @@ const Applications = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2 ml-3">
+                    <div className="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
                       {(!application.hasAccepted) && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'accept')}
                             disabled={processingId === application.id}
@@ -383,7 +383,7 @@ const Applications = () => {
                         </div>
                       )}
                       {application.hasAccepted && (
-                        <div className="text-xs text-green-600 font-semibold text-right">
+                        <div className="text-xs text-green-600 font-semibold text-left sm:text-right">
                           Member ID: {application.user.id.toUpperCase()}
                         </div>
                       )}
@@ -406,7 +406,7 @@ const Applications = () => {
 
               {showCommitteeApplications && applications.committee.map((application) => (
                 <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-base font-semibold text-gray-800 truncate">{application.user.name}</h3>
@@ -438,9 +438,9 @@ const Applications = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2 ml-3">
+                    <div className="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
                       {/* Download Buttons */}
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-wrap">
                         <button 
                           onClick={() => handleDownloadCV(application)}
                           className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
@@ -463,7 +463,7 @@ const Applications = () => {
                           href={`/api/admin/eb-profiles/${application.interviewBy}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center"
+                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center w-full sm:w-auto"
                           onClick={async (e) => {
                             e.preventDefault();
                             try {
@@ -483,14 +483,14 @@ const Applications = () => {
                           Join Meeting
                         </a>
                       ) : (
-                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed" disabled>
+                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed w-full sm:w-auto" disabled>
                           No Interviewer
                         </button>
                       )}
 
                       {/* Action Buttons */}
                       {(!application.status || application.status === 'pending') && (
-                        <div className="flex gap-1 flex-wrap">
+                        <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'evaluate')}
                             disabled={processingId === application.id}
@@ -525,7 +525,7 @@ const Applications = () => {
                         </div>
                       )}
                       {(application.status === 'evaluating' || application.status === 'failed') && !application.hasAccepted && (
-                        <div className="flex gap-1 flex-wrap">
+                        <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
                             disabled={processingId === application.id}
@@ -553,7 +553,7 @@ const Applications = () => {
                         </div>
                       )}
                       {application.hasAccepted && (
-                        <div className="text-xs text-green-600 font-semibold text-right">
+                        <div className="text-xs text-green-600 font-semibold text-left sm:text-right">
                           Member ID: {application.user.id.toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
@@ -585,7 +585,7 @@ const Applications = () => {
 
               {showEaApplications && applications.ea.map((application) => (
                 <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-base font-semibold text-gray-800 truncate">{application.user.name}</h3>
@@ -609,9 +609,9 @@ const Applications = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-end gap-2 ml-3">
+                    <div className="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
                       {/* Download Buttons */}
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-wrap">
                         <button 
                           onClick={() => handleDownloadCV(application)}
                           className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
@@ -634,7 +634,7 @@ const Applications = () => {
                           href={`/api/admin/eb-profiles/${application.interviewBy}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center"
+                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center w-full sm:w-auto"
                           onClick={async (e) => {
                             e.preventDefault();
                             try {
@@ -654,14 +654,14 @@ const Applications = () => {
                           Join Meeting
                         </a>
                       ) : (
-                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed" disabled>
+                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed w-full sm:w-auto" disabled>
                           No Interviewer
                         </button>
                       )}
 
                       {/* Action Buttons */}
                       {(!application.status || application.status === 'pending') && (
-                        <div className="flex gap-1 flex-wrap">
+                        <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'evaluate')}
                             disabled={processingId === application.id}
@@ -696,7 +696,7 @@ const Applications = () => {
                         </div>
                       )}
                       {(application.status === 'evaluating' || application.status === 'failed') && !application.hasAccepted && (
-                        <div className="flex gap-1 flex-wrap">
+                        <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}
@@ -724,7 +724,7 @@ const Applications = () => {
                         </div>
                       )}
                       {application.hasAccepted && (
-                        <div className="text-xs text-green-600 font-semibold text-right">
+                        <div className="text-xs text-green-600 font-semibold text-left sm:text-right">
                           Member ID: {application.user.id.toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
