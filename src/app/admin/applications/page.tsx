@@ -195,6 +195,12 @@ const Applications = () => {
       }
     }
     
+    // Check if application has no schedule yet (only for committee and EA applications)
+    if ((application.type === 'committee' || application.type === 'ea') && 
+        (!application.interviewSlotDay || !application.interviewSlotTimeStart)) {
+      return <span className="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">No Schedule</span>;
+    }
+    
     if (application.status === 'passed' || application.hasAccepted === true) {
       return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
     } else if (application.status === 'failed') {

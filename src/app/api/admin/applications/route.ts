@@ -78,6 +78,11 @@ export async function GET(request: NextRequest) {
         whereClause.status = 'evaluating';
       } else if (status === 'rejected') {
         whereClause.status = 'failed';
+      } else if (status === 'no-schedule') {
+        whereClause.OR = [
+          { interviewSlotDay: null },
+          { interviewSlotTimeStart: null }
+        ];
       }
       // If status is 'all' or not provided, no filter is applied
 
@@ -132,6 +137,11 @@ export async function GET(request: NextRequest) {
         whereClause.status = 'evaluating';
       } else if (status === 'rejected') {
         whereClause.status = 'failed';
+      } else if (status === 'no-schedule') {
+        whereClause.OR = [
+          { interviewSlotDay: null },
+          { interviewSlotTimeStart: null }
+        ];
       }
       // If status is 'all' or not provided, no filter is applied
 

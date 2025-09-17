@@ -35,7 +35,7 @@ const EAs = () => {
   const router = useRouter();
   const [eas, setEAs] = useState<EA[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending' | 'rejected'>('all');
+  const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule'>('all');
 
   const fetchEAs = useCallback(async () => {
     try {
@@ -80,6 +80,8 @@ const EAs = () => {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] rounded-full">Rejected</span>;
     } else if (ea.status === 'redirected') {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
+    } else if (!ea.interviewSlotDay || !ea.interviewSlotTimeStart) {
+      return <span className="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">No Schedule</span>;
     } else {
       return <span className="px-2 py-1 text-xs font-semibold text-[#5B4515] bg-gradient-to-r from-[#FFE7B4] to-[#FFF3D6] rounded-full">Pending</span>;
     }
@@ -158,13 +160,14 @@ const EAs = () => {
               <label className="block text-sm font-medium text-[#134687] mb-2">Status</label>
               <select
                 value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected')}
+                onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule')}
                 className="px-3 py-2 border-2 border-[#005FD9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#044FAF]"
               >
                 <option value="all">All Applications</option>
                 <option value="accepted">Accepted</option>
                 <option value="pending">Pending</option>
                 <option value="rejected">Rejected</option>
+                <option value="no-schedule">No Schedule</option>
               </select>
             </div>
           </div>
