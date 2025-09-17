@@ -38,12 +38,23 @@ const Staffs = () => {
   const [staffs, setStaffs] = useState<CommitteeStaff[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPreviousPage: false
+  });
 
   const fetchStaffs = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
         type: 'committee',
+        page: currentPage.toString(),
+        limit: '10',
         ...(selectedStatus !== 'all' && { status: selectedStatus })
       });
 
@@ -51,13 +62,14 @@ const Staffs = () => {
       if (response.ok) {
         const data = await response.json();
         setStaffs(data.applications);
+        setPagination(data.pagination);
       }
     } catch (error) {
       console.error('Error fetching staffs:', error);
     } finally {
       setLoading(false);
     }
-  }, [selectedStatus]);
+  }, [selectedStatus, currentPage]);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -74,6 +86,15 @@ const Staffs = () => {
 
     fetchStaffs();
   }, [status, session, router, selectedStatus, fetchStaffs]);
+
+  // Reset to page 1 when status changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedStatus]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const getStatusBadge = (staff: CommitteeStaff) => {
     if (staff.hasAccepted) {
@@ -271,6 +292,63 @@ const Staffs = () => {
             </div>
           )}
         </div>
+
+        {/* PAGINATION */}
+        {staffs.length > 0 && pagination.totalPages > 1 && (
+          <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalCount)} of {pagination.totalCount} applications
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!pagination.hasPreviousPage}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (pagination.totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= pagination.totalPages - 2) {
+                      pageNum = pagination.totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-1 text-sm rounded-md ${
+                          currentPage === pageNum
+                            ? 'bg-[#044FAF] text-white'
+                            : 'border border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -87,6 +87,15 @@ export default function SuperAdminDashboard() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPreviousPage: false
+  })
   const { data: session, status } = useSession()
   const router = useRouter()
 
@@ -104,7 +113,7 @@ export default function SuperAdminDashboard() {
     }
 
     fetchUsers()
-  }, [status, session?.user?.role, router])
+  }, [status, session?.user?.role, router, currentPage])
 
   // Handle filtering and sorting
   useEffect(() => {
@@ -155,12 +164,22 @@ export default function SuperAdminDashboard() {
     setFilteredUsers(filtered)
   }, [searchTerm, users, sortField, sortDirection])
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users/all')
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '10'
+      });
+      
+      const response = await fetch(`/api/admin/users/all?${params}`)
       if (response.ok) {
         const data = await response.json()
         setUsers(data.users)
+        setPagination(data.pagination)
       } else {
         console.error('Failed to fetch users:', response.status)
       }
@@ -827,6 +846,63 @@ export default function SuperAdminDashboard() {
               })}
             </div>
           </div>
+
+          {/* PAGINATION */}
+          {filteredUsers.length > 0 && pagination.totalPages > 1 && (
+            <div className="bg-white rounded-xl shadow-sm border-2 border-[#FFFFFF] p-6 mt-6">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalCount)} of {pagination.totalCount} users
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={!pagination.hasPreviousPage}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (pagination.totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= pagination.totalPages - 2) {
+                        pageNum = pagination.totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`px-3 py-1 text-sm rounded-md ${
+                            currentPage === pageNum
+                              ? 'bg-[#044FAF] text-white'
+                              : 'border border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={!pagination.hasNextPage}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Confirmation Dialog */}

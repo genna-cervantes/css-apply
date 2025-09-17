@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const session = await getServerSession(authOptions);
         
@@ -24,7 +24,16 @@ export async function GET() {
             );
         }
 
-        // Fetch all users with their EB profiles
+        // Get pagination parameters from URL
+        const { searchParams } = new URL(request.url);
+        const page = parseInt(searchParams.get('page') || '1');
+        const limit = parseInt(searchParams.get('limit') || '10');
+        const skip = (page - 1) * limit;
+
+        // Get total count for pagination
+        const totalCount = await prisma.user.count();
+
+        // Fetch users with their EB profiles (paginated)
         const users = await prisma.user.findMany({
             select: {
                 id: true,
@@ -44,12 +53,22 @@ export async function GET() {
             },
             orderBy: {
                 createdAt: 'desc'
-            }
+            },
+            skip: skip,
+            take: limit
         });
 
         return NextResponse.json({
             success: true,
-            users: users
+            users: users,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+                totalCount: totalCount,
+                limit: limit,
+                hasNextPage: page < Math.ceil(totalCount / limit),
+                hasPreviousPage: page > 1
+            }
         });
 
     } catch (error) {

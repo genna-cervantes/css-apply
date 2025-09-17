@@ -27,6 +27,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const status = searchParams.get('status');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const skip = (page - 1) * limit;
 
     if (type === 'member') {
       const whereClause: Record<string, unknown> = {};
@@ -41,9 +44,16 @@ export async function GET(request: NextRequest) {
       }
       // If status is 'all' or not provided, no filter is applied
 
+      // Get total count for pagination
+      const totalCount = await prisma.memberApplication.count({
+        where: whereClause,
+      });
+
       const memberApplications = await prisma.memberApplication.findMany({
         where: whereClause,
         orderBy: { createdAt: "desc" },
+        skip: skip,
+        take: limit,
         include: {
           user: {
             select: {
@@ -60,6 +70,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         applications: memberApplications,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalCount: totalCount,
+          limit: limit,
+          hasNextPage: page < Math.ceil(totalCount / limit),
+          hasPreviousPage: page > 1
+        }
       });
     }
 
@@ -86,9 +104,16 @@ export async function GET(request: NextRequest) {
       }
       // If status is 'all' or not provided, no filter is applied
 
+      // Get total count for pagination
+      const totalCount = await prisma.eAApplication.count({
+        where: whereClause,
+      });
+
       const eaApplications = await prisma.eAApplication.findMany({
         where: whereClause,
         orderBy: { createdAt: "desc" },
+        skip: skip,
+        take: limit,
         include: {
           user: {
             select: {
@@ -119,6 +144,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         applications: eaApplicationsWithCvLinks,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalCount: totalCount,
+          limit: limit,
+          hasNextPage: page < Math.ceil(totalCount / limit),
+          hasPreviousPage: page > 1
+        }
       });
     }
 
@@ -145,9 +178,16 @@ export async function GET(request: NextRequest) {
       }
       // If status is 'all' or not provided, no filter is applied
 
+      // Get total count for pagination
+      const totalCount = await prisma.committeeApplication.count({
+        where: whereClause,
+      });
+
       const committeeApplications = await prisma.committeeApplication.findMany({
         where: whereClause,
         orderBy: { createdAt: "desc" },
+        skip: skip,
+        take: limit,
         include: {
           user: {
             select: {
@@ -183,6 +223,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         applications: committeeApplicationsWithCvLinks,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalCount: totalCount,
+          limit: limit,
+          hasNextPage: page < Math.ceil(totalCount / limit),
+          hasPreviousPage: page > 1
+        }
       });
     }
 
