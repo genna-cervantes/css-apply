@@ -201,7 +201,7 @@ const Applications = () => {
       return <span className="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">No Schedule</span>;
     }
     
-    if (application.status === 'passed' || application.hasAccepted === true) {
+    if (application.status === 'passed' || (application.hasAccepted === true && application.status !== null)) {
       return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
     } else if (application.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
@@ -458,6 +458,7 @@ const Applications = () => {
                       )}
 
                       {/* Action Buttons */}
+                      {/* Step 1: Initial evaluation - only show Evaluate button */}
                       {(!application.status || application.status === 'pending') && (
                         <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
@@ -465,35 +466,12 @@ const Applications = () => {
                             disabled={processingId === application.id}
                             className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
-                          </button>
-                          <button
-                            onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
-                            disabled={processingId === application.id}
-                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
-                          >
-                            Accept
-                          </button>
-                          <button
-                            onClick={() => handleApplicationAction(application.id, 'committee', 'reject')}
-                            disabled={processingId === application.id}
-                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
-                          >
-                            Reject
-                          </button>
-                          <button
-                            onClick={() => {
-                              setShowRedirectModal(true)
-                              setSelectedApplication(application)
-                            }}
-                            disabled={processingId === application.id}
-                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
-                          >
-                            Redirect
+                            {processingId === application.id ? 'Processing...' : 'Evaluated'}
                           </button>
                         </div>
                       )}
-                      {(application.status === 'evaluating' || application.status === 'failed') && !application.hasAccepted && (
+                      {/* Step 2: After evaluation - show Accept, Reject, Redirect buttons */}
+                      {application.status === 'evaluating' && !application.hasAccepted && (
                         <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
@@ -629,6 +607,7 @@ const Applications = () => {
                       )}
 
                       {/* Action Buttons */}
+                      {/* Step 1: Initial evaluation - only show Evaluate button */}
                       {(!application.status || application.status === 'pending') && (
                         <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
@@ -636,35 +615,12 @@ const Applications = () => {
                             disabled={processingId === application.id}
                             className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
-                          </button>
-                          <button
-                            onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
-                            disabled={processingId === application.id}
-                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
-                          >
-                            Accept
-                          </button>
-                          <button
-                            onClick={() => handleApplicationAction(application.id, 'ea', 'reject')}
-                            disabled={processingId === application.id}
-                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
-                          >
-                            Reject
-                          </button>
-                          <button
-                            onClick={() => {
-                              setShowRedirectModal(true)
-                              setSelectedApplication(application)
-                            }}
-                            disabled={processingId === application.id}
-                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
-                          >
-                            Redirect
+                            {processingId === application.id ? 'Processing...' : 'Evaluated'}
                           </button>
                         </div>
                       )}
-                      {(application.status === 'evaluating' || application.status === 'failed') && !application.hasAccepted && (
+                      {/* Step 2: After evaluation - show Accept, Reject, Redirect buttons */}
+                      {application.status === 'evaluating' && !application.hasAccepted && (
                         <div className="flex gap-1 flex-wrap w-full sm:w-auto">
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}

@@ -4,6 +4,20 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, emailTemplates } from "@/lib/email";
 
+// Type definitions for raw query results
+interface CountResult {
+  count: bigint;
+}
+
+interface MemberApplicationRaw {
+  id: string;
+  studentNumber: string;
+  hasAccepted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  paymentProof?: string;
+}
+
 // GET applications with filtering
 export async function GET(request: NextRequest) {
   try {
@@ -79,11 +93,11 @@ export async function GET(request: NextRequest) {
            prisma.$queryRawUnsafe(countQuery)
          ]);
 
-         totalCount = Number((countResult as any)[0].count);
+         totalCount = Number((countResult as CountResult[])[0].count);
          
          // Get user data for each application
          memberApplications = await Promise.all(
-           (applications as any[]).map(async (app) => {
+           (applications as MemberApplicationRaw[]).map(async (app) => {
              const user = await prisma.user.findUnique({
                where: { studentNumber: app.studentNumber },
                select: {
@@ -118,11 +132,11 @@ export async function GET(request: NextRequest) {
            prisma.$queryRawUnsafe(countQuery)
          ]);
 
-         totalCount = Number((countResult as any)[0].count);
+         totalCount = Number((countResult as CountResult[])[0].count);
          
          // Get user data for each application
          memberApplications = await Promise.all(
-           (applications as any[]).map(async (app) => {
+           (applications as MemberApplicationRaw[]).map(async (app) => {
              const user = await prisma.user.findUnique({
                where: { studentNumber: app.studentNumber },
                select: {
@@ -178,11 +192,15 @@ export async function GET(request: NextRequest) {
       // Filter by status if provided
       if (status === 'accepted') {
         whereClause.hasAccepted = true;
+        whereClause.status = { not: null }; // Exclude applications with NULL status
+        console.log('EA Accepted filter applied:', whereClause);
       } else if (status === 'pending') {
         whereClause.OR = [
           { hasAccepted: false, status: null },
-          { hasAccepted: false, status: 'pending' }
+          { hasAccepted: false, status: 'pending' },
+          { hasAccepted: true, status: null } // Include accepted applications that were reset to NULL
         ];
+        console.log('EA Pending filter applied:', whereClause);
       } else if (status === 'evaluating') {
         whereClause.status = 'evaluating';
       } else if (status === 'rejected') {
@@ -195,8 +213,23 @@ export async function GET(request: NextRequest) {
           { interviewSlotTimeStart: '' }
         ];
         console.log('No-schedule filter applied for EA applications:', whereClause);
+      } else if (status === 'all') {
+        // For 'all' status, exclude accepted/rejected/redirected applications but keep evaluating ones
+        whereClause.NOT = [
+          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
+          { status: 'failed' }, // Exclude rejected applications
+          { status: 'redirected' } // Exclude redirected applications
+        ];
+        console.log('EA All filter applied (excluding accepted/rejected/redirected):', whereClause);
+      } else if (!status) {
+        // If no status is provided, apply the same logic as 'all'
+        whereClause.NOT = [
+          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
+          { status: 'failed' }, // Exclude rejected applications
+          { status: 'redirected' } // Exclude redirected applications
+        ];
+        console.log('EA No status filter applied (excluding accepted/rejected/redirected):', whereClause);
       }
-      // If status is 'all' or not provided, no filter is applied
 
       // Get total count for pagination
       const totalCount = await prisma.eAApplication.count({
@@ -225,6 +258,14 @@ export async function GET(request: NextRequest) {
         console.log(`Found ${eaApplications.length} EA applications with no schedule`);
         eaApplications.forEach(app => {
           console.log(`EA App ${app.id}: day=${app.interviewSlotDay}, time=${app.interviewSlotTimeStart}`);
+        });
+      }
+
+      // Debug logging for all status filters
+      if (status === 'accepted' || status === 'pending') {
+        console.log(`Found ${eaApplications.length} EA applications with status: ${status}`);
+        eaApplications.forEach(app => {
+          console.log(`EA App ${app.id}: hasAccepted=${app.hasAccepted}, status=${app.status}, user=${app.user?.name}`);
         });
       }
 
@@ -262,10 +303,12 @@ export async function GET(request: NextRequest) {
       // Filter by status if provided
       if (status === 'accepted') {
         whereClause.hasAccepted = true;
+        whereClause.status = { not: null }; // Exclude applications with NULL status
       } else if (status === 'pending') {
         whereClause.OR = [
           { hasAccepted: false, status: null },
-          { hasAccepted: false, status: 'pending' }
+          { hasAccepted: false, status: 'pending' },
+          { hasAccepted: true, status: null } // Include accepted applications that were reset to NULL
         ];
       } else if (status === 'evaluating') {
         whereClause.status = 'evaluating';
@@ -279,8 +322,23 @@ export async function GET(request: NextRequest) {
           { interviewSlotTimeStart: '' }
         ];
         console.log('No-schedule filter applied for Committee applications:', whereClause);
+      } else if (status === 'all') {
+        // For 'all' status, exclude accepted/rejected/redirected applications but keep evaluating ones
+        whereClause.NOT = [
+          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
+          { status: 'failed' }, // Exclude rejected applications
+          { status: 'redirected' } // Exclude redirected applications
+        ];
+        console.log('Committee All filter applied (excluding accepted/rejected/redirected):', whereClause);
+      } else if (!status) {
+        // If no status is provided, apply the same logic as 'all'
+        whereClause.NOT = [
+          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
+          { status: 'failed' }, // Exclude rejected applications
+          { status: 'redirected' } // Exclude redirected applications
+        ];
+        console.log('Committee No status filter applied (excluding accepted/rejected/redirected):', whereClause);
       }
-      // If status is 'all' or not provided, no filter is applied
 
       // Get total count for pagination
       const totalCount = await prisma.committeeApplication.count({

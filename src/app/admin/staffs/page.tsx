@@ -97,7 +97,7 @@ const Staffs = () => {
   };
 
   const getStatusBadge = (staff: CommitteeStaff) => {
-    if (staff.hasAccepted) {
+    if (staff.hasAccepted && staff.status !== null) {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Accepted</span>;
     } else if (staff.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] rounded-full">Rejected</span>;

@@ -160,6 +160,9 @@ const Members = () => {
                       <div className="text-xs text-[#134687] space-y-0.5">
                         <div>Student #: {member.studentNumber} | Section: {member.user.section}</div>
                         <div>Email: {member.user.email}</div>
+                        {member.hasAccepted && (
+                          <div className="text-green-600 font-semibold">Member ID: {member.user.id.toUpperCase()}</div>
+                        )}
                         {member.paymentProof && (
                           <div>Payment Proof: {member.paymentProof}</div>
                         )}

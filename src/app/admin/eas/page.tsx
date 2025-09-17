@@ -95,7 +95,7 @@ const EAs = () => {
   };
 
   const getStatusBadge = (ea: EA) => {
-    if (ea.hasAccepted) {
+    if (ea.hasAccepted && ea.status !== null) {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Accepted</span>;
     } else if (ea.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] rounded-full">Rejected</span>;
