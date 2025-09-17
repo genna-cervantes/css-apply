@@ -881,16 +881,13 @@ function HomeContent() {
       </section>
 
       <section className="bg-white lg:bg-white px-5 py-9">
-        <div
-          className="relative overflow-hidden flex flex-col justify-center items-center rounded-xl bg-center bg-cover"
-          style={{ backgroundImage: "url('/assets/csspromo.gif')" }}
-        >
-          <div className="absolute inset-0 bg-[#00459C]/60"></div>
+        <div className="relative overflow-hidden flex flex-col justify-center items-center rounded-xl bg-center bg-cover bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/sec2_pic1.jpg')]">
+          <div className="absolute inset-0 bg-[#00459C]/70"></div>
           <div className="relative py-30 px-10 z-10 flex flex-col justify-center items-center">
-            <div className="text-3xl md:text-4xl lg:text-5xl text-white font-raleway drop-shadow-[0_4px_14px_rgba(0,0,0,0.85)] text-center">
+            <div className="text-3xl md:text-4xl lg:text-5xl text-white font-raleway text-center [text-shadow:0_2px_4px_rgba(0,0,0,0.6)] md:[text-shadow:0_3px_8px_rgba(0,0,0,0.7)] lg:[text-shadow:0_8px_40px_rgba(0,0,0,1)]">
               Build the future. Start with us.
             </div>
-            <div className="text-center text-xs lg:text-lg text-extralight text-white mt-2 font-inter drop-shadow-[0_3px_10px_rgba(0,0,0,0.8)]">
+            <div className="text-center text-xs lg:text-lg font-extralight text-white mt-2 font-inter [text-shadow:0_3px_10px_rgba(0,0,0,0.8)]">
               Join the Computer Science Society and turn your passion into
               impact.
             </div>
