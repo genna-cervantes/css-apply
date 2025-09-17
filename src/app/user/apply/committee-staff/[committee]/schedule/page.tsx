@@ -135,15 +135,12 @@ function SchedulePageContent() {
 
       // Dynamic dates: From current date until September 26, 2025
       const hardcodedDates = [];
-      const today = new Date();
-      const endDate = new Date(2025, 8, 26); // September 26, 2025
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(2025, 8, 26);
+      end.setHours(23, 59, 59, 999);
 
-      // Generate dates from today until September 26
-      for (
-        let date = new Date(today);
-        date <= endDate;
-        date.setDate(date.getDate() + 1)
-      ) {
+      for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
         hardcodedDates.push(new Date(date));
       }
 
