@@ -155,10 +155,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get signed URL for secure access (works with private buckets)
+        // Get signed URL for secure access (works with private buckets) - 24 hours expiration
         const { data: urlData, error: urlError } = await supabase.storage
             .from(bucketName)
-            .createSignedUrl(filePath, 3600);
+            .createSignedUrl(filePath, 86400);
 
         if (urlError) {
             console.error('Error creating signed URL:', urlError);

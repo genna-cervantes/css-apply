@@ -93,17 +93,17 @@ export async function GET(request: NextRequest) {
       // Check if supabaseFilePath is a full URL or just a path
       if (supabaseFilePath.startsWith('http')) {
         // It's a full URL, we can use it directly or generate a signed URL
-        // Extract bucket and file path from the URL
-        const urlMatch = supabaseFilePath.match(/\/storage\/v1\/object\/public\/([^\/]+)\/(.+)/);
+        // Extract bucket and file path from the URL (handle both public and signed URLs)
+        const urlMatch = supabaseFilePath.match(/\/storage\/v1\/object\/(?:public|sign)\/([^\/]+)\/(.+?)(?:\?|$)/);
         
         if (urlMatch) {
           const bucketName = urlMatch[1];
           const filePath = urlMatch[2];
           
-          // Generate a signed URL for better security
+          // Generate a signed URL for better security (24 hours expiration)
           const { data, error } = await supabase.storage
             .from(bucketName)
-            .createSignedUrl(filePath, 3600);
+            .createSignedUrl(filePath, 86400);
 
           if (error) {
             console.error("Supabase error:", error);
@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
         
         const { data, error } = await supabase.storage
           .from(bucketName)
-          .createSignedUrl(supabaseFilePath, 3600);
+          .createSignedUrl(supabaseFilePath, 86400);
 
         if (error) {
           console.error("Supabase error:", error);

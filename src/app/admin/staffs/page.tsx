@@ -111,34 +111,17 @@ const Staffs = () => {
   };
 
   const handleDownloadCV = async (staff: CommitteeStaff) => {
-    if (!staff.cvDownloadUrl) {
-      alert('CV not available for download');
-      return;
-    }
-
     try {
-      const response = await fetch(staff.cvDownloadUrl);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.downloadUrl) {
-          // Create a temporary link to download the file
-          const link = document.createElement('a');
-          link.href = data.downloadUrl;
-          link.download = data.fileName || `${staff.user.name}_CV.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          alert('Failed to generate download link');
-        }
-      } else {
-        const errorData = await response.json();
-        if (response.status === 404) {
-          alert('CV file not found in storage');
-        } else {
-          alert(errorData.error || 'Failed to download CV');
-        }
-      }
+      // Use the new download endpoint that forces download
+      const downloadUrl = `/api/admin/download-pdf?applicationId=${staff.id}&type=cv&applicationType=committee`;
+      
+      // Create a temporary link to download the file
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${staff.user.name}_CV.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Error downloading CV:', error);
       alert('Error downloading CV');
@@ -146,34 +129,17 @@ const Staffs = () => {
   };
 
   const handleDownloadPortfolio = async (staff: CommitteeStaff) => {
-    if (!staff.portfolioDownloadUrl) {
-      alert('Portfolio not available for download');
-      return;
-    }
-
     try {
-      const response = await fetch(staff.portfolioDownloadUrl);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.downloadUrl) {
-          // Create a temporary link to download the file
-          const link = document.createElement('a');
-          link.href = data.downloadUrl;
-          link.download = data.fileName || `${staff.user.name}_Portfolio.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          alert('Failed to generate download link');
-        }
-      } else {
-        const errorData = await response.json();
-        if (response.status === 404) {
-          alert('Portfolio file not found in storage');
-        } else {
-          alert(errorData.error || 'Failed to download Portfolio');
-        }
-      }
+      // Use the new download endpoint that forces download
+      const downloadUrl = `/api/admin/download-pdf?applicationId=${staff.id}&type=portfolio&applicationType=committee`;
+      
+      // Create a temporary link to download the file
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `${staff.user.name}_Portfolio.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Error downloading Portfolio:', error);
       alert('Error downloading Portfolio');

@@ -86,17 +86,17 @@ export async function GET(request: NextRequest) {
     try {
       // Check if supabaseFilePath is a full URL or just a path
       if (supabaseFilePath.startsWith('http')) {
-        // It's a full URL, extract bucket and file path
-        const urlMatch = supabaseFilePath.match(/\/storage\/v1\/object\/public\/([^\/]+)\/(.+)/);
+        // It's a full URL, extract bucket and file path (handle both public and signed URLs)
+        const urlMatch = supabaseFilePath.match(/\/storage\/v1\/object\/(?:public|sign)\/([^\/]+)\/(.+?)(?:\?|$)/);
         
         if (urlMatch) {
           const bucketName = urlMatch[1];
           const filePath = urlMatch[2];
           
-          // Generate a signed URL for secure access
+          // Generate a signed URL for secure access (24 hours expiration)
           const { data, error } = await supabase.storage
             .from(bucketName)
-            .createSignedUrl(filePath, 3600);
+            .createSignedUrl(filePath, 86400);
 
           if (error) {
             console.error("Supabase error:", error);
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
             success: true,
             accessUrl: data.signedUrl,
             fileName: `${user.name}_${user.studentNumber}_${fileType.toUpperCase()}.pdf`,
-            expiresIn: 3600
+            expiresIn: 86400
           });
         } else {
           // If we can't parse the URL, return the original URL
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
             success: true,
             accessUrl: supabaseFilePath,
             fileName: `${user.name}_${user.studentNumber}_${fileType.toUpperCase()}.pdf`,
-            expiresIn: 3600
+            expiresIn: 86400
           });
         }
       } else {
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
         
         const { data, error } = await supabase.storage
           .from(bucketName)
-          .createSignedUrl(supabaseFilePath, 3600);
+          .createSignedUrl(supabaseFilePath, 86400);
 
         if (error) {
           console.error("Supabase error:", error);
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
           success: true,
           accessUrl: data.signedUrl,
           fileName: `${user.name}_${user.studentNumber}_${fileType.toUpperCase()}.pdf`,
-          expiresIn: 3600
+          expiresIn: 86400
         });
       }
     } catch (supabaseError) {
