@@ -296,30 +296,49 @@ const Schedule = () => {
     if (!position) return;
     
     try {
+      setScheduleIsLoading(true);
       
-      // Fetch unavailable slots
-      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${position}`, {
-        method: "GET",
-      });
-      const unavailableRes = await unavailableResponse.json();
-      console.log('unavailable slots:', unavailableRes);
-      setUnavailableTimeSlots(unavailableRes.unavailableSlotsData);
+      // Fetch both unavailable slots and interview slots in parallel
+      const [unavailableResponse, interviewResponse] = await Promise.all([
+        fetch(`/api/admin/unavailable-slots/${position}`, {
+          method: "GET",
+        }),
+        fetch(`/api/admin/interview-slots/${position}`, {
+          method: "GET",
+        })
+      ]);
 
-      // Fetch interview slots
-      const interviewResponse = await fetch(`/api/admin/interview-slots/${position}`, {
-        method: "GET",
-      });
-      const interviewRes = await interviewResponse.json();
-      console.log('interview slots:', interviewRes);
+      const [unavailableRes, interviewRes] = await Promise.all([
+        unavailableResponse.json(),
+        interviewResponse.json()
+      ]);
+
+      // Update states with the fetched data
+      setUnavailableTimeSlots(unavailableRes.unavailableSlotsData || []);
+      
       if (interviewRes.success && interviewRes.slots) {
         setInterviewSlots(interviewRes.slots);
+      } else {
+        setInterviewSlots([]);
       }
       
       setShowCalendar(true);
     } catch (error) {
-      console.error("Error generating slots:", error);
+      console.error("Error fetching slots:", error);
+      // Set empty arrays on error to prevent stale data
+      setUnavailableTimeSlots([]);
+      setInterviewSlots([]);
+    } finally {
+      setScheduleIsLoading(false);
     }
   }, []);
+
+  // Refresh function for manual updates
+  const refreshSchedule = useCallback(async () => {
+    if (ebProfile?.position) {
+      await fetchSlots(ebProfile.position);
+    }
+  }, [ebProfile?.position, fetchSlots]);
 
   // Optimized initialization effect
   useEffect(() => {
@@ -341,12 +360,10 @@ const Schedule = () => {
     // Initialize only once
     if (!isInitialized && session?.user?.dbId) {
       setIsInitialized(true);
-      setScheduleIsLoading(true);
       getEBData(session.user.dbId).then((ebProfile) => {
         if (ebProfile?.position) {
           fetchSlots(ebProfile.position);
         }
-        setScheduleIsLoading(false);
       });
     }
   }, [status, session?.user?.role, session?.user?.dbId, isInitialized, getEBData, fetchSlots, router]);
@@ -450,12 +467,26 @@ const Schedule = () => {
         {/* MAIN SHAPE */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-6 min-h-[calc(100vh-200px)] md:min-h-[calc(100vh-280px)]">
           {/* schedule header */}
-          <div className="flex items-center justify-center md:justify-start mb-4 md:mb-6 space-x-2">
-            {/* schedule icon */}
-            <Calendar className="w-4 h-4 md:w-6 md:h-6 text-gray-700" />
-            <h2 className="text-base md:text-xl font-semibold text-gray-800">
-              Your Schedule
-            </h2>
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div className="flex items-center space-x-2">
+              {/* schedule icon */}
+              <Calendar className="w-4 h-4 md:w-6 md:h-6 text-gray-700" />
+              <h2 className="text-base md:text-xl font-semibold text-gray-800">
+                Your Schedule
+              </h2>
+            </div>
+            
+            {/* Refresh button */}
+            <button
+              onClick={refreshSchedule}
+              disabled={scheduleIsLoading}
+              className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh</span>
+            </button>
           </div>
 
           {/* INNER SHAPE */}
