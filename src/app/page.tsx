@@ -23,11 +23,7 @@ function HomeContent() {
       const result = await signIn("google", {
         callbackUrl,
         redirect: false,
-      const result = await signIn("google", {
-        callbackUrl,
-        redirect: false,
       });
-
 
       if (result?.error) {
         console.error("Sign-in error:", result.error);
@@ -53,11 +49,7 @@ function HomeContent() {
       const result = await signIn("google", {
         callbackUrl: targetPath,
         redirect: false,
-      const result = await signIn("google", {
-        callbackUrl: targetPath,
-        redirect: false,
       });
-
 
       if (result?.error) {
         console.error("Sign-in error:", result.error);
