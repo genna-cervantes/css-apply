@@ -33,6 +33,33 @@ export async function GET(request: Request) {
         // Get total count for pagination
         const totalCount = await prisma.user.count();
 
+        // Get overall stats for dashboard
+        const [totalUsers, totalEbMembers, totalAdmins, totalApplicants] = await Promise.all([
+            prisma.user.count(),
+            prisma.user.count({
+                where: {
+                    ebProfile: {
+                        isNot: null
+                    }
+                }
+            }),
+            prisma.user.count({
+                where: {
+                    role: {
+                        in: ['admin', 'super_admin']
+                    }
+                }
+            }),
+            // Count total applicants across all application types
+            Promise.all([
+                prisma.memberApplication.count(),
+                prisma.eAApplication.count(),
+                prisma.committeeApplication.count()
+            ]).then(([memberCount, eaCount, committeeCount]) => 
+                memberCount + eaCount + committeeCount
+            )
+        ]);
+
         // Fetch users with their EB profiles (paginated)
         const users = await prisma.user.findMany({
             select: {
@@ -61,6 +88,12 @@ export async function GET(request: Request) {
         return NextResponse.json({
             success: true,
             users: users,
+            stats: {
+                totalUsers,
+                totalEbMembers,
+                totalAdmins,
+                totalApplicants
+            },
             pagination: {
                 currentPage: page,
                 totalPages: Math.ceil(totalCount / limit),
