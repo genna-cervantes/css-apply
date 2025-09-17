@@ -2,6 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { getPositionTitle, getRoleId } from "@/lib/eb-mapping";
 
 // GET all applications with filtering
 export async function GET(
@@ -78,12 +79,32 @@ export async function GET(
       });
   
       // get ea applications
+      // Handle both EB role IDs and position names in interviewBy field
+      const positionTitle = getPositionTitle(position);
+      const roleId = getRoleId(position);
+      
       const eAApplications = await prisma.eAApplication.findMany({
           where: {
-              interviewBy: {
-                  equals: position,
-                  mode: 'insensitive'
-              }
+              OR: [
+                  {
+                      interviewBy: {
+                          equals: position,
+                          mode: 'insensitive'
+                      }
+                  },
+                  {
+                      interviewBy: {
+                          equals: positionTitle,
+                          mode: 'insensitive'
+                      }
+                  },
+                  {
+                      interviewBy: {
+                          equals: roleId,
+                          mode: 'insensitive'
+                      }
+                  }
+              ]
           },
           orderBy: { createdAt: "desc" },
           include: {

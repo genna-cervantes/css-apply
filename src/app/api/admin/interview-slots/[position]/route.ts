@@ -56,10 +56,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
         const eaApplicationsSlots = await prisma.eAApplication.findMany({
             where: {
-                interviewBy: {
-                    equals: normalizedPosition,
-                    mode: 'insensitive'
-                }
+                OR: [
+                    {
+                        interviewBy: {
+                            equals: normalizedPosition,
+                            mode: 'insensitive'
+                        }
+                    },
+                    {
+                        interviewBy: {
+                            equals: position,
+                            mode: 'insensitive'
+                        }
+                    }
+                ]
             },
             select: {
                 id: true,
