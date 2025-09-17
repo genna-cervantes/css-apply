@@ -66,6 +66,9 @@ const EB_COMMITTEES = [
   'technology development'
 ] as const;
 
+type SortField = 'name' | 'email' | 'role' | 'position' | 'studentNumber' | 'createdAt'
+type SortDirection = 'asc' | 'desc'
+
 export default function SuperAdminDashboard() {
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
@@ -82,6 +85,8 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [pendingChanges, setPendingChanges] = useState<PendingChange[]>([])
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [sortField, setSortField] = useState<SortField>('name')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const { data: session, status } = useSession()
   const router = useRouter()
 
@@ -101,7 +106,7 @@ export default function SuperAdminDashboard() {
     fetchUsers()
   }, [status, session?.user?.role, router])
 
-  // REF: doesnt need a useEffect
+  // Handle filtering and sorting
   useEffect(() => {
     const filtered = users.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -109,8 +114,46 @@ export default function SuperAdminDashboard() {
       user.studentNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.ebProfile?.position.toLowerCase().includes(searchTerm.toLowerCase())
     )
+
+    // Sort the filtered results
+    filtered.sort((a, b) => {
+      let aValue: string | number = ''
+      let bValue: string | number = ''
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase()
+          bValue = b.name.toLowerCase()
+          break
+        case 'email':
+          aValue = a.email.toLowerCase()
+          bValue = b.email.toLowerCase()
+          break
+        case 'role':
+          aValue = a.role.toLowerCase()
+          bValue = b.role.toLowerCase()
+          break
+        case 'position':
+          aValue = a.ebProfile?.position?.toLowerCase() || ''
+          bValue = b.ebProfile?.position?.toLowerCase() || ''
+          break
+        case 'studentNumber':
+          aValue = a.studentNumber || ''
+          bValue = b.studentNumber || ''
+          break
+        case 'createdAt':
+          aValue = new Date(a.createdAt).getTime()
+          bValue = new Date(b.createdAt).getTime()
+          break
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+
     setFilteredUsers(filtered)
-  }, [searchTerm, users])
+  }, [searchTerm, users, sortField, sortDirection])
 
   const fetchUsers = async () => {
     try {
@@ -241,25 +284,54 @@ export default function SuperAdminDashboard() {
     return change ? change.newRole : null
   }
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return (
+        <svg className="w-4 h-4 text-[#134687]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        </svg>
+      )
+    }
+    
+    return sortDirection === 'asc' ? (
+      <svg className="w-4 h-4 text-[#044FAF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+      </svg>
+    ) : (
+      <svg className="w-4 h-4 text-[#044FAF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    )
+  }
+
   const getRoleBadgeClass = (role: string) => {
     switch (role) {
       case 'super_admin':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-gradient-to-r from-[#044FAF] to-[#134687] text-white border-[#005FD9]'
       case 'admin':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-gradient-to-r from-[#044FAF] to-[#134687] text-white border-[#005FD9]'
       case 'eb':
-        return 'bg-green-100 text-green-800'
+        return 'bg-gradient-to-r from-[#044FAF] to-[#134687] text-white border-[#005FD9]'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] border-[#005FD9]'
     }
   }
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#044FAF]"></div>
+          <p className="mt-4 text-[#134687]">Loading dashboard...</p>
         </div>
       </div>
     )
@@ -270,53 +342,121 @@ export default function SuperAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat overflow-x-hidden">
+      <div className="max-w-7xl mx-auto w-full p-6">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 mt-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-                EB Management Dashboard
-              </h1>
-              <p className="text-gray-600">
-                Manage user roles and EB permissions
+              <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit mb-4">
+                Super Admin Dashboard
+              </div>
+              <p className="text-black text-xs lg:text-lg font-Inter font-light leading-5">
+                Manage user roles, EB permissions, and system administration for CSS Apply
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <button
                 onClick={() => router.push('/admin')}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto"
+                className="inline-flex items-center px-6 py-3 border-2 border-[#005FD9] rounded-lg shadow-sm text-sm font-medium text-[#134687] bg-white hover:bg-[#F3F3FD] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#044FAF] transition-all duration-200 w-full sm:w-auto"
               >
-                <svg className="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="-ml-1 mr-2 h-5 w-5 text-[#134687]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
                 </svg>
                 Go to Admin Page
               </button>
-              <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <span className="text-indigo-800 font-semibold">
+              <div className="flex items-center bg-white rounded-lg px-4 py-3 shadow-sm border-2 border-[#005FD9]">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#044FAF] to-[#134687] flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">
                     {session.user?.name?.[0]?.toUpperCase() || 'A'}
                   </span>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900">{session.user?.name}</p>
-                  <p className="text-xs text-gray-500">Super Admin</p>
+                  <p className="text-sm font-semibold text-[#134687]">{session.user?.name}</p>
+                  <p className="text-xs text-[#044FAF] font-medium">Super Administrator</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Overview */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+            <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-[#134687]">Total Users</p>
+                  <p className="text-2xl font-bold text-[#044FAF]">{users.length}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-[#134687]">EB Members</p>
+                  <p className="text-2xl font-bold text-[#044FAF]">{users.filter(u => u.ebProfile).length}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-[#134687]">Admins</p>
+                  <p className="text-2xl font-bold text-[#044FAF]">{users.filter(u => u.role === 'admin' || u.role === 'super_admin').length}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-[#134687]">Pending Changes</p>
+                  <p className="text-2xl font-bold text-[#044FAF]">{pendingChanges.length}</p>
                 </div>
               </div>
             </div>
           </div>
           
           {pendingChanges.length > 0 && (
-            <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+            <div className="mt-6 bg-[#FFE7B4] border-l-4 border-[#FFBC2B] p-4 rounded-md">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className="h-5 w-5 text-[#CE9823]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
+                  <p className="text-sm text-[#5B4515]">
                     You have <span className="font-medium">{pendingChanges.length} pending role change(s)</span>. 
                     Click &quot;Confirm Changes&quot; to save them.
                   </p>
@@ -331,7 +471,7 @@ export default function SuperAdminDashboard() {
           <div className="mb-6 flex flex-col sm:flex-row gap-3">
             <button
               onClick={confirmRoleChanges}
-              className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#044FAF] hover:bg-[#04387B] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#044FAF] w-full sm:w-auto transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98"
             >
               <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -340,7 +480,7 @@ export default function SuperAdminDashboard() {
             </button>
             <button
               onClick={cancelRoleChanges}
-              className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full sm:w-auto"
+              className="inline-flex items-center justify-center px-4 py-2 border-2 border-[#005FD9] rounded-md shadow-sm text-sm font-medium text-[#134687] bg-white hover:bg-[#F3F3FD] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#044FAF] w-full sm:w-auto transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98"
             >
               <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -354,7 +494,7 @@ export default function SuperAdminDashboard() {
         <div className="mb-6">
           <div className="relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-[#134687]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
               </svg>
             </div>
@@ -363,34 +503,52 @@ export default function SuperAdminDashboard() {
               placeholder="Search users by name, email, student number, or position..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full pl-10 pr-3 py-3 border-2 border-[#005FD9] rounded-md leading-5 bg-white placeholder-[#134687] focus:outline-none focus:placeholder-[#044FAF] focus:ring-1 focus:ring-[#044FAF] focus:border-[#044FAF]"
             />
           </div>
         </div>
 
         {/* Users List - Mobile Cards / Desktop Table */}
-        <div className="bg-white shadow overflow-hidden rounded-lg">
+        <div className="bg-white shadow overflow-hidden rounded-lg border-2 border-[#005FD9]">
           {/* Desktop Table View */}
-          <div className="hidden lg:block overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="hidden lg:block overflow-x-auto max-w-full">
+            <table className="w-full divide-y divide-gray-200 table-fixed">
+              <thead className="bg-gradient-to-r from-[#F3F3FD] to-[#E8F2FF]">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
+                  <th scope="col" className="w-1/5 px-3 py-4 text-left text-xs font-semibold text-[#134687] uppercase tracking-wider">
+                    <button
+                      onClick={() => handleSort('name')}
+                      className="flex items-center space-x-1 hover:text-[#044FAF] transition-colors duration-200"
+                    >
+                      <span>User</span>
+                      {getSortIcon('name')}
+                    </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Current Role
+                  <th scope="col" className="w-1/8 px-2 py-4 text-left text-xs font-semibold text-[#134687] uppercase tracking-wider">
+                    <button
+                      onClick={() => handleSort('role')}
+                      className="flex items-center space-x-1 hover:text-[#044FAF] transition-colors duration-200"
+                    >
+                      <span>Current Role</span>
+                      {getSortIcon('role')}
+                    </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="w-1/8 px-2 py-4 text-left text-xs font-semibold text-[#134687] uppercase tracking-wider">
                     New Role
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    EB Position
+                  <th scope="col" className="w-1/4 px-2 py-4 text-left text-xs font-semibold text-[#134687] uppercase tracking-wider">
+                    <button
+                      onClick={() => handleSort('position')}
+                      className="flex items-center space-x-1 hover:text-[#044FAF] transition-colors duration-200"
+                    >
+                      <span>EB Position</span>
+                      {getSortIcon('position')}
+                    </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="w-1/8 px-2 py-4 text-left text-xs font-semibold text-[#134687] uppercase tracking-wider">
                     Committees
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="w-1/8 px-2 py-4 text-left text-xs font-semibold text-[#134687] uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -401,103 +559,120 @@ export default function SuperAdminDashboard() {
                   const displayRole = pendingRole || user.role
                   
                   return (
-                    <tr key={user.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                    <tr key={user.id} className="hover:bg-[#F3F3FD] transition-colors duration-200">
+                      <td className="px-3 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                              <span className="text-indigo-800 font-semibold">
+                          <div className="flex-shrink-0 h-8 w-8">
+                            <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#044FAF] to-[#134687] flex items-center justify-center border-2 border-[#005FD9]">
+                              <span className="text-white font-bold text-xs">
                                 {user.name[0]?.toUpperCase()}
                               </span>
                             </div>
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
+                          <div className="ml-2 min-w-0 flex-1">
+                            <div className="text-xs font-semibold text-[#134687] truncate">
                               {user.name}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-xs text-[#134687] truncate">
                               {user.email}
                             </div>
                             {user.studentNumber && (
-                              <div className="text-sm text-gray-500">
+                              <div className="text-xs text-[#044FAF] font-medium">
                                 {user.studentNumber}
                               </div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeClass(user.role)}`}>
-                          {user.role}
+                      <td className="px-2 py-4 whitespace-nowrap">
+                        <div className="flex items-center space-x-1">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${getRoleBadgeClass(user.role)}`}>
+                            {user.role.replace('_', ' ').toUpperCase()}
                         </span>
                         {pendingRole && (
-                          <span className="ml-2 text-xs text-indigo-600">
-                            (Changing...)
+                          <span className="inline-flex items-center px-1 py-1 rounded-full text-xs font-medium bg-[#FFE7B4] text-[#5B4515] border border-[#FFBC2B]">
+                            Changing...
                           </span>
                         )}
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-2 py-4 whitespace-nowrap">
                         <select
                           value={displayRole}
                           onChange={(e) => handleRoleChange(user.id, user.role, e.target.value)}
-                          className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                          className="block w-full pl-1 pr-6 py-1 text-xs border-2 border-[#005FD9] focus:outline-none focus:ring-[#044FAF] focus:border-[#044FAF] rounded-md"
                         >
                           <option value="user">User</option>
                           <option value="admin">Admin</option>
                           <option value="super_admin">Super Admin</option>
                         </select>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-900">
                         {user.ebProfile?.position ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-[#044FAF] to-[#134687] text-white border border-[#005FD9]">
                             {user.ebProfile.position}
                           </span>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] border border-[#005FD9]">
+                            No Position
+                          </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-2 py-4 text-sm text-gray-900">
                         {user.ebProfile?.committees.length ? (
                           <div className="flex flex-wrap gap-1">
-                            {user.ebProfile.committees.slice(0, 2).map(committee => (
-                              <span key={committee} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            {user.ebProfile.committees.slice(0, 1).map(committee => (
+                              <span key={committee} className="inline-flex items-center px-1 py-1 rounded-md text-xs font-medium bg-gradient-to-r from-[#044FAF] to-[#134687] text-white border border-[#005FD9]">
                                 {committee}
                               </span>
                             ))}
-                            {user.ebProfile.committees.length > 2 && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                +{user.ebProfile.committees.length - 2} more
+                            {user.ebProfile.committees.length > 1 && (
+                              <span className="inline-flex items-center px-1 py-1 rounded-md text-xs font-medium bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] border border-[#005FD9]">
+                                +{user.ebProfile.committees.length - 1}
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="inline-flex items-center px-1 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] border border-[#005FD9]">
+                            No Committees
+                          </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        {user.ebProfile ? (
-                          <>
+                      <td className="px-2 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end space-x-1">
+                          {user.ebProfile ? (
+                            <>
+                              <button
+                                onClick={() => handleMakeEb(user)}
+                                className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#134687] bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] border border-[#005FD9] rounded hover:bg-gradient-to-r hover:from-[#044FAF] hover:to-[#134687] hover:text-white focus:outline-none focus:ring-1 focus:ring-[#044FAF] transition-all duration-200"
+                              >
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleRemoveEb(user.id)}
+                                className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#134687] bg-gradient-to-r from-[#FFE7B4] to-[#FFF3D6] border border-[#FFBC2B] rounded hover:bg-gradient-to-r hover:from-[#FFBC2B] hover:to-[#CE9823] hover:text-[#5B4515] focus:outline-none focus:ring-1 focus:ring-[#FFBC2B] transition-all duration-200"
+                              >
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Remove
+                              </button>
+                            </>
+                          ) : (
                             <button
                               onClick={() => handleMakeEb(user)}
-                              className="text-indigo-600 hover:text-indigo-900"
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-gradient-to-r from-[#044FAF] to-[#134687] border border-[#005FD9] rounded hover:bg-gradient-to-r hover:from-[#04387B] hover:to-[#0f3a6b] focus:outline-none focus:ring-1 focus:ring-[#044FAF] transition-all duration-200"
                             >
-                              Edit EB
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              Make EB
                             </button>
-                            <button
-                              onClick={() => handleRemoveEb(user.id)}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              Remove EB
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            onClick={() => handleMakeEb(user)}
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            Make EB
-                          </button>
-                        )}
+                          )}
+                        </div>
                       </td>
                     </tr>
                   )

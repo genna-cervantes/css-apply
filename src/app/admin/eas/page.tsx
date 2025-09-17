@@ -75,13 +75,13 @@ const EAs = () => {
 
   const getStatusBadge = (ea: EA) => {
     if (ea.hasAccepted) {
-      return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Accepted</span>;
     } else if (ea.status === 'failed') {
-      return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] rounded-full">Rejected</span>;
     } else if (ea.status === 'redirected') {
-      return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
     } else {
-      return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
+      return <span className="px-2 py-1 text-xs font-semibold text-[#5B4515] bg-gradient-to-r from-[#FFE7B4] to-[#FFF3D6] rounded-full">Pending</span>;
     }
   };
 
@@ -122,17 +122,17 @@ const EAs = () => {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading executive assistants...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#044FAF]"></div>
+          <p className="mt-4 text-[#134687]">Loading executive assistants...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex font-inter" style={{ backgroundColor: "#f6f6fe" }}>
+    <div className="min-h-screen flex bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat overflow-x-hidden">
       {/* Sidebar Navigation */}
       <MobileSidebar>
         <SidebarContent activePage="eas" />
@@ -142,27 +142,24 @@ const EAs = () => {
       <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12">
         {/* PAGE HEADER */}
         <div className="mb-8 mt-12 md:mt-8 text-center md:text-left">
-          <h1 
-            className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-2 flex items-center justify-center md:justify-start"
-            style={{ fontFamily: "var(--font-raleway)" }}
-          >
+          <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit mb-4">
             Executive Assistants
-          </h1>
-          <p className="text-sm md:text-base text-gray-600 italic mb-6 md:mb-6">
-            View and manage all executive assistant applications and members.
+          </div>
+          <p className="text-black text-xs lg:text-lg font-Inter font-light leading-5 mb-4 md:mb-6">
+            View and manage all executive assistant applications and members for CSS Apply.
           </p>
-          <hr className="border-gray-300" />
+          <hr className="border-[#005FD9]" />
         </div>
 
         {/* FILTERS */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6 mb-6">
           <div className="flex flex-wrap gap-4 items-center">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-medium text-[#134687] mb-2">Status</label>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected')}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border-2 border-[#005FD9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#044FAF]"
               >
                 <option value="all">All Applications</option>
                 <option value="accepted">Accepted</option>
@@ -174,7 +171,7 @@ const EAs = () => {
         </div>
 
         {/* EAS LIST */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 min-h-[calc(100vh-180px)] md:min-h-[calc(100vh-280px)]">
+        <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6 mb-6 min-h-[calc(100vh-180px)] md:min-h-[calc(100vh-280px)]">
           {eas.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">No executive assistant applications found</p>
@@ -186,14 +183,14 @@ const EAs = () => {
                 const secondEB = roles.find(r => r.id === ea.secondOptionEb);
                 
                 return (
-                  <div key={ea.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
+                  <div key={ea.id} className="border-2 border-[#005FD9] rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                     <div className="flex justify-between items-start">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-base font-semibold text-gray-800 truncate">{ea.user.name}</h3>
+                          <h3 className="text-base font-semibold text-[#134687] truncate">{ea.user.name}</h3>
                           {getStatusBadge(ea)}
                         </div>
-                        <div className="text-xs text-gray-600 space-y-0.5">
+                        <div className="text-xs text-[#134687] space-y-0.5">
                           <div>Student #: {ea.studentNumber} | Section: {ea.user.section}</div>
                           <div>Email: {ea.user.email}</div>
                           <div>First Choice: {firstEB?.title}</div>
@@ -211,7 +208,7 @@ const EAs = () => {
                         {ea.cvDownloadUrl && (
                           <button
                             onClick={() => handleDownloadCV(ea)}
-                            className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                            className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] transition-all duration-200"
                           >
                             <Download size={12} />
                             CV

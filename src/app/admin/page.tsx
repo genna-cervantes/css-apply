@@ -429,10 +429,10 @@ const Schedule = () => {
   // Show loading for initial load or when data is being fetched
   if (status === "loading" || scheduleIsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading schedule...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#044FAF]"></div>
+          <p className="mt-4 text-[#134687]">Loading schedule...</p>
         </div>
       </div>
     );
@@ -440,8 +440,7 @@ const Schedule = () => {
 
   return (
     <div
-      className="min-h-screen flex font-inter"
-      style={{ backgroundColor: "#f6f6fe" }}
+      className="min-h-screen flex bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat overflow-x-hidden"
     >
       {/* Sidebar Navigation */}
       <MobileSidebar>
@@ -452,26 +451,23 @@ const Schedule = () => {
       <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12">
         {/* PAGE HEADER */}
         <div className="mb-6 mt-8 md:mb-8 md:mt-8 text-center md:text-left">
-          <h1
-            className="text-xl md:text-4xl font-bold text-gray-800 mb-2 flex items-center justify-center md:justify-start"
-            style={{ fontFamily: "var(--font-raleway)" }}
-          >
+          <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit mb-4">
             Welcome, {ebProfile?.position} 👋
-          </h1>
-          <p className="text-xs md:text-base text-gray-600 italic mb-4 md:mb-6">
-            Stay organized and guide applicants through their journey.
+          </div>
+          <p className="text-black text-xs lg:text-lg font-Inter font-light leading-5 mb-4 md:mb-6">
+            Stay organized and guide applicants through their journey with CSS Apply.
           </p>
-          <hr className="border-gray-300" />
+          <hr className="border-[#005FD9]" />
         </div>
 
         {/* MAIN SHAPE */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-6 min-h-[calc(100vh-200px)] md:min-h-[calc(100vh-280px)]">
+        <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-4 md:p-6 mb-6 min-h-[calc(100vh-200px)] md:min-h-[calc(100vh-280px)]">
           {/* schedule header */}
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <div className="flex items-center space-x-2">
               {/* schedule icon */}
-              <Calendar className="w-4 h-4 md:w-6 md:h-6 text-gray-700" />
-              <h2 className="text-base md:text-xl font-semibold text-gray-800">
+              <Calendar className="w-4 h-4 md:w-6 md:h-6 text-[#134687]" />
+              <h2 className="text-base md:text-xl font-semibold text-[#134687]">
                 Your Schedule
               </h2>
             </div>
@@ -480,7 +476,7 @@ const Schedule = () => {
             <button
               onClick={refreshSchedule}
               disabled={scheduleIsLoading}
-              className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-[#134687] bg-white border-2 border-[#005FD9] rounded-md hover:bg-[#F3F3FD] hover:text-[#044FAF] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -491,20 +487,20 @@ const Schedule = () => {
 
           {/* INNER SHAPE */}
           <div
-            className="bg-gray-50 rounded-lg border border-gray-200 p-4 md:p-8"
+            className="bg-gradient-to-r from-[#F3F3FD] to-[#E8F2FF] rounded-lg p-4 md:p-8"
             style={{ minHeight: "calc(100vh - 400px)" }}
           >
             {!showCalendar && !scheduleIsLoading ? (
               <div className="flex flex-col items-center justify-center h-full px-2">
                 {/* big calendar icon */}
                 <div className="w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6">
-                  <CalendarPlus className="w-full h-full text-gray-400" />
+                  <CalendarPlus className="w-full h-full text-[#134687]" />
                 </div>
 
-                <h3 className="text-base md:text-xl font-semibold text-gray-600 mb-2 md:mb-3 text-center">
+                <h3 className="text-base md:text-xl font-semibold text-[#134687] mb-2 md:mb-3 text-center">
                   Set Your Schedule
                 </h3>
-                <p className="text-xs md:text-base text-gray-500 text-center mb-6 md:mb-8 max-w-sm md:max-w-md">
+                <p className="text-xs md:text-base text-[#134687] text-center mb-6 md:mb-8 max-w-sm md:max-w-md">
                   Click the button below to mark your unavailable times. You can
                   select single time blocks or drag across multiple days to
                   create continuous unavailable periods.
@@ -512,38 +508,38 @@ const Schedule = () => {
 
                 <button
                   onClick={() => setShowCalendar(true)}
-                  className="text-xs md:text-sm font-medium py-2 px-6 md:py-3 md:px-10 rounded-full bg-[#134687] text-white hover:bg-[#0f3a6b] transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
+                  className="text-xs md:text-sm font-medium py-2 px-6 md:py-3 md:px-10 rounded-full bg-gradient-to-r from-[#044FAF] to-[#134687] text-white hover:from-[#04387B] hover:to-[#0f3a6b] transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
                 >
                   Set Unavailable Times
                 </button>
               </div>
             ) : scheduleIsLoading ? (
               <div className="flex flex-col items-center justify-center h-full px-2">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
-                <p className="text-sm text-gray-600">Loading schedule data...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#044FAF] mb-4"></div>
+                <p className="text-sm text-[#134687]">Loading schedule data...</p>
               </div>
             ) : (
               <div className="space-y-4 md:space-y-6">
                 {interviewSlots.length > 0 && <div className="flex">
-                  <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">
+                  <h4 className="text-xs md:text-sm font-semibold text-[#134687] mb-1">
                     Meeting Link: {interviewSlots[0].meetingLink}
                   </h4>
                 </div>}
                 {/* Guide Message */}
-                <div className="bg-white border border-gray-200 rounded-lg p-3 md:p-4">
+                <div className="bg-white rounded-lg p-3 md:p-4">
                   <div className="flex items-start gap-2 md:gap-3">
                     <div className="flex-shrink-0">
-                      <div className="w-5 h-5 md:w-6 md:h-6 bg-gray-100 rounded-full flex items-center justify-center">
-                        <span className="text-gray-600 text-xs md:text-sm font-semibold">
+                      <div className="w-5 h-5 md:w-6 md:h-6 bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs md:text-sm font-semibold">
                           i
                         </span>
                       </div>
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">
+                      <h4 className="text-xs md:text-sm font-semibold text-[#134687] mb-1">
                         How to use the schedule calendar:
                       </h4>
-                      <ul className="text-xs text-gray-700 space-y-1">
+                      <ul className="text-xs text-[#134687] space-y-1">
                         <li>
                           • <strong>View:</strong> Blue blocks show unavailable times, red blocks show scheduled interviews
                         </li>
@@ -575,17 +571,17 @@ const Schedule = () => {
                   <div className="flex flex-wrap gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-[#134687] rounded border border-[#0f3a6b]"></div>
-                      <span className="text-xs text-gray-600">Unavailable Times</span>
+                      <span className="text-xs text-[#134687]">Unavailable Times</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 bg-[#dc2626] rounded border border-[#b91c1c]"></div>
-                      <span className="text-xs text-gray-600">Scheduled Interviews</span>
+                      <span className="text-xs text-[#134687]">Scheduled Interviews</span>
                     </div>
                   </div>
                 </div>
 
                 {/* FullCalendar Component */}
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="rounded-lg overflow-hidden">
                   <style jsx global>{`
                     .fc-event {
                       border-radius: 3px;

@@ -288,17 +288,17 @@ const Applications = () => {
   // Show loading for initial load or when data is being fetched
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-          <p className="mt-4 text-gray-600">Loading applications...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#044FAF]"></div>
+          <p className="mt-4 text-[#134687]">Loading applications...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex font-inter" style={{ backgroundColor: "#f6f6fe" }}>
+    <div className="min-h-screen flex bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat overflow-x-hidden">
       {/* Sidebar Navigation */}
       <MobileSidebar>
         <SidebarContent activePage="applications" />
@@ -308,20 +308,17 @@ const Applications = () => {
       <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12">
         {/* PAGE HEADER */}
         <div className="mb-8 mt-12 md:mt-8 text-center md:text-left">
-          <h1 
-            className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-2 flex items-center justify-center md:justify-start"
-            style={{ fontFamily: "var(--font-raleway)" }}
-          >
-            Application Management
-          </h1>
-          <p className="text-sm md:text-base text-gray-600 italic mb-6 md:mb-6">
-            Review and manage all applications from students.
+          <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit mb-4">
+            All Applications
+          </div>
+          <p className="text-black text-xs lg:text-lg font-Inter font-light leading-5 mb-4 md:mb-6">
+            Review and manage all applications from students for CSS Apply
           </p>
-          <hr className="border-gray-300" />
+          <hr className="border-[#005FD9]" />
         </div>
 
         {/* APPLICATIONS LIST */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 min-h-[calc(100vh-180px)] md:min-h-[calc(100vh-280px)]">
+        <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6 mb-6 min-h-[calc(100vh-180px)] md:min-h-[calc(100vh-280px)]">
           {applications.committee.length === 0 && applications.ea.length === 0 && applications.member.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">No applications under your position found</p>
@@ -329,7 +326,7 @@ const Applications = () => {
           ) : (
             <>
             <div className="space-y-3">
-              <div className="flex justify-between items-center bg-green-600 text-white p-3 rounded-md">
+              <div className="flex justify-between items-center bg-gradient-to-r from-[#044FAF] to-[#134687] text-white p-3 rounded-md">
                 <div className="flex gap-2 items-center">
                   <h2 className="font-semibold text-sm">Member Applications</h2>
                   <p className="text-xs">({applicationCounts.member})</p>
@@ -340,7 +337,7 @@ const Applications = () => {
               </div>
 
               {showMemberApplications && applications.member.map((application) => (
-                <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
+                <div key={application.id} className="border-2 border-[#005FD9] rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -369,14 +366,14 @@ const Applications = () => {
                           <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
                             {processingId === application.id ? 'Processing...' : 'Accept'}
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             {processingId === application.id ? 'Processing...' : 'Reject'}
                           </button>
@@ -394,7 +391,7 @@ const Applications = () => {
             </div>
 
             <div className="space-y-3 mt-4">
-              <div className="flex justify-between items-center bg-blue-600 text-white p-3 rounded-md">
+              <div className="flex justify-between items-center bg-gradient-to-r from-[#044FAF] to-[#134687] text-white p-3 rounded-md">
                 <div className="flex gap-2 items-center">
                   <h2 className="font-semibold text-sm">Committee Applications</h2>
                   <p className="text-xs">({applicationCounts.committee})</p>
@@ -405,7 +402,7 @@ const Applications = () => {
               </div>
 
               {showCommitteeApplications && applications.committee.map((application) => (
-                <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
+                <div key={application.id} className="border-2 border-[#005FD9] rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -443,14 +440,14 @@ const Applications = () => {
                       <div className="flex gap-1 flex-wrap">
                         <button 
                           onClick={() => handleDownloadCV(application)}
-                          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                          className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] transition-all duration-200"
                         >
                           CV
                         </button>
                         {application.portfolioDownloadUrl && (
                           <button 
                             onClick={() => handleDownloadPortfolio(application)}
-                            className="px-2 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] transition-all duration-200"
                           >
                             Portfolio
                           </button>
@@ -463,7 +460,7 @@ const Applications = () => {
                           href={`/api/admin/eb-profiles/${application.interviewBy}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center w-full sm:w-auto"
+                          className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] inline-block text-center w-full sm:w-auto transition-all duration-200"
                           onClick={async (e) => {
                             e.preventDefault();
                             try {
@@ -483,7 +480,7 @@ const Applications = () => {
                           Join Meeting
                         </a>
                       ) : (
-                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed w-full sm:w-auto" disabled>
+                        <button className="px-2 py-1 bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] text-xs rounded cursor-not-allowed w-full sm:w-auto border-2 border-[#005FD9]" disabled>
                           No Interviewer
                         </button>
                       )}
@@ -494,21 +491,21 @@ const Applications = () => {
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'evaluate')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
                             {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
                             Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Reject
                           </button>
@@ -518,7 +515,7 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Redirect
                           </button>
@@ -529,14 +526,14 @@ const Applications = () => {
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
                             Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'committee', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Reject
                           </button>
@@ -546,7 +543,7 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Redirect
                           </button>
@@ -573,7 +570,7 @@ const Applications = () => {
             </div>
 
             <div className="space-y-3 mt-4">
-              <div className="flex justify-between items-center bg-blue-600 text-white p-3 rounded-md">
+              <div className="flex justify-between items-center bg-gradient-to-r from-[#044FAF] to-[#134687] text-white p-3 rounded-md">
                 <div className="flex gap-2 items-center">
                   <h2 className="font-semibold text-sm">Executive Assistant Applications</h2>
                   <p className="text-xs">({applicationCounts.ea})</p>
@@ -584,7 +581,7 @@ const Applications = () => {
               </div>
 
               {showEaApplications && applications.ea.map((application) => (
-                <div key={application.id} className="border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
+                <div key={application.id} className="border-2 border-[#005FD9] rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -614,14 +611,14 @@ const Applications = () => {
                       <div className="flex gap-1 flex-wrap">
                         <button 
                           onClick={() => handleDownloadCV(application)}
-                          className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                          className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] transition-all duration-200"
                         >
                           CV
                         </button>
                         {application.portfolioDownloadUrl && (
                           <button 
                             onClick={() => handleDownloadPortfolio(application)}
-                            className="px-2 py-1 bg-teal-600 text-white text-xs rounded hover:bg-teal-700"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] transition-all duration-200"
                           >
                             Portfolio
                           </button>
@@ -634,7 +631,7 @@ const Applications = () => {
                           href={`/api/admin/eb-profiles/${application.interviewBy}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-2 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 inline-block text-center w-full sm:w-auto"
+                          className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] inline-block text-center w-full sm:w-auto transition-all duration-200"
                           onClick={async (e) => {
                             e.preventDefault();
                             try {
@@ -654,7 +651,7 @@ const Applications = () => {
                           Join Meeting
                         </a>
                       ) : (
-                        <button className="px-2 py-1 bg-gray-400 text-white text-xs rounded cursor-not-allowed w-full sm:w-auto" disabled>
+                        <button className="px-2 py-1 bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] text-xs rounded cursor-not-allowed w-full sm:w-auto border-2 border-[#005FD9]" disabled>
                           No Interviewer
                         </button>
                       )}
@@ -665,21 +662,21 @@ const Applications = () => {
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'evaluate')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
                             {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
                             Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Reject
                           </button>
@@ -689,7 +686,7 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Redirect
                           </button>
@@ -700,14 +697,14 @@ const Applications = () => {
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
                             Accept
                           </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'reject')}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Reject
                           </button>
@@ -717,7 +714,7 @@ const Applications = () => {
                               setSelectedApplication(application)
                             }}
                             disabled={processingId === application.id}
-                            className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 disabled:opacity-50"
+                            className="px-2 py-1 bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] text-white text-xs rounded hover:from-[#CE9823] hover:to-[#B8860B] disabled:opacity-50 transition-all duration-200"
                           >
                             Redirect
                           </button>
@@ -785,7 +782,7 @@ const Applications = () => {
               <button
                 onClick={() => handleApplicationAction(selectedApplication.id, selectedApplication.type, 'redirect')}
                 disabled={!redirectTo || processingId === selectedApplication.id}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white rounded-md hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
               >
                 {processingId === selectedApplication.id ? 'Processing...' : 'Redirect'}
               </button>
