@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
@@ -99,6 +99,28 @@ export default function SuperAdminDashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
 
+  const fetchUsers = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '10'
+      });
+      
+      const response = await fetch(`/api/admin/users/all?${params}`)
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(data.users)
+        setPagination(data.pagination)
+      } else {
+        console.error('Failed to fetch users:', response.status)
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [currentPage])
+
   useEffect(() => {
     if (status === 'loading') return
 
@@ -113,7 +135,7 @@ export default function SuperAdminDashboard() {
     }
 
     fetchUsers()
-  }, [status, session?.user?.role, router, currentPage])
+  }, [status, session?.user?.role, router, fetchUsers])
 
   // Handle filtering and sorting
   useEffect(() => {
@@ -167,28 +189,6 @@ export default function SuperAdminDashboard() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  const fetchUsers = async () => {
-    try {
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: '10'
-      });
-      
-      const response = await fetch(`/api/admin/users/all?${params}`)
-      if (response.ok) {
-        const data = await response.json()
-        setUsers(data.users)
-        setPagination(data.pagination)
-      } else {
-        console.error('Failed to fetch users:', response.status)
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleMakeEb = (user: User) => {
     setSelectedUser(user)
