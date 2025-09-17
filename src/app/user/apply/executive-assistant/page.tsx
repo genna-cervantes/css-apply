@@ -25,9 +25,12 @@ export default function AssistantApplication() {
           if (data.hasMemberApplication) {
             router.push("/user/apply/member/progress");
           } else if (data.hasCommitteeApplication) {
-            const committeeId = data.applications.committee?.firstOptionCommittee;
+            const committeeId =
+              data.applications.committee?.firstOptionCommittee;
             if (committeeId) {
-              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+              router.push(
+                `/user/apply/committee-staff/${committeeId}/progress`
+              );
             }
           } else if (data.hasEAApplication) {
             const ebRole = data.applications.ea?.firstOptionEb;
@@ -47,7 +50,7 @@ export default function AssistantApplication() {
   }
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
@@ -234,7 +237,7 @@ export default function AssistantApplication() {
               <button
                 type="button"
                 onClick={() => router.push("/user")}
-                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+                className="cursor-pointer hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
               >
                 Back
               </button>
@@ -245,7 +248,7 @@ export default function AssistantApplication() {
                       `/user/apply/executive-assistant/${selectedRole}/application`
                     )
                   }
-                  className="bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
+                  className="cursor-pointer bg-[#044FAF] text-white px-15 py-3 rounded-lg font-inter font-normal text-sm hover:bg-[#04387B] transition-colors"
                 >
                   Apply
                 </button>

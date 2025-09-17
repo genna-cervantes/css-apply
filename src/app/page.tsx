@@ -20,11 +20,11 @@ function HomeContent() {
   const handleEnterClick = async () => {
     setIsLoggingIn(true);
     try {
-      const result = await signIn("google", { 
-        callbackUrl, 
-        redirect: false 
+      const result = await signIn("google", {
+        callbackUrl,
+        redirect: false,
       });
-      
+
       if (result?.error) {
         console.error("Sign-in error:", result.error);
         // Redirect to error page with error details
@@ -46,11 +46,11 @@ function HomeContent() {
   const handleApplyClick = async (targetPath: string) => {
     setIsLoggingIn(true);
     try {
-      const result = await signIn("google", { 
-        callbackUrl: targetPath, 
-        redirect: false 
+      const result = await signIn("google", {
+        callbackUrl: targetPath,
+        redirect: false,
       });
-      
+
       if (result?.error) {
         console.error("Sign-in error:", result.error);
         router.push(`/auth/error?error=${encodeURIComponent(result.error)}`);
@@ -133,49 +133,49 @@ function HomeContent() {
     shape?: string;
   }> = [
     {
-      src: "/assets/partners/BiteSlice.jpg",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/BiteSlice.jpg",
       alt: "BiteSlice",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/profile.php?id=100064060713967",
     },
     {
-      src: "/assets/partners/HomeRoom.jpg",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/HomeRoom.jpg",
       alt: "HomeRoom",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/homeroomcoworkingph",
     },
     {
-      src: "/assets/partners/MindZone.jpg",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/MindZone.jpg",
       alt: "MindZone",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/mindzoneespanaph",
     },
     {
-      src: "/assets/partners/NomuCafe.png",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/NomuCafe.png",
       alt: "NomuCafe",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/nomuPH",
     },
     {
-      src: "/assets/partners/Sumu.jpg",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/Sumu.jpg",
       alt: "Sumu",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/sumuph",
     },
     {
-      src: "/assets/partners/TheCatalyst.jpg",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/TheCatalyst.jpg",
       alt: "TheCatalyst",
       size: "h-28 w-28",
       facebookUrl: "https://www.facebook.com/coworking.thecatalyst",
     },
     {
-      src: "/assets/partners/Yorokobi.jpg",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/Yorokobi.jpg",
       alt: "Yorokobi",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/yorokobimnl",
     },
     {
-      src: "/assets/partners/ZeroCafe.png",
+      src: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/partners/ZeroCafe.png",
       alt: "ZeroCafe",
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/ZeroCafePH",
@@ -200,7 +200,7 @@ function HomeContent() {
           >
             <div className="w-16 h-12 md:w-28 md:h-20  flex items-center justify-center">
               <Image
-                src="/assets/logos/Logo_CSS Apply.svg"
+                src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/Logo_CSS Apply.svg"
                 alt="CSS Apply Logo"
                 width={112}
                 height={80}
@@ -218,7 +218,7 @@ function HomeContent() {
                 <div className="w-1/6 h-full flex items-center justify-center">
                   {/* REF: Use next image instead of img */}
                   <Image
-                    src="/assets/pictures/landingpage/landingpage1.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -227,7 +227,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage2.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -236,7 +236,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage3.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -245,7 +245,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage4.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -254,7 +254,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage5.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage5.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -263,7 +263,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage6.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage6.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -275,7 +275,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage7.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage1.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -284,7 +284,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage8.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage2.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -293,7 +293,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage9.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage3.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -302,7 +302,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage10.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage4.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -311,7 +311,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage11.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage5.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -320,7 +320,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/6 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage12.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage6.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -372,7 +372,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage13.png"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage7.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -381,7 +381,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage14.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage8.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -390,7 +390,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage15.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage9.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -399,7 +399,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage16.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage10.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -408,7 +408,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage17.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage11.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -420,7 +420,7 @@ function HomeContent() {
               <div className="flex w-full h-full">
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage18.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage7.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -429,7 +429,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage19.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage8.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -438,7 +438,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage20.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage9.jpg"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -447,7 +447,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage21.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage10.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -456,7 +456,7 @@ function HomeContent() {
                 </div>
                 <div className="w-1/5 h-full flex items-center justify-center">
                   <Image
-                    src="/assets/pictures/landingpage/landingpage22.jpg"
+                    src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/landingpage/landingpage11.png"
                     alt="Landing page image"
                     width={400}
                     height={300}
@@ -523,35 +523,35 @@ function HomeContent() {
           <div className="flex-shrink-0 flex justify-center items-center">
             <div className="relative w-[450px] h-[450px] overflow-hidden rounded-lg shadow-lg">
               <Image
-                src="/assets/pictures/sec2_pic1.jpg"
+                src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/sec2_pic1.jpg"
                 alt="Slideshow image 1"
                 width={450}
                 height={450}
                 className="absolute inset-0 w-full h-full object-cover animate-slideshow"
               />
               <Image
-                src="/assets/pictures/sec2_pic2.jpg"
+                src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/sec2_pic2.jpg"
                 alt="Slideshow image 2"
                 width={450}
                 height={450}
                 className="absolute inset-0 w-full h-full object-cover animate-slideshow animation-delay-2s"
               />
               <Image
-                src="/assets/pictures/sec2_pic3.jpg"
+                src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/sec2_pic3.jpg"
                 alt="Slideshow image 3"
                 width={450}
                 height={450}
                 className="absolute inset-0 w-full h-full object-cover animate-slideshow animation-delay-4s"
               />
               <Image
-                src="/assets/pictures/sec2_pic4.jpg"
+                src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/sec2_pic4.jpg"
                 alt="Slideshow image 4"
                 width={450}
                 height={450}
                 className="absolute inset-0 w-full h-full object-cover animate-slideshow animation-delay-6s"
               />
               <Image
-                src="/assets/pictures/sec2_pic5.jpg"
+                src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/sec2_pic5.jpg"
                 alt="Slideshow image 5"
                 width={450}
                 height={450}
@@ -616,7 +616,7 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-center"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_mobile_pic1.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic1.png')",
             }}
           >
             <div className="p-5 ml-4 sm:ml-10 sm:w-[60%] md:w-[40%] md:ml-10 text-left text-white border-l-4 border-white">
@@ -634,7 +634,7 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_mobile_pic2.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic2.png')",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-1/2 sm:ml-4 md:ml-6">
@@ -654,7 +654,7 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_mobile_pic3.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic3.png')",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -673,7 +673,7 @@ function HomeContent() {
           <div
             className="relative w-full h-60 bg-cover bg-center flex items-end"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_mobile_pic4.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_mobile_pic4.png')",
             }}
           >
             <div className="p-5 text-left text-white flex flex-row h-1/2 sm:w-[60%] md:w-[50%] sm:ml-4 md:ml-6">
@@ -700,7 +700,7 @@ function HomeContent() {
           <div
             className="w-[28%] h-full bg-cover bg-center flex items-center pl-10"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_desktop_pic1.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic1.png')",
             }}
           >
             <div className="flex flex-col justify-end text-left text-white border-l-4 border-white h-[80%] w-[70%] pl-3 ">
@@ -718,7 +718,7 @@ function HomeContent() {
           <div
             className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_desktop_pic2.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic2.png')",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
@@ -734,7 +734,7 @@ function HomeContent() {
           <div
             className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_desktop_pic3.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic3.png')",
             }}
           >
             <div className="font-inter text-left text-white w-[83%] mb-14 ml-5 ">
@@ -750,7 +750,7 @@ function HomeContent() {
           <div
             className="relative w-[28%] h-full bg-cover bg-center flex flex-col justify-end"
             style={{
-              backgroundImage: "url('/assets/pictures/s4_desktop_pic4.png')",
+              backgroundImage: "url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/s4_desktop_pic4.png')",
             }}
           >
             <div className="font-inter text-left text-white w-[80%] mb-14 ml-5">
@@ -833,7 +833,7 @@ function HomeContent() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
             <div className="flex-shrink-0 order-2 lg:order-1">
               <Image
-                src="/assets/logos/csar.png"
+                src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/csar.png"
                 alt="CSAR Logo"
                 width={300}
                 height={300}
@@ -880,7 +880,7 @@ function HomeContent() {
       <section className="bg-white lg:bg-white px-5 py-9">
         <div
           className="relative overflow-hidden flex flex-col justify-center items-center rounded-xl bg-center bg-cover"
-          style={{ backgroundImage: "url('/assets/pictures/csspromo.gif')" }}
+          style={{ backgroundImage: "url('/assets/csspromo.gif')" }}
         >
           <div className="absolute inset-0 bg-[#00459C]/60"></div>
           <div className="relative py-30 px-10 z-10 flex flex-col justify-center items-center">

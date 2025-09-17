@@ -53,13 +53,23 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Try sending schedule confirmation email (non-blocking for response)
+        // Send email notification with meeting link when schedule is selected
         try {
-            const emailTemplate = emailTemplates.scheduleCommitteeInterview(
+            // Get the EB profile for the interviewer to get their meeting link
+            const ebProfile = await prisma.eBProfile.findFirst({
+                where: { 
+                    position: interviewBy 
+                }
+            });
+
+            const meetingLink = ebProfile?.meetingLink || null;
+
+            const emailTemplate = emailTemplates.committeeApplication(
                 user.name ?? 'Applicant',
-                interviewSlotDay,
-                interviewSlotTimeStart,
-                interviewSlotTimeEnd,
+                user.committeeApplication.studentNumber,
+                user.committeeApplication.firstOptionCommittee,
+                user.committeeApplication.secondOptionCommittee,
+                meetingLink || undefined,
                 interviewBy
             );
             await sendEmail(user.email, emailTemplate.subject, emailTemplate.html);

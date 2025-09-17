@@ -43,7 +43,8 @@ export default function CommitteeApplication() {
         // Prefill first and last name from Google session
         const fullName = session?.user?.name || "";
         if (fullName) {
-          const { firstName: extractedFirstName, lastName: extractedLastName } = parseFullName(fullName);
+          const { firstName: extractedFirstName, lastName: extractedLastName } =
+            parseFullName(fullName);
           setFormData((prev) => ({
             ...prev,
             firstName: prev.firstName || extractedFirstName,
@@ -83,9 +84,12 @@ export default function CommitteeApplication() {
           if (data.hasMemberApplication) {
             router.push("/user/apply/member/progress");
           } else if (data.hasCommitteeApplication) {
-            const committeeId = data.applications.committee?.firstOptionCommittee;
+            const committeeId =
+              data.applications.committee?.firstOptionCommittee;
             if (committeeId) {
-              router.push(`/user/apply/committee-staff/${committeeId}/progress`);
+              router.push(
+                `/user/apply/committee-staff/${committeeId}/progress`
+              );
             }
           } else if (data.hasEAApplication) {
             const ebRole = data.applications.ea?.firstOptionEb;
@@ -110,18 +114,18 @@ export default function CommitteeApplication() {
 
   const getCommitteeImage = (committeeId: string) => {
     const imageMap: { [key: string]: string } = {
-      academics: "/assets/committee_test/CSAR_ACADEMICS.png",
-      community: "/assets/committee_test/CSAR_COMMDEV.png",
-      creatives: "/assets/committee_test/CSAR_CREATIVES.png",
-      documentation: "/assets/committee_test/CSAR_DOCU.png",
-      external: "/assets/committee_test/CSAR_EXTERNALS.png",
-      finance: "/assets/committee_test/CSAR_FINANCE.png",
-      logistics: "/assets/committee_test/CSAR_LOGISTICS.png",
-      publicity: "/assets/committee_test/CSAR_PUBLICITY.png",
-      sports: "/assets/committee_test/CSAR_SPOTA.png",
-      technology: "/assets/committee_test/CSAR_TECHDEV.png",
+      academics: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_ACADEMICS.png",
+      community: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_COMMDEV.png",
+      creatives: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_CREATIVES.png",
+      documentation: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_DOCU.png",
+      external: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_EXTERNALS.png",
+      finance: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_FINANCE.png",
+      logistics: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_LOGISTICS.png",
+      publicity: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_PUBLICITY.png",
+      sports: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_SPOTA.png",
+      technology: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_TECHDEV.png",
     };
-    return imageMap[committeeId] || "/assets/committee_test/Questions CSAR.png";
+    return imageMap[committeeId] || "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/Questions CSAR.png";
   };
 
   useEffect(() => {
@@ -140,6 +144,9 @@ export default function CommitteeApplication() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
+
+  const requiresPortfolio = (committeeKey?: string) =>
+    ["creatives", "technology", "documentation"].includes(committeeKey || "");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -193,8 +200,8 @@ export default function CommitteeApplication() {
     }
 
     if (
-      (selectedCommittee?.id === "creatives" ||
-        selectedCommittee?.id === "technology") &&
+      (requiresPortfolio(selectedCommittee?.id) ||
+        requiresPortfolio(formData.secondChoice)) &&
       !formData.portfolioLink
     ) {
       setError("Please upload or wait for your Portfolio to finish uploading");
@@ -272,11 +279,11 @@ export default function CommitteeApplication() {
 
     try {
       const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-      uploadFormData.append('studentNumber', formData.studentNumber);
-      uploadFormData.append('section', formData.section);
-      uploadFormData.append('fileType', type);
-      uploadFormData.append('applicationType', 'committee');
+      uploadFormData.append("file", file);
+      uploadFormData.append("studentNumber", formData.studentNumber);
+      uploadFormData.append("section", formData.section);
+      uploadFormData.append("fileType", type);
+      uploadFormData.append("applicationType", "committee");
 
       const response = await fetch("/api/files/upload", {
         method: "POST",
@@ -337,7 +344,7 @@ export default function CommitteeApplication() {
   }
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
@@ -592,8 +599,8 @@ export default function CommitteeApplication() {
                     )}
                   </div>
                 </div>
-                {(selectedCommittee.id === "creatives" ||
-                  selectedCommittee.id === "technology") && (
+                {(requiresPortfolio(selectedCommittee.id) ||
+                  requiresPortfolio(formData.secondChoice)) && (
                   <div className="flex gap-4 lg:gap-2 items-center">
                     <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                       Portfolio (in pdf):
@@ -631,7 +638,8 @@ export default function CommitteeApplication() {
                                 if (file.size > 10 * 1024 * 1024) {
                                   setUploadError((prev) => ({
                                     ...prev,
-                                    cv: "File size must be less than 10MB",
+                                    portfolio:
+                                      "File size must be less than 10MB",
                                   }));
                                   return;
                                 }
@@ -712,14 +720,14 @@ export default function CommitteeApplication() {
               <button
                 type="button"
                 onClick={() => router.push("/user/apply/committee-staff")}
-                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+                className="cursor-pointer hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Submitting..." : "Next"}
               </button>

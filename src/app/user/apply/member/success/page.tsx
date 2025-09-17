@@ -18,7 +18,7 @@ function SuccessPageContent() {
           {/* CSAR Excited Image */}
           <div>
             <Image
-              src="/assets/pictures/CSAR_Excited.png"
+              src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/CSAR_Excited.png"
               alt="CSAR Excited"
               width={150}
               height={150}

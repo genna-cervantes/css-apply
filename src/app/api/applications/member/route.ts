@@ -128,6 +128,7 @@ export async function GET() {
             hasApplication: !!user.memberApplication,
             application: user.memberApplication,
             user: {
+                id: user.id,
                 studentNumber: user.studentNumber,
                 name: user.name,
                 section: user.section

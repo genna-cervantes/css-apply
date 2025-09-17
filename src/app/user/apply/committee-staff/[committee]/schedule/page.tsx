@@ -1,6 +1,6 @@
 "use client";
 
-import {  useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 // import { useSession } from "next-auth/react";
 import Header from "@/components/Header";
@@ -15,7 +15,7 @@ import { getRoleId } from "@/lib/eb-mapping";
 function SchedulePageContent() {
   const router = useRouter();
   const { committee: committeeId } = useParams<{ committee: string }>();
-  
+
   // State for scheduling
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<
@@ -47,7 +47,6 @@ function SchedulePageContent() {
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-
   // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -68,36 +67,53 @@ function SchedulePageContent() {
   }, [showModal]);
 
   const fetchUnavailableSlots = useCallback(async () => {
-
-    const ebForInterview = await fetch(`/api/applications/committee-staff/eb/${committeeId}`);
+    const ebForInterview = await fetch(
+      `/api/applications/committee-staff/eb/${committeeId}`
+    );
     const ebRes = await ebForInterview.json();
     const ebForInterviewData = ebRes.ebs;
 
-    const ebUnavailabilityMap = await Promise.all(ebForInterviewData.map(async (eb: {position: string}) => {
-      // Fetch unavailable slots
-      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${getRoleId(eb.position)}`);
-      const unavailableData = await unavailableResponse.json();
-      const unavailableSlots = unavailableData.unavailableSlotsData.map((slot: {date: string; startTime: string; endTime: string}) => `${slot.date}-${slot.startTime}-${slot.endTime}`);
-      
-      // Fetch existing interview bookings
-      const interviewSlotsResponse = await fetch(`/api/admin/interview-slots/${eb.position}`);
-      const interviewSlotsData = await interviewSlotsResponse.json();
-      const bookedSlots = interviewSlotsData.success ? interviewSlotsData.slots.map((slot: {day: string; timeStart: string; timeEnd: string}) => `${slot.day}-${slot.timeStart}-${slot.timeEnd}`) : [];
-      
-      return {
-        eb: eb.position,
-        unavailableSlots: new Set(unavailableSlots),
-        bookedSlots: new Set(bookedSlots)
-      };
-    }));
+    const ebUnavailabilityMap = await Promise.all(
+      ebForInterviewData.map(async (eb: { position: string }) => {
+        // Fetch unavailable slots
+        const unavailableResponse = await fetch(
+          `/api/admin/unavailable-slots/${getRoleId(eb.position)}`
+        );
+        const unavailableData = await unavailableResponse.json();
+        const unavailableSlots = unavailableData.unavailableSlotsData.map(
+          (slot: { date: string; startTime: string; endTime: string }) =>
+            `${slot.date}-${slot.startTime}-${slot.endTime}`
+        );
+
+        // Fetch existing interview bookings
+        const interviewSlotsResponse = await fetch(
+          `/api/admin/interview-slots/${eb.position}`
+        );
+        const interviewSlotsData = await interviewSlotsResponse.json();
+        const bookedSlots = interviewSlotsData.success
+          ? interviewSlotsData.slots.map(
+              (slot: { day: string; timeStart: string; timeEnd: string }) =>
+                `${slot.day}-${slot.timeStart}-${slot.timeEnd}`
+            )
+          : [];
+
+        return {
+          eb: eb.position,
+          unavailableSlots: new Set(unavailableSlots),
+          bookedSlots: new Set(bookedSlots),
+        };
+      })
+    );
 
     // Create a flattened set for backward compatibility
-    const flattenedSlots = ebUnavailabilityMap.flatMap(item => Array.from(item.unavailableSlots));
-    
+    const flattenedSlots = ebUnavailabilityMap.flatMap((item) =>
+      Array.from(item.unavailableSlots)
+    );
+
     return {
       unavailableSlots: new Set(flattenedSlots),
       ebUnavailabilityMap,
-      allEbs: ebForInterviewData.map((eb: {position: string}) => eb.position)
+      allEbs: ebForInterviewData.map((eb: { position: string }) => eb.position),
     };
   }, [committeeId]);
 
@@ -121,9 +137,13 @@ function SchedulePageContent() {
       const hardcodedDates = [];
       const today = new Date();
       const endDate = new Date(2025, 8, 26); // September 26, 2025
-      
+
       // Generate dates from today until September 26
-      for (let date = new Date(today); date <= endDate; date.setDate(date.getDate() + 1)) {
+      for (
+        let date = new Date(today);
+        date <= endDate;
+        date.setDate(date.getDate() + 1)
+      ) {
         hardcodedDates.push(new Date(date));
       }
 
@@ -138,71 +158,99 @@ function SchedulePageContent() {
         // Generate time slots from 7 AM to 9 PM in 30-minute increments
         for (let hour = 7; hour < 21; hour++) {
           for (let minute = 0; minute < 60; minute += 30) {
-            const timeStr = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+            const timeStr = `${hour.toString().padStart(2, "0")}:${minute
+              .toString()
+              .padStart(2, "0")}`;
             const startTime = new Date(date);
             startTime.setHours(hour, minute, 0, 0);
 
             // Skip slots that are in the past for today's date
-            if (date.toDateString() === now.toDateString() && startTime.getTime() <= now.getTime()) {
+            if (
+              date.toDateString() === now.toDateString() &&
+              startTime.getTime() <= now.getTime()
+            ) {
               continue;
             }
 
             const endTime = new Date(startTime);
             endTime.setMinutes(startTime.getMinutes() + 30);
-            
-            const endTimeStr = `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`;
+
+            const endTimeStr = `${endTime
+              .getHours()
+              .toString()
+              .padStart(2, "0")}:${endTime
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")}`;
             const slotId = `${dateStr}-${timeStr}-${endTimeStr}`;
-            
+
             // Find which EBs are available for this time slot
             const availableEBsForSlot = allEbs.filter((eb: string) => {
-              const ebData = ebUnavailabilityMap.find(item => item.eb === eb);
+              const ebData = ebUnavailabilityMap.find((item) => item.eb === eb);
               if (!ebData) return true; // If no data, assume available
-              
+
               const slotEndTime = new Date(startTime);
               slotEndTime.setMinutes(startTime.getMinutes() + 30);
-              const endTimeStr = `${slotEndTime.getHours().toString().padStart(2, "0")}:${slotEndTime.getMinutes().toString().padStart(2, "0")}`;
-              
+              const endTimeStr = `${slotEndTime
+                .getHours()
+                .toString()
+                .padStart(2, "0")}:${slotEndTime
+                .getMinutes()
+                .toString()
+                .padStart(2, "0")}`;
+
               // Check if this time slot is already booked for this EB
               const slotKey = `${dateStr}-${timeStr}-${endTimeStr}`;
               if (ebData.bookedSlots.has(slotKey)) {
                 return false; // EB is already booked at this time
               }
-              
+
               // Check if this EB is unavailable at this time slot
-              return !(Array.from(ebData.unavailableSlots) as string[]).some((unavailableSlot: string) => {
-                const parts = unavailableSlot.split('-');
-                if (parts.length >= 4) {
-                  const unavailableDate = `${parts[0]}-${parts[1]}-${parts[2]}`;
-                  const unavailableStartTime = parts[3];
-                  const unavailableEndTime = parts[4];
-                  
-                  // Check if the date matches and the time is within the range
-                  if (unavailableDate === dateStr) {
-                    const slotTimeMinutes = hour * 60 + minute;
-                    const [startHour, startMinute] = unavailableStartTime.split(':').map(Number);
-                    const [endHour, endMinute] = unavailableEndTime.split(':').map(Number);
-                    const startTimeMinutes = startHour * 60 + startMinute;
-                    const endTimeMinutes = endHour * 60 + endMinute;
-                    
-                    // Check if slot time is within the unavailable range
-                    return slotTimeMinutes >= startTimeMinutes && slotTimeMinutes < endTimeMinutes;
+              return !(Array.from(ebData.unavailableSlots) as string[]).some(
+                (unavailableSlot: string) => {
+                  const parts = unavailableSlot.split("-");
+                  if (parts.length >= 4) {
+                    const unavailableDate = `${parts[0]}-${parts[1]}-${parts[2]}`;
+                    const unavailableStartTime = parts[3];
+                    const unavailableEndTime = parts[4];
+
+                    // Check if the date matches and the time is within the range
+                    if (unavailableDate === dateStr) {
+                      const slotTimeMinutes = hour * 60 + minute;
+                      const [startHour, startMinute] = unavailableStartTime
+                        .split(":")
+                        .map(Number);
+                      const [endHour, endMinute] = unavailableEndTime
+                        .split(":")
+                        .map(Number);
+                      const startTimeMinutes = startHour * 60 + startMinute;
+                      const endTimeMinutes = endHour * 60 + endMinute;
+
+                      // Check if slot time is within the unavailable range
+                      return (
+                        slotTimeMinutes >= startTimeMinutes &&
+                        slotTimeMinutes < endTimeMinutes
+                      );
+                    }
                   }
+                  return false;
                 }
-                return false;
-              });
+              );
             });
 
-             // Only add slots if at least one EB is available
-             // Hide slots when ALL EBs are unavailable (no one can conduct interviews)
-             if (availableEBsForSlot.length > 0) {
+            // Only add slots if at least one EB is available
+            // Hide slots when ALL EBs are unavailable (no one can conduct interviews)
+            if (availableEBsForSlot.length > 0) {
               // Randomly assign one EB from the available EBs
-              const randomIndex = Math.floor(Math.random() * availableEBsForSlot.length);
+              const randomIndex = Math.floor(
+                Math.random() * availableEBsForSlot.length
+              );
               const assignedEB = availableEBsForSlot[randomIndex];
-              
+
               slots.push({
                 id: slotId,
                 start: startTime.toISOString(),
-                end: endTime.toISOString(),
+                end: endTimeStr,
                 date: dateStr,
                 time: timeStr,
                 isBooked: false, // All slots start as available
@@ -297,7 +345,7 @@ function SchedulePageContent() {
               interviewSlotDay: selectedSlotData.date,
               interviewSlotTimeStart: selectedSlotData.time,
               interviewSlotTimeEnd: selectedSlotData.end,
-              interviewBy: selectedSlotData.assignedEB
+              interviewBy: selectedSlotData.assignedEB,
             }),
           }
         );
@@ -369,7 +417,7 @@ function SchedulePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center my-12 lg:my-28">
@@ -439,9 +487,11 @@ function SchedulePageContent() {
 
             {/* Scheduling Section */}
             <div className="lg:mb-8 mt-5 lg:mt-8 flex flex-col items-center justify-center w-full">
-               <p className="text-black text-xs lg:text-md font-bold text-center mb-3 lg:mb-6 font-inter">
-                 Click on any available slot to reserve your interview schedule. Each slot shows the EB who will conduct your interview. Slots are available when at least one EB is free.
-               </p>
+              <p className="text-black text-xs lg:text-md font-bold text-center mb-3 lg:mb-6 font-inter">
+                Click on any available slot to reserve your interview schedule.
+                Each slot shows the EB who will conduct your interview. Slots
+                are available when at least one EB is free.
+              </p>
 
               {isLoading ? (
                 <div className="flex justify-center items-center py-12">
@@ -632,7 +682,7 @@ function SchedulePageContent() {
                     `/user/apply/committee-staff/${committeeId}/application`
                   )
                 }
-                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+                className="cursor-pointer hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
               >
                 Back
               </button>
@@ -640,7 +690,7 @@ function SchedulePageContent() {
                 type="button"
                 onClick={handleSubmitClick}
                 disabled={!selectedSlot}
-                className={`whitespace-nowrap font-inter text-sm font-semibold px-15 py-3 rounded-lg border-2 transition-all duration-150 active:scale-95 ${
+                className={` cursor-pointer whitespace-nowrap font-inter text-sm font-semibold px-15 py-3 rounded-lg border-2 transition-all duration-150 active:scale-95 ${
                   selectedSlot
                     ? "text-[#134687] border-[#134687] bg-white hover:bg-[#B1CDF0]"
                     : "text-gray-400 border-gray-300 bg-gray-100 cursor-not-allowed"

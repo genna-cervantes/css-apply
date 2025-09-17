@@ -149,7 +149,7 @@ export default function MemberApplication() {
   };
 
   return (
-    <div className="min-h-screen md:bg-[rgb(243,243,253)] md:bg-[url('/assets/pictures/background.png')] flex flex-col justify-between bg-cover bg-repeat">
+    <div className="min-h-screen md:bg-[rgb(243,243,253)] md:bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] flex flex-col justify-between bg-cover bg-repeat">
       <Header />
 
       <section className="flex flex-col justify-between items-center px-20 py-10 lg:px-50 lg:py-20">
@@ -279,7 +279,7 @@ export default function MemberApplication() {
             <div className="hidden lg:flex justify-center items-center mt-8">
               <div className="relative w-[300px] h-[360px]">
                 <Image
-                  src="/assets/pictures/MemberImage.jpg"
+                  src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/MemberImage1.png"
                   alt="Member"
                   fill
                   sizes="300px"

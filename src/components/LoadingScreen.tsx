@@ -9,16 +9,16 @@ export default function LoadingScreen() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const committeeImages = [
-    "/assets/committee_test/CSAR_ACADEMICS.png",
-    "/assets/committee_test/CSAR_COMMDEV.png",
-    "/assets/committee_test/CSAR_CREATIVES.png",
-    "/assets/committee_test/CSAR_DOCU.png",
-    "/assets/committee_test/CSAR_EXTERNALS.png",
-    "/assets/committee_test/CSAR_FINANCE.png",
-    "/assets/committee_test/CSAR_LOGISTICS.png",
-    "/assets/committee_test/CSAR_PUBLICITY.png",
-    "/assets/committee_test/CSAR_SPOTA.png",
-    "/assets/committee_test/CSAR_TECHDEV.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_ACADEMICS.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_COMMDEV.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_CREATIVES.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_DOCU.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_EXTERNALS.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_FINANCE.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_LOGISTICS.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_PUBLICITY.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_SPOTA.png",
+    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_TECHDEV.png",
   ];
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function LoadingScreen() {
           }
         }
       `}</style>
-      <div className="fixed inset-0 bg-[#F6F6FE] bg-[url('/assets/pictures/loadingscreen_background.png')] bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center z-50">
+      <div className="fixed inset-0 bg-[#F6F6FE] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/loadingscreen_background.png')] bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center z-50">
         {/* Committee Image Animation */}
         <div className="mb-8 flex items-center justify-center transition-all duration-500 ease-in-out">
           <div className="relative w-[150px] h-[150px] flex items-center justify-center group">

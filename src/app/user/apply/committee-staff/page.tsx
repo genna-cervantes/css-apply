@@ -14,22 +14,22 @@ export default function StaffApplication() {
 
   const getCommitteeImage = (committeeId: string) => {
     const imageMap: { [key: string]: string } = {
-      academics: "/assets/committee_test/CSAR_ACADEMICS.png",
-      community: "/assets/committee_test/CSAR_COMMDEV.png",
-      creatives: "/assets/committee_test/CSAR_CREATIVES.png",
-      documentation: "/assets/committee_test/CSAR_DOCU.png",
-      external: "/assets/committee_test/CSAR_EXTERNALS.png",
-      finance: "/assets/committee_test/CSAR_FINANCE.png",
-      logistics: "/assets/committee_test/CSAR_LOGISTICS.png",
-      publicity: "/assets/committee_test/CSAR_PUBLICITY.png",
-      sports: "/assets/committee_test/CSAR_SPOTA.png",
-      technology: "/assets/committee_test/CSAR_TECHDEV.png",
+      academics: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_ACADEMICS.png",
+      community: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_COMMDEV.png",
+      creatives: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_CREATIVES.png",
+      documentation: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_DOCU.png",
+      external: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_EXTERNALS.png",
+      finance: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_FINANCE.png",
+      logistics: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_LOGISTICS.png",
+      publicity: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_PUBLICITY.png",
+      sports: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_SPOTA.png",
+      technology: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_TECHDEV.png",
     };
-    return imageMap[committeeId] || "/assets/committee_test/Questions CSAR.png";
+    return imageMap[committeeId] || "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/Questions CSAR.png";
   };
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat  flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat  flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
@@ -183,8 +183,9 @@ export default function StaffApplication() {
                         <Image
                           src={getCommitteeImage(selectedRole)}
                           alt={
-                            committeeRolesRequirements.find((r) => r.id === selectedRole)
-                              ?.title || "Committee"
+                            committeeRolesRequirements.find(
+                              (r) => r.id === selectedRole
+                            )?.title || "Committee"
                           }
                           fill
                           sizes="(max-width: 1024px) 100vw, 40vw"
@@ -203,7 +204,7 @@ export default function StaffApplication() {
                       </div>
                       <div className="w-full lg:w-2/5 h-80 overflow-hidden relative">
                         <Image
-                          src="/assets/committee_test/Questions CSAR.png"
+                          src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/Questions CSAR.png"
                           alt="Select a committee"
                           fill
                           sizes="(max-width: 1024px) 100vw, 40vw"
@@ -222,7 +223,7 @@ export default function StaffApplication() {
               <button
                 type="button"
                 onClick={() => router.push("/user")}
-                className="hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+                className="cursor-pointer hidden lg:block bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
               >
                 Back
               </button>
@@ -234,11 +235,11 @@ export default function StaffApplication() {
                       `/user/apply/committee-staff/${selectedRole}/application`
                     )
                   }
-                  className="whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
+                  className="cursor-pointer whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95"
                 >
                   Apply
                 </button>
-              )}  
+              )}
             </div>
           </div>
         </div>

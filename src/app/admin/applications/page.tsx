@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
@@ -36,13 +36,16 @@ interface Application {
   paymentProof?: string;
 }
 
+// Cache for EB data to prevent unnecessary API calls
+const ebDataCache = new Map<string, {position: string; timestamp: number}>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 const Applications = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [applications, setApplications] = useState<{committee: Application[], ea: Application[], member: Application[]}>({committee: [], ea: [], member: []});
   const [loading, setLoading] = useState(false);
   const [selectedType] = useState<'member' | 'committee' | 'ea'>('member');
-  const [selectedStatus] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [showRedirectModal, setShowRedirectModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
@@ -51,7 +54,52 @@ const Applications = () => {
   const [showCommitteeApplications, setShowCommitteeApplications] = useState(true);
   const [showEaApplications, setShowEaApplications] = useState(true);
   const [showMemberApplications, setShowMemberApplications] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  // Memoized EB data fetching with caching
+  const getEBData = useCallback(async (id: string) => {
+    // Check cache first
+    const cached = ebDataCache.get(id);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setEbData(cached);
+      return cached;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/eb-profiles/${id}`);
+      const data = await response.json();
+      const ebProfile = data.ebProfile;
+      
+      // Cache the result
+      ebDataCache.set(id, { ...ebProfile, timestamp: Date.now() });
+      setEbData(ebProfile);
+      return ebProfile;
+    } catch (error) {
+      console.error('Error fetching EB data:', error);
+      return null;
+    }
+  }, []);
+
+  // Memoized applications fetching with caching
+  const fetchApplications = useCallback(async (position: string) => {
+    if (!position) return;
+    
+    try {
+      setLoading(true);
+      
+      const response = await fetch(`/api/admin/applications/${position}`);
+      if (response.ok) {
+        const data = await response.json();
+        setApplications(data.applications);
+      }
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Optimized initialization effect
   useEffect(() => {
     if (status === 'loading') return;
 
@@ -65,39 +113,23 @@ const Applications = () => {
       return;
     }
 
-    getEBData(session?.user?.dbId);
-  }, [status, session, router]);
-
-  const fetchApplications = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      const response = await fetch(`/api/admin/applications/${ebData?.position}`);
-      if (response.ok) {
-        const data = await response.json();
-        setApplications(data.applications);
-      }
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-    } finally {
-      setLoading(false);
+    // Initialize only once
+    if (!isInitialized && session?.user?.dbId) {
+      setIsInitialized(true);
+      getEBData(session.user.dbId).then((ebProfile) => {
+        if (ebProfile?.position) {
+          fetchApplications(ebProfile.position);
+        }
+      });
     }
-  }, [ebData?.position]);
+  }, [status, session?.user?.role, session?.user?.dbId, isInitialized, getEBData, fetchApplications, router]);
 
-  // Separate useEffect for fetching applications when ebData is available
-  useEffect(() => {
-    if (ebData) {
-      fetchApplications();
+  // Memoized application action handler
+  const handleApplicationAction = useCallback(async (applicationId: string, type: 'committee' | 'ea' | 'member', action: 'accept' | 'reject' | 'redirect' | 'evaluate') => {
+    if (type === 'member' && action === 'evaluate') {
+      return;
     }
-  }, [ebData, selectedType, selectedStatus, fetchApplications]);
-
-  const getEBData = async (id: string) => {
-    const response = await fetch(`/api/admin/eb-profiles/${id}`);
-    const data = await response.json();
-    setEbData(data.ebProfile);
-  };
-
-  const handleApplicationAction = async (applicationId: string, type: 'committee' | 'ea' | 'member', action: 'accept' | 'reject' | 'redirect' | 'evaluate') => {
+    
     try {
       setProcessingId(applicationId);
       
@@ -120,7 +152,10 @@ const Applications = () => {
       });
 
       if (response.ok) {
-        await fetchApplications(); // Refresh the list
+        // Only refetch if we have EB data
+        if (ebData?.position) {
+          await fetchApplications(ebData.position);
+        }
         setShowRedirectModal(false);
         setSelectedApplication(null);
         setRedirectTo('');
@@ -134,9 +169,10 @@ const Applications = () => {
     } finally {
       setProcessingId(null);
     }
-  };
+  }, [redirectTo, ebData?.position, fetchApplications]);
 
-  const getStatusBadge = (application: Application) => {
+  // Memoized status badge component
+  const getStatusBadge = useCallback((application: Application) => {
     if (application.type === 'member') {
       if (application.hasAccepted === true) {
         return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
@@ -158,9 +194,10 @@ const Applications = () => {
     } else {
       return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pending</span>;
     }
-  }; 
+  }, []);
 
-  const getApplicationDetails = (application: Application) => {
+  // Memoized application details component
+  const getApplicationDetails = useCallback((application: Application) => {
     if (selectedType === 'member') {
       return (
         <div className="text-sm text-gray-600">
@@ -197,9 +234,18 @@ const Applications = () => {
         </div>
       );
     }
-  };
+  }, [selectedType]);
 
-  if (loading) {
+  // Memoized application counts
+  const applicationCounts = useMemo(() => ({
+    member: applications.member.length,
+    committee: applications.committee.length,
+    ea: applications.ea.length,
+    total: applications.member.length + applications.committee.length + applications.ea.length
+  }), [applications]);
+
+  // Show loading only for initial load
+  if (loading && !isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center">
@@ -245,7 +291,7 @@ const Applications = () => {
               <div className="flex justify-between items-center bg-green-600 text-white p-4 rounded-md">
                 <div className="flex gap-2 items-center">
                   <h2 className="font-semibold">Member Applications</h2>
-                  <p>({applications.member.length})</p>
+                  <p>({applicationCounts.member})</p>
                 </div>
                 <button onClick={() => setShowMemberApplications(!showMemberApplications)}>
                   {!showMemberApplications ? <LucideChevronUp /> : <LucideChevronDown />}
@@ -273,13 +319,6 @@ const Applications = () => {
                     <div className="flex gap-2 ml-4">
                       {(!application.hasAccepted) && (
                         <>
-                          <button
-                            onClick={() => handleApplicationAction(application.id, 'member', 'evaluate')}
-                            disabled={processingId === application.id}
-                            className="px-3 py-1 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 disabled:opacity-50"
-                          >
-                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
-                          </button>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'member', 'accept')}
                             disabled={processingId === application.id}
@@ -311,7 +350,7 @@ const Applications = () => {
               <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-md">
                 <div className="flex gap-2 items-center">
                   <h2 className="font-semibold">Committee Applications</h2>
-                  <p>({applications.committee.length})</p>
+                  <p>({applicationCounts.committee})</p>
                 </div>
                 <button onClick={() => setShowCommitteeApplications(!showCommitteeApplications)}>
                   {!showCommitteeApplications ? <LucideChevronUp /> : <LucideChevronDown />}
@@ -380,6 +419,34 @@ const Applications = () => {
                           </button>
                         </>
                       )}
+                      {(application.status === 'evaluating' || application.status === 'failed' || application.status === 'redirected') && !application.hasAccepted && (
+                        <>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'committee', 'accept')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                          </button>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'committee', 'reject')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowRedirectModal(true)
+                              setSelectedApplication(application)
+                            }}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-yellow-600 text-white text-sm rounded-md hover:bg-yellow-700 disabled:opacity-50"
+                          >
+                            Redirect
+                          </button>
+                        </>
+                      )}
                       {application.hasAccepted && (
                         <div className="text-sm text-green-600 font-semibold">
                           Member ID: {application.user.id.toUpperCase()}
@@ -404,7 +471,7 @@ const Applications = () => {
               <div className="flex justify-between items-center bg-blue-600 text-white p-4 rounded-md">
                 <div className="flex gap-2 items-center">
                   <h2 className="font-semibold">Executive Assistant Applications</h2>
-                  <p>({applications.ea.length})</p>
+                  <p>({applicationCounts.ea})</p>
                 </div>
                 <button onClick={() => setShowEaApplications(!showEaApplications)}>
                   {!showEaApplications ? <LucideChevronUp /> : <LucideChevronDown />}
@@ -442,6 +509,34 @@ const Applications = () => {
                           >
                             {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Accept'}
+                          </button>
+                          <button
+                            onClick={() => handleApplicationAction(application.id, 'ea', 'reject')}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {processingId === application.id ? 'Processing...' : 'Reject'}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowRedirectModal(true)
+                              setSelectedApplication(application)
+                            }}
+                            disabled={processingId === application.id}
+                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 disabled:opacity-50"
+                          >
+                            Redirect
+                          </button>
+                        </>
+                      )}
+                      {(application.status === 'evaluating' || application.status === 'failed' || application.status === 'redirected') && !application.hasAccepted && (
+                        <>
                           <button
                             onClick={() => handleApplicationAction(application.id, 'ea', 'accept')}
                             disabled={processingId === application.id}

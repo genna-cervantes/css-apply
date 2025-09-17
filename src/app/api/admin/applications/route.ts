@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEmail, emailTemplates } from "@/lib/email";
 
 // GET applications with filtering
 export async function GET(request: NextRequest) {
@@ -233,6 +234,21 @@ export async function PUT(request: NextRequest) {
             },
           },
         });
+
+        // Send acceptance email
+        if (updatedApplication?.user?.email && updatedApplication?.user?.name && updatedApplication?.user?.id) {
+          try {
+            const emailTemplate = emailTemplates.memberAccepted(
+              updatedApplication.user.name,
+              updatedApplication.user.id
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Acceptance email sent to ${updatedApplication.user.email} for member application`);
+          } catch (emailError) {
+            console.error('Failed to send acceptance email:', emailError);
+            // Don't fail the request if email fails
+          }
+        }
       } else if (action === "reject") {
         updatedApplication = await prisma.memberApplication.update({
           where: { id: applicationId },
@@ -298,6 +314,46 @@ export async function PUT(request: NextRequest) {
           },
         },
       });
+
+      // Send appropriate email based on action
+      if (updatedApplication?.user?.email && updatedApplication?.user?.name) {
+        try {
+          if (action === "accept" && updatedApplication?.user?.id && updatedApplication?.firstOptionCommittee) {
+            const emailTemplate = emailTemplates.committeeAccepted(
+              updatedApplication.user.name,
+              updatedApplication.user.id,
+              updatedApplication.firstOptionCommittee
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Acceptance email sent to ${updatedApplication.user.email} for committee application`);
+          } else if (action === "reject" && updatedApplication?.firstOptionCommittee) {
+            const emailTemplate = emailTemplates.committeeRejected(
+              updatedApplication.user.name,
+              updatedApplication.firstOptionCommittee
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Rejection email sent to ${updatedApplication.user.email} for committee application`);
+          } else if (action === "redirect" && updatedApplication?.firstOptionCommittee && redirection) {
+            const emailTemplate = emailTemplates.committeeRedirected(
+              updatedApplication.user.name,
+              updatedApplication.firstOptionCommittee,
+              redirection
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Redirection email sent to ${updatedApplication.user.email} for committee application`);
+          } else if (action === "evaluate" && updatedApplication?.firstOptionCommittee) {
+            const emailTemplate = emailTemplates.committeeEvaluating(
+              updatedApplication.user.name,
+              updatedApplication.firstOptionCommittee
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Evaluation email sent to ${updatedApplication.user.email} for committee application`);
+          }
+        } catch (emailError) {
+          console.error('Failed to send email:', emailError);
+          // Don't fail the request if email fails
+        }
+      }
     } else if (type === "ea") {
       const updateData: {hasAccepted?: boolean; status?: string; redirection?: string} = {};
 
@@ -329,6 +385,46 @@ export async function PUT(request: NextRequest) {
           },
         },
       });
+
+      // Send appropriate email based on action
+      if (updatedApplication?.user?.email && updatedApplication?.user?.name) {
+        try {
+          if (action === "accept" && updatedApplication?.user?.id && updatedApplication?.ebRole) {
+            const emailTemplate = emailTemplates.executiveAssistantAccepted(
+              updatedApplication.user.name,
+              updatedApplication.user.id,
+              updatedApplication.ebRole
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Acceptance email sent to ${updatedApplication.user.email} for EA application`);
+          } else if (action === "reject" && updatedApplication?.ebRole) {
+            const emailTemplate = emailTemplates.executiveAssistantRejected(
+              updatedApplication.user.name,
+              updatedApplication.ebRole
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Rejection email sent to ${updatedApplication.user.email} for EA application`);
+          } else if (action === "redirect" && updatedApplication?.ebRole && redirection) {
+            const emailTemplate = emailTemplates.executiveAssistantRedirected(
+              updatedApplication.user.name,
+              updatedApplication.ebRole,
+              redirection
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Redirection email sent to ${updatedApplication.user.email} for EA application`);
+          } else if (action === "evaluate" && updatedApplication?.ebRole) {
+            const emailTemplate = emailTemplates.executiveAssistantEvaluating(
+              updatedApplication.user.name,
+              updatedApplication.ebRole
+            );
+            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+            console.log(`Evaluation email sent to ${updatedApplication.user.email} for EA application`);
+          }
+        } catch (emailError) {
+          console.error('Failed to send email:', emailError);
+          // Don't fail the request if email fails
+        }
+      }
     } else {
       return NextResponse.json(
         { error: "Invalid application type" },

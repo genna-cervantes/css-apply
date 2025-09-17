@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from "@/components/AdminMobileSB";
@@ -15,10 +15,13 @@ import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
+// Cache for EB data to prevent unnecessary API calls
+const ebDataCache = new Map<string, {userId: string; position: string; committees: string[]; isActive: boolean; timestamp: number}>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 const Schedule = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [showCalendar, setShowCalendar] = useState(false);
   const [unavailableTimeSlots, setUnavailableTimeSlots] = useState<
     Array<{
@@ -47,12 +50,13 @@ const Schedule = () => {
     position: string;
     committees: string[];
     isActive: boolean;
-} | null>(null);
+  } | null>(null);
   const [scheduleIsLoading, setScheduleIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const calendarRef = useRef<FullCalendar>(null);
 
-  // Helper function to format date and time for display
-  const formatDateTime = (dateStr: string, timeSlot: string) => {
+  // Memoized helper function to format date and time for display
+  const formatDateTime = useCallback((dateStr: string, timeSlot: string) => {
     const date = new Date(dateStr);
     const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
     const monthDay = date.toLocaleDateString("en-US", {
@@ -78,22 +82,43 @@ const Schedule = () => {
       startTime: formatTime(startTime),
       endTime: formatTime(endTime),
     };
-  };
+  }, []);
 
+  // Memoized EB data fetching with caching
   const getEBData = useCallback(async (id: string) => {
+    if (!id) return;
+    
+    // Check cache first
+    const cached = ebDataCache.get(id);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setEbProfile({
+        userId: cached.userId,
+        position: cached.position,
+        committees: cached.committees,
+        isActive: cached.isActive,
+      });
+      return cached;
+    }
+    
     try{
       const ebData = await fetch(`/api/admin/eb-profiles/${id}`, {
         method: "GET",
       });
       const parsedEBData = await ebData.json();      
-      setEbProfile({
+      const ebProfileData = {
         userId: parsedEBData.ebProfile.userId,
         position: parsedEBData.ebProfile.position,
         committees: parsedEBData.ebProfile.committees,
         isActive: parsedEBData.ebProfile.isActive,
-      });
+      };
+      
+      // Cache the result
+      ebDataCache.set(id, { ...ebProfileData, timestamp: Date.now() });
+      setEbProfile(ebProfileData);
+      return ebProfileData;
     }catch(error){
       console.error("Error getting EB data:", error);
+      return null;
     }
   }, []);
 
@@ -239,20 +264,25 @@ const Schedule = () => {
     setCalendarEvents(events);
   }, [unavailableTimeSlots, interviewSlots]);
 
+  // Memoized calendar events to prevent unnecessary re-renders
+  const memoizedCalendarEvents = useMemo(() => {
+    return calendarEvents;
+  }, [calendarEvents]);
+
+  // Optimized effect for calendar events
   useEffect(() => {
     if (unavailableTimeSlots.length > 0 || interviewSlots.length > 0) {
       generateCalendarEvents();
     }
   }, [unavailableTimeSlots, interviewSlots, generateCalendarEvents]);
 
-  const fetchSlots = useCallback(async () => {
-    if (!ebProfile) return;
+  const fetchSlots = useCallback(async (position: string) => {
+    if (!position) return;
     
     try {
-      setLoading(true);
       
       // Fetch unavailable slots
-      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${ebProfile.position}`, {
+      const unavailableResponse = await fetch(`/api/admin/unavailable-slots/${position}`, {
         method: "GET",
       });
       const unavailableRes = await unavailableResponse.json();
@@ -260,7 +290,7 @@ const Schedule = () => {
       setUnavailableTimeSlots(unavailableRes.unavailableSlotsData);
 
       // Fetch interview slots
-      const interviewResponse = await fetch(`/api/admin/interview-slots/${ebProfile.position}`, {
+      const interviewResponse = await fetch(`/api/admin/interview-slots/${position}`, {
         method: "GET",
       });
       const interviewRes = await interviewResponse.json();
@@ -272,11 +302,10 @@ const Schedule = () => {
       setShowCalendar(true);
     } catch (error) {
       console.error("Error generating slots:", error);
-    } finally {
-      setLoading(false);
     }
-  }, [ebProfile]);
+  }, []);
 
+  // Optimized initialization effect
   useEffect(() => {
     if (status === "loading") return;
 
@@ -293,17 +322,18 @@ const Schedule = () => {
       return;
     }
 
-    setScheduleIsLoading(true);
-    getEBData(session?.user?.dbId);
-  }, [status, session, router, getEBData]);
-
-  // Separate useEffect for fetching slots when ebProfile is available
-  useEffect(() => {
-    if (ebProfile) {
-      fetchSlots();
-      setScheduleIsLoading(false);
+    // Initialize only once
+    if (!isInitialized && session?.user?.dbId) {
+      setIsInitialized(true);
+      setScheduleIsLoading(true);
+      getEBData(session.user.dbId).then((ebProfile) => {
+        if (ebProfile?.position) {
+          fetchSlots(ebProfile.position);
+        }
+        setScheduleIsLoading(false);
+      });
     }
-  }, [ebProfile, fetchSlots]);
+  }, [status, session?.user?.role, session?.user?.dbId, isInitialized, getEBData, fetchSlots, router]);
 
   const handleCreateSlot = async () => {
     if (unavailableTimeSlots.length === 0) {
@@ -344,7 +374,9 @@ const Schedule = () => {
       // setUnavailableTimeSlots([]);
       // setCalendarEvents([]);
       setShowConfirmModal(false);
-      await fetchSlots();
+      if (ebProfile?.position) {
+        await fetchSlots(ebProfile.position);
+      }
       alert("Unavailable time slots saved successfully!");
     } catch (error) {
       console.error("Error creating unavailable slots:", error);
@@ -354,7 +386,8 @@ const Schedule = () => {
     }
   };
 
-  if (status === "loading" || loading || !ebProfile || scheduleIsLoading) {
+  // Only show loading for initial load
+  if (status === "loading" || (scheduleIsLoading && !isInitialized)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center">
@@ -514,7 +547,7 @@ const Schedule = () => {
                     selectMirror={true}
                     dayMaxEvents={true}
                     moreLinkClick="popover"
-                    events={calendarEvents}
+                    events={memoizedCalendarEvents}
                     select={handleDateSelect}
                     eventClick={handleEventClick}
                     selectOverlap={false}

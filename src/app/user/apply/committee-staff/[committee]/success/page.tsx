@@ -47,7 +47,7 @@ function SuccessPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(243,243,253)] bg-[url('/assets/pictures/background.png')] bg-cover  bg-no-repeat">
+    <div className="min-h-screen bg-[rgb(243,243,253)] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover  bg-no-repeat">
       <Header />
 
       <section>
@@ -55,7 +55,7 @@ function SuccessPageContent() {
           {/* CSAR Excited Image */}
           <div>
             <Image
-              src="/assets/pictures/CSAR_Excited.png"
+              src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/CSAR_Excited.png"
               alt="CSAR Excited"
               width={150}
               height={150}

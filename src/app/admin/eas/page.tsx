@@ -71,7 +71,7 @@ const EAs = () => {
     }
 
     fetchEAs();
-  }, [status, session, router, selectedStatus, fetchEAs]);
+  }, [status, session?.user?.role, selectedStatus, fetchEAs, router]);
 
   const getStatusBadge = (ea: EA) => {
     if (ea.hasAccepted) {

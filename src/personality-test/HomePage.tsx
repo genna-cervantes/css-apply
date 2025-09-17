@@ -42,7 +42,7 @@ const HomePage: React.FC<HomePageProps> = ({ onStartQuiz }) => {
                 </div>
 
                 <div className={styles['home-central-content']}>
-                    <Image src="/assets/committee_test/Questions CSAR.png" alt="An illustration with a question mark, representing the quiz" className={styles['home-main-image']} width={400} height={400} />
+                    <Image src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/Questions CSAR.png" alt="An illustration with a question mark, representing the quiz" className={styles['home-main-image']} width={400} height={400} />
                     <div className={styles['home-text-content']}>
                         <h1 className={styles['home-title']}>Not Sure Which Committee You Belong To?</h1>
                         <p className={styles['home-subtitle']}>The best way to find your passion and skills is to get involved and try things out!</p>

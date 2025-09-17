@@ -50,7 +50,7 @@ export default function ErrorPage({
   };
 
   return (
-    <div className="min-h-screen bg-[rgb(243,243,253)] bg-[url('/assets/pictures/background.png')] bg-cover bg-no-repeat">
+    <div className="min-h-screen bg-[rgb(243,243,253)] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-no-repeat">
       <Header />
 
       <section className="flex flex-col items-center justify-center py-8 sm:py-12 lg:py-20 px-4 sm:px-6 lg:px-8">
@@ -58,7 +58,7 @@ export default function ErrorPage({
           {/* Error Icon/Image */}
           <div className="mb-8">
             <Image
-              src="/assets/pictures/CSAR_Sad.png"
+              src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/CSAR_Sad.png"
               alt="Error"
               width={150}
               height={150}

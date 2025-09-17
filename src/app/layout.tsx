@@ -29,9 +29,9 @@ export const metadata: Metadata = {
   },
   description: "CSS Apply Recruitment 101 Portal",
   icons: {
-    icon: "/assets/logos/Logo_CSS Apply.svg",
-    shortcut: "/assets/logos/Logo_CSS Apply.svg",
-    apple: "/assets/logos/Logo_CSS Apply.svg",
+    icon: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/Logo_CSS Apply.svg",
+    shortcut: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/Logo_CSS Apply.svg",
+    apple: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/Logo_CSS Apply.svg",
   },
 };
 

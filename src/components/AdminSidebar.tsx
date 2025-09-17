@@ -24,7 +24,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
       <div className="pt-12 pb-8 px-6 border-b">
         <div className="flex items-center justify-center">
           <Image
-            src="/assets/logos/Logo_CSS Apply.svg"
+            src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/Logo_CSS Apply.svg"
             alt="CSS Apply Logo"
             width={120}
             height={40}

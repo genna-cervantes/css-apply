@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Add domains if you're loading external images
-    domains: [],
+    domains: ["odjmlznlgvuslhceobtz.supabase.co"],
     // Increase memory limit for image optimization
     minimumCacheTTL: 60,
     // Handle large images better
