@@ -74,6 +74,9 @@ export default function SuperAdminDashboard() {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   // REF: search params instead of state so mag ppersist ung search/filter term
   const [searchTerm, setSearchTerm] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState<User[]>([])
+  const [isGlobalSearch, setIsGlobalSearch] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showEbForm, setShowEbForm] = useState(false)
   const [ebForm, setEbForm] = useState<EBProfileForm>({
@@ -130,6 +133,47 @@ export default function SuperAdminDashboard() {
     }
   }, [currentPage])
 
+  // Search users function
+  const searchUsers = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsGlobalSearch(false);
+      setIsSearching(false);
+      return;
+    }
+    
+    try {
+      setIsSearching(true);
+      const response = await fetch(`/api/admin/users/search?q=${encodeURIComponent(query)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.users);
+        setIsGlobalSearch(true);
+        console.log('Search results:', data.users);
+      }
+    } catch (error) {
+      console.error('Error searching users:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Handle search input change with debouncing
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchTerm(query);
+    if (query.trim()) {
+      // Debounce search by 300ms
+      const timeoutId = setTimeout(() => {
+        searchUsers(query);
+      }, 300);
+      
+      return () => clearTimeout(timeoutId);
+    } else {
+      setIsGlobalSearch(false);
+      setSearchResults([]);
+    }
+  }, [searchUsers]);
+
   useEffect(() => {
     if (status === 'loading') return
 
@@ -148,7 +192,10 @@ export default function SuperAdminDashboard() {
 
   // Handle filtering and sorting
   useEffect(() => {
-    const filtered = users.filter(user =>
+    // Use search results if we're doing a global search, otherwise use regular filtering
+    const sourceUsers = isGlobalSearch ? searchResults : users;
+    
+    const filtered = sourceUsers.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.studentNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -193,7 +240,7 @@ export default function SuperAdminDashboard() {
     })
 
     setFilteredUsers(filtered)
-  }, [searchTerm, users, sortField, sortDirection])
+  }, [searchTerm, users, searchResults, isGlobalSearch, sortField, sortDirection])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -530,11 +577,26 @@ export default function SuperAdminDashboard() {
               type="text"
               placeholder="Search users by name, email, student number, or position..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="block w-full pl-10 pr-3 py-3 border-2 border-[#005FD9] rounded-md leading-5 bg-white placeholder-[#134687] focus:outline-none focus:placeholder-[#044FAF] focus:ring-1 focus:ring-[#044FAF] focus:border-[#044FAF]"
             />
           </div>
         </div>
+
+        {/* Search Status */}
+        {searchTerm.trim() && (
+          <div className="mb-4">
+            <p className="text-sm text-gray-600">
+              {isSearching ? (
+                'Searching...'
+              ) : isGlobalSearch ? (
+                `Found ${filteredUsers.length} result(s) for "${searchTerm}" across all users`
+              ) : (
+                `Showing ${filteredUsers.length} result(s) for "${searchTerm}" on current page`
+              )}
+            </p>
+          </div>
+        )}
 
         {/* Users List - Mobile Cards / Desktop Table */}
         <div className="bg-white shadow overflow-hidden rounded-lg border-2 border-[#005FD9]">
@@ -857,7 +919,7 @@ export default function SuperAdminDashboard() {
           </div>
 
           {/* PAGINATION */}
-          {filteredUsers.length > 0 && pagination.totalPages > 1 && (
+          {filteredUsers.length > 0 && pagination.totalPages > 1 && !isGlobalSearch && (
             <div className="bg-white rounded-xl shadow-sm border-2 border-[#FFFFFF] p-6 mt-6">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">

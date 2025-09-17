@@ -69,26 +69,46 @@ const Applications = () => {
   const [showEaApplications, setShowEaApplications] = useState(false);
   const [showMemberApplications, setShowMemberApplications] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<{
+    committee: Application[];
+    ea: Application[];
+    member: Application[];
+  }>({
+    committee: [],
+    ea: [],
+    member: [],
+  });
+
+  // Clear EB data cache
+  const clearEBCache = useCallback((id: string) => {
+    ebDataCache.delete(id);
+    console.log(`Cleared EB cache for user ${id}`);
+  }, []);
 
   // Memoized EB data fetching with caching
-  const getEBData = useCallback(async (id: string) => {
-    // Check cache first
-    const cached = ebDataCache.get(id);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      setEbData(cached);
-      return cached;
+  const getEBData = useCallback(async (id: string, forceRefresh = false) => {
+    // Check cache first (unless force refresh is requested)
+    if (!forceRefresh) {
+      const cached = ebDataCache.get(id);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        setEbData(cached);
+        return cached;
+      }
     }
 
     try {
       // Add cache-busting timestamp
       const timestamp = Date.now();
-      const response = await fetch(`/api/admin/eb-profiles/${id}?t=${timestamp}`);
+      const response = await fetch(`/api/admin/eb-profiles/${id}?t=${timestamp}&force=${forceRefresh}`);
       const data = await response.json();
       const ebProfile = data.ebProfile;
       
       // Cache the result
       ebDataCache.set(id, { ...ebProfile, timestamp: Date.now() });
       setEbData(ebProfile);
+      console.log(`Fetched fresh EB data for user ${id}: position=${ebProfile?.position}`);
       return ebProfile;
     } catch (error) {
       console.error('Error fetching EB data:', error);
@@ -117,6 +137,42 @@ const Applications = () => {
     }
   }, []);
 
+  // Search applications function
+  const searchApplications = useCallback(async (query: string, position: string) => {
+    if (!query.trim() || !position) {
+      setSearchResults({ committee: [], ea: [], member: [] });
+      setIsSearching(false);
+      return;
+    }
+    
+    try {
+      setIsSearching(true);
+      const response = await fetch(`/api/admin/applications/search?q=${encodeURIComponent(query)}&position=${encodeURIComponent(position)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.applications);
+        console.log('Search results:', data.applications);
+      }
+    } catch (error) {
+      console.error('Error searching applications:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Handle search input change with debouncing
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchQuery(query);
+    if (ebData?.position) {
+      // Debounce search by 300ms
+      const timeoutId = setTimeout(() => {
+        searchApplications(query, ebData.position);
+      }, 300);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [ebData?.position, searchApplications]);
+
   // Optimized initialization effect
   useEffect(() => {
     if (status === 'loading') return;
@@ -134,8 +190,11 @@ const Applications = () => {
     // Initialize only once
     if (!isInitialized && session?.user?.dbId) {
       setIsInitialized(true);
+      console.log('Initializing applications page for user:', session.user.dbId);
       getEBData(session.user.dbId).then((ebProfile) => {
+        console.log('Initial EB profile:', ebProfile);
         if (ebProfile?.position) {
+          console.log('Fetching applications for position:', ebProfile.position);
           fetchApplications(ebProfile.position);
         }
       });
@@ -254,12 +313,15 @@ const Applications = () => {
   };
 
   // Memoized application counts
-  const applicationCounts = useMemo(() => ({
-    member: applications.member.length,
-    committee: applications.committee.length,
-    ea: applications.ea.length,
-    total: applications.member.length + applications.committee.length + applications.ea.length
-  }), [applications]);
+  const applicationCounts = useMemo(() => {
+    const currentApplications = searchQuery.trim() ? searchResults : applications;
+    return {
+      member: currentApplications.member.length,
+      committee: currentApplications.committee.length,
+      ea: currentApplications.ea.length,
+      total: currentApplications.member.length + currentApplications.committee.length + currentApplications.ea.length
+    };
+  }, [applications, searchResults, searchQuery]);
 
   // Show loading for initial load or when data is being fetched
   if (loading) {
@@ -288,30 +350,103 @@ const Applications = () => {
             <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit">
               All Applications
             </div>
-            <button
-              onClick={() => {
-                if (ebData?.position) {
-                  fetchApplications(ebData.position);
-                }
-              }}
-              className="px-4 py-2 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-sm rounded-md hover:from-[#04387B] hover:to-[#0f3a6b] transition-all duration-200"
-            >
-              Refresh
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  if (session?.user?.id) {
+                    // Clear cache and force refresh
+                    clearEBCache(session.user.id);
+                    getEBData(session.user.id, true).then((freshEbData) => {
+                      if (freshEbData?.position) {
+                        fetchApplications(freshEbData.position);
+                      }
+                    });
+                  }
+                }}
+                className="px-4 py-2 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-sm rounded-md hover:from-[#04387B] hover:to-[#0f3a6b] transition-all duration-200"
+              >
+                Refresh
+              </button>
+              <button
+                onClick={() => {
+                  if (session?.user?.id) {
+                    // Force refresh position data
+                    clearEBCache(session.user.id);
+                    getEBData(session.user.id, true).then((freshEbData) => {
+                      console.log('Fresh EB data:', freshEbData);
+                      if (freshEbData?.position) {
+                        fetchApplications(freshEbData.position);
+                      }
+                    });
+                  }
+                }}
+                className="px-4 py-2 bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white text-sm rounded-md hover:from-[#E55A2B] hover:to-[#CC4A1F] transition-all duration-200"
+                title="Force refresh your position data (use if you recently changed positions)"
+              >
+                Refresh Position
+              </button>
+            </div>
           </div>
-          <p className="text-black text-xs lg:text-lg font-Inter font-light leading-5 mb-4 md:mb-6">
+          <p className="text-black text-xs lg:text-lg font-Inter font-light leading-5 mb-2">
             Review and manage all applications from students for CSS Apply
           </p>
+          {ebData?.position && (
+            <p className="text-sm text-gray-600 mb-4">
+              Current Position: <span className="font-semibold text-[#044FAF]">{ebData.position}</span>
+            </p>
+          )}
+          
+          {/* SEARCH BAR */}
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <input
+                type="text"
+                placeholder="Search by name, student number, or email..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="w-full px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#044FAF] focus:border-transparent"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              {isSearching && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#044FAF]"></div>
+                </div>
+              )}
+            </div>
+            {searchQuery.trim() && (
+              <p className="text-sm text-gray-600 mt-2">
+                {isSearching ? 'Searching...' : `Found ${applicationCounts.total} result(s) for "${searchQuery}"`}
+              </p>
+            )}
+          </div>
+          
           <hr className="border-[#005FD9]" />
         </div>
 
         {/* APPLICATIONS LIST */}
         <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6 mb-6 min-h-[calc(100vh-180px)] md:min-h-[calc(100vh-280px)]">
-          {applications.committee.length === 0 && applications.ea.length === 0 && applications.member.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No applications under your position found</p>
-            </div>
-          ) : (
+          {(() => {
+            const currentApplications = searchQuery.trim() ? searchResults : applications;
+            const hasApplications = currentApplications.committee.length > 0 || currentApplications.ea.length > 0 || currentApplications.member.length > 0;
+            
+            if (!hasApplications) {
+              return (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">
+                    {searchQuery.trim() 
+                      ? `No applications found for "${searchQuery}"` 
+                      : "No applications under your position found"
+                    }
+                  </p>
+                </div>
+              );
+            }
+            
+            return (
             <>
             <div className="space-y-3">
               <div className="flex justify-between items-center bg-gradient-to-r from-[#044FAF] to-[#134687] text-white p-3 rounded-md">
@@ -324,7 +459,7 @@ const Applications = () => {
                 </button>
               </div>
 
-              {showMemberApplications && applications.member.map((application) => (
+              {showMemberApplications && currentApplications.member.map((application) => (
                 <div key={application.id} className="border-2 border-[#005FD9] rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
@@ -389,7 +524,7 @@ const Applications = () => {
                 </button>
               </div>
 
-              {showCommitteeApplications && applications.committee.map((application) => (
+              {showCommitteeApplications && currentApplications.committee.map((application) => (
                 <div key={application.id} className="border-2 border-[#005FD9] rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
@@ -546,7 +681,7 @@ const Applications = () => {
                 </button>
               </div>
 
-              {showEaApplications && applications.ea.map((application) => (
+              {showEaApplications && currentApplications.ea.map((application) => (
                 <div key={application.id} className="border-2 border-[#005FD9] rounded-lg p-3 hover:shadow-sm transition-shadow bg-white">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                     <div className="flex-1 min-w-0">
@@ -684,7 +819,8 @@ const Applications = () => {
               ))}
             </div>
             </>
-          )}
+            );
+          })()}
         </div>
       </div>
 
