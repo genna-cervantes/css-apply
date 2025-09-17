@@ -156,12 +156,7 @@ function HomeContent() {
       size: "h-20 w-20",
       facebookUrl: "https://www.facebook.com/nomuPH",
     },
-    {
-      src: "/assets/partners/Sumu.jpg",
-      alt: "Sumu",
-      size: "h-20 w-20",
-      facebookUrl: "https://www.facebook.com/sumuph",
-    },
+
     {
       src: "/assets/partners/TheCatalyst.jpg",
       alt: "TheCatalyst",
