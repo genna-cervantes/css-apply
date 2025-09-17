@@ -214,12 +214,9 @@ export async function GET(request: NextRequest) {
         ];
         console.log('No-schedule filter applied for EA applications:', whereClause);
       } else if (status === 'all' || !status) {
-        // For 'all' status or no status, exclude accepted/rejected/redirected applications
-        whereClause.NOT = [
-          { hasAccepted: true, status: 'passed' }, // Exclude truly accepted applications
-          { status: 'failed' }, // Exclude rejected applications
-          { status: 'redirected' } // Exclude redirected applications
-        ];
+        // For 'all' status or no status, show ALL applications (no filtering)
+        // This is for the EA and Committee Staff tabs that should show all applications
+        console.log('EA All status - showing all applications');
       }
 
       // Get total count for pagination
@@ -314,13 +311,9 @@ export async function GET(request: NextRequest) {
         ];
         console.log('No-schedule filter applied for Committee applications:', whereClause);
       } else if (status === 'all' || !status) {
-        // For 'all' status or no status, exclude accepted/rejected/redirected applications
-        whereClause.NOT = [
-          { hasAccepted: true, status: 'passed' }, // Exclude truly accepted applications
-          { status: 'failed' }, // Exclude rejected applications
-          { status: 'redirected' } // Exclude redirected applications
-        ];
-        console.log('Committee All/No status filter applied (excluding accepted/rejected/redirected):', whereClause);
+        // For 'all' status or no status, show ALL applications (no filtering)
+        // This is for the EA and Committee Staff tabs that should show all applications
+        console.log('Committee All status - showing all applications');
       }
 
       // Get total count for pagination
