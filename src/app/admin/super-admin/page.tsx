@@ -689,26 +689,26 @@ export default function SuperAdminDashboard() {
                 const displayRole = pendingRole || user.role
                 
                 return (
-                  <div key={user.id} className="p-4 hover:bg-gray-50">
+                  <div key={user.id} className="p-4 hover:bg-[#F3F3FD] transition-colors duration-200">
                     <div className="flex flex-col space-y-3">
                       {/* User Info */}
                       <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                            <span className="text-indigo-800 font-semibold">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#044FAF] to-[#134687] flex items-center justify-center border-2 border-[#005FD9]">
+                            <span className="text-white font-bold text-sm">
                               {user.name[0]?.toUpperCase()}
                             </span>
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-gray-900 truncate">
+                          <div className="text-sm font-semibold text-[#134687] truncate">
                             {user.name}
                           </div>
-                          <div className="text-sm text-gray-500 truncate">
+                          <div className="text-xs text-[#134687] truncate">
                             {user.email}
                           </div>
                           {user.studentNumber && (
-                            <div className="text-sm text-gray-500">
+                            <div className="text-xs text-[#044FAF] font-medium">
                               {user.studentNumber}
                             </div>
                           )}
@@ -718,25 +718,25 @@ export default function SuperAdminDashboard() {
                       {/* Role Information */}
                       <div className="flex flex-col space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium text-gray-500">Current Role:</span>
+                          <span className="text-xs font-medium text-[#134687]">Current Role:</span>
                           <div className="flex items-center space-x-2">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeClass(user.role)}`}>
-                              {user.role}
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getRoleBadgeClass(user.role)}`}>
+                              {user.role.replace('_', ' ').toUpperCase()}
                             </span>
                             {pendingRole && (
-                              <span className="text-xs text-indigo-600">
-                                (Changing...)
+                              <span className="inline-flex items-center px-1 py-1 rounded-full text-xs font-medium bg-[#FFE7B4] text-[#5B4515] border border-[#FFBC2B]">
+                                Changing...
                               </span>
                             )}
                           </div>
                         </div>
                         
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium text-gray-500">New Role:</span>
+                          <span className="text-xs font-medium text-[#134687]">New Role:</span>
                           <select
                             value={displayRole}
                             onChange={(e) => handleRoleChange(user.id, user.role, e.target.value)}
-                            className="block w-32 pl-2 pr-8 py-1 text-xs border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                            className="block w-32 pl-1 pr-6 py-1 text-xs border-2 border-[#005FD9] focus:outline-none focus:ring-[#044FAF] focus:border-[#044FAF] rounded-md"
                           >
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
@@ -748,61 +748,74 @@ export default function SuperAdminDashboard() {
                       {/* EB Information */}
                       <div className="flex flex-col space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium text-gray-500">EB Position:</span>
+                          <span className="text-xs font-medium text-[#134687]">EB Position:</span>
                           {user.ebProfile?.position ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-[#044FAF] to-[#134687] text-white border border-[#005FD9]">
                               {user.ebProfile.position}
                             </span>
                           ) : (
-                            <span className="text-gray-400 text-xs">-</span>
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] border border-[#005FD9]">
+                              No Position
+                            </span>
                           )}
                         </div>
                         
                         <div className="flex flex-col space-y-1">
-                          <span className="text-xs font-medium text-gray-500">Committees:</span>
+                          <span className="text-xs font-medium text-[#134687]">Committees:</span>
                           {user.ebProfile?.committees.length ? (
                             <div className="flex flex-wrap gap-1">
                               {user.ebProfile.committees.slice(0, 3).map(committee => (
-                                <span key={committee} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                <span key={committee} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gradient-to-r from-[#044FAF] to-[#134687] text-white border border-[#005FD9]">
                                   {committee}
                                 </span>
                               ))}
                               {user.ebProfile.committees.length > 3 && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] border border-[#005FD9]">
                                   +{user.ebProfile.committees.length - 3} more
                                 </span>
                               )}
                             </div>
                           ) : (
-                            <span className="text-gray-400 text-xs">-</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] text-[#134687] border border-[#005FD9]">
+                              No Committees
+                            </span>
                           )}
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
-                        <span className="text-xs font-medium text-gray-500">Actions:</span>
+                      <div className="flex flex-col space-y-2 pt-2 border-t border-[#E8F2FF]">
+                        <span className="text-xs font-medium text-[#134687]">Actions:</span>
                         <div className="flex flex-wrap gap-2">
                           {user.ebProfile ? (
                             <>
                               <button
                                 onClick={() => handleMakeEb(user)}
-                                className="px-3 py-1 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100"
+                                className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#134687] bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] border border-[#005FD9] rounded hover:bg-gradient-to-r hover:from-[#044FAF] hover:to-[#134687] hover:text-white focus:outline-none focus:ring-1 focus:ring-[#044FAF] transition-all duration-200"
                               >
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
                                 Edit EB
                               </button>
                               <button
                                 onClick={() => handleRemoveEb(user.id)}
-                                className="px-3 py-1 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100"
+                                className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded hover:bg-red-100 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200"
                               >
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                                 Remove EB
                               </button>
                             </>
                           ) : (
                             <button
                               onClick={() => handleMakeEb(user)}
-                              className="px-3 py-1 text-xs font-medium text-green-600 bg-green-50 rounded-md hover:bg-green-100"
+                              className="inline-flex items-center px-2 py-1 text-xs font-medium text-[#134687] bg-gradient-to-r from-[#E8F2FF] to-[#F3F3FD] border border-[#005FD9] rounded hover:bg-gradient-to-r hover:from-[#044FAF] hover:to-[#134687] hover:text-white focus:outline-none focus:ring-1 focus:ring-[#044FAF] transition-all duration-200"
                             >
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
                               Make EB
                             </button>
                           )}
@@ -819,37 +832,37 @@ export default function SuperAdminDashboard() {
         {/* Confirmation Dialog */}
         {showConfirmDialog && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
-              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 mx-auto">
-                <svg className="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl border-2 border-[#005FD9]">
+              <div className="flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-r from-[#044FAF] to-[#134687] mx-auto">
+                <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="mt-3 text-center sm:mt-5">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                <h3 className="text-lg leading-6 font-medium text-[#134687]">
                   Confirm Role Changes
                 </h3>
                 <div className="mt-2">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[#134687]">
                     You are about to change roles for {pendingChanges.length} user(s). Please review the changes below:
                   </p>
                 </div>
                 
-                <div className="mt-4 max-h-60 overflow-y-auto border-t border-b border-gray-200 py-4">
+                <div className="mt-4 max-h-60 overflow-y-auto border-t border-b border-[#E8F2FF] py-4">
                   {pendingChanges.map((change, index) => {
                     const user = users.find(u => u.id === change.userId)
                     return (
-                      <div key={index} className="mb-3 p-3 bg-gray-50 rounded-md">
-                        <div className="font-medium text-gray-900">{user?.name}</div>
+                      <div key={index} className="mb-3 p-3 bg-gradient-to-r from-[#F3F3FD] to-[#E8F2FF] rounded-md border border-[#005FD9]">
+                        <div className="font-medium text-[#134687]">{user?.name}</div>
                         <div className="flex items-center mt-1">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeClass(change.oldRole)}`}>
-                            {change.oldRole}
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getRoleBadgeClass(change.oldRole)}`}>
+                            {change.oldRole.replace('_', ' ').toUpperCase()}
                           </span>
-                          <svg className="mx-2 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="mx-2 h-4 w-4 text-[#134687]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                           </svg>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeClass(change.newRole)}`}>
-                            {change.newRole}
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getRoleBadgeClass(change.newRole)}`}>
+                            {change.newRole.replace('_', ' ').toUpperCase()}
                           </span>
                         </div>
                       </div>
@@ -861,14 +874,14 @@ export default function SuperAdminDashboard() {
                 <button
                   type="button"
                   onClick={confirmRoleChanges}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#044FAF] text-base font-medium text-white hover:bg-[#04387B] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#044FAF] sm:col-start-2 sm:text-sm transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98"
                 >
                   Confirm Changes
                 </button>
                 <button
                   type="button"
                   onClick={cancelRoleChanges}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border-2 border-[#005FD9] shadow-sm px-4 py-2 bg-white text-base font-medium text-[#134687] hover:bg-[#F3F3FD] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#044FAF] sm:mt-0 sm:col-start-1 sm:text-sm transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98"
                 >
                   Cancel
                 </button>
