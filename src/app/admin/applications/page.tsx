@@ -80,7 +80,9 @@ const Applications = () => {
     }
 
     try {
-      const response = await fetch(`/api/admin/eb-profiles/${id}`);
+      // Add cache-busting timestamp
+      const timestamp = Date.now();
+      const response = await fetch(`/api/admin/eb-profiles/${id}?t=${timestamp}`);
       const data = await response.json();
       const ebProfile = data.ebProfile;
       
@@ -101,7 +103,9 @@ const Applications = () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/api/admin/applications/${position}`);
+      // Add cache-busting timestamp to ensure fresh data
+      const timestamp = Date.now();
+      const response = await fetch(`/api/admin/applications/${position}?t=${timestamp}`);
       if (response.ok) {
         const data = await response.json();
         setApplications(data.applications);
@@ -280,8 +284,20 @@ const Applications = () => {
       <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12">
         {/* PAGE HEADER */}
         <div className="mb-8 mt-12 md:mt-8 text-center md:text-left">
-          <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit mb-4">
-            All Applications
+          <div className="flex justify-between items-center mb-4">
+            <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit">
+              All Applications
+            </div>
+            <button
+              onClick={() => {
+                if (ebData?.position) {
+                  fetchApplications(ebData.position);
+                }
+              }}
+              className="px-4 py-2 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-sm rounded-md hover:from-[#04387B] hover:to-[#0f3a6b] transition-all duration-200"
+            >
+              Refresh
+            </button>
           </div>
           <p className="text-black text-xs lg:text-lg font-Inter font-light leading-5 mb-4 md:mb-6">
             Review and manage all applications from students for CSS Apply
@@ -466,7 +482,7 @@ const Applications = () => {
                             disabled={processingId === application.id}
                             className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Evaluated'}
+                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
                         </div>
                       )}
@@ -615,7 +631,7 @@ const Applications = () => {
                             disabled={processingId === application.id}
                             className="px-2 py-1 bg-gradient-to-r from-[#044FAF] to-[#134687] text-white text-xs rounded hover:from-[#04387B] hover:to-[#0f3a6b] disabled:opacity-50 transition-all duration-200"
                           >
-                            {processingId === application.id ? 'Processing...' : 'Evaluated'}
+                            {processingId === application.id ? 'Processing...' : 'Evaluate'}
                           </button>
                         </div>
                       )}

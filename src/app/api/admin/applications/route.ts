@@ -213,8 +213,14 @@ export async function GET(request: NextRequest) {
           { interviewSlotTimeStart: '' }
         ];
         console.log('No-schedule filter applied for EA applications:', whereClause);
+      } else if (status === 'all' || !status) {
+        // For 'all' status or no status, exclude accepted/rejected/redirected applications
+        whereClause.NOT = [
+          { hasAccepted: true, status: 'passed' }, // Exclude truly accepted applications
+          { status: 'failed' }, // Exclude rejected applications
+          { status: 'redirected' } // Exclude redirected applications
+        ];
       }
-      // If status is 'all' or not provided, no filter is applied for EA applications
 
       // Get total count for pagination
       const totalCount = await prisma.eAApplication.count({
@@ -307,8 +313,15 @@ export async function GET(request: NextRequest) {
           { interviewSlotTimeStart: '' }
         ];
         console.log('No-schedule filter applied for Committee applications:', whereClause);
+      } else if (status === 'all' || !status) {
+        // For 'all' status or no status, exclude accepted/rejected/redirected applications
+        whereClause.NOT = [
+          { hasAccepted: true, status: 'passed' }, // Exclude truly accepted applications
+          { status: 'failed' }, // Exclude rejected applications
+          { status: 'redirected' } // Exclude redirected applications
+        ];
+        console.log('Committee All/No status filter applied (excluding accepted/rejected/redirected):', whereClause);
       }
-      // If status is 'all' or not provided, no filter is applied for Committee applications
 
       // Get total count for pagination
       const totalCount = await prisma.committeeApplication.count({
