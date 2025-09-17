@@ -63,7 +63,8 @@ export async function GET(
           member: [],
       };
   
-      const commApplications = await prisma.committeeApplication.findMany({
+      // First, let's see all applications for this position
+      const allCommApplications = await prisma.committeeApplication.findMany({
         where: {
           interviewBy: {
             equals: position,
@@ -77,13 +78,36 @@ export async function GET(
             },
           },
       });
+
+      console.log(`Found ${allCommApplications.length} total committee applications for position: ${position}`);
+      allCommApplications.forEach(app => {
+        console.log(`Committee App ${app.id}: hasAccepted=${app.hasAccepted}, status=${app.status}, user=${app.user?.name}`);
+      });
+
+      const commApplications = allCommApplications.filter(app => {
+        // Include applications that are NOT truly processed
+        const isAccepted = app.hasAccepted && app.status === 'passed';
+        const isRejected = app.status === 'failed';
+        const isRedirected = app.status === 'redirected';
+        
+        const shouldInclude = !isAccepted && !isRejected && !isRedirected;
+        
+        if (!shouldInclude) {
+          console.log(`Excluding committee app ${app.id}: hasAccepted=${app.hasAccepted}, status=${app.status}`);
+        }
+        
+        return shouldInclude;
+      });
+
+      console.log(`Filtered to ${commApplications.length} committee applications for All Applications tab`);
   
       // get ea applications
       // Handle both EB role IDs and position names in interviewBy field
       const positionTitle = getPositionTitle(position);
       const roleId = getRoleId(position);
       
-      const eAApplications = await prisma.eAApplication.findMany({
+      // First, let's see all EA applications for this position
+      const allEAApplications = await prisma.eAApplication.findMany({
           where: {
               OR: [
                   {
@@ -113,6 +137,28 @@ export async function GET(
             },
           },
       });
+
+      console.log(`Found ${allEAApplications.length} total EA applications for position: ${position}`);
+      allEAApplications.forEach(app => {
+        console.log(`EA App ${app.id}: hasAccepted=${app.hasAccepted}, status=${app.status}, user=${app.user?.name}`);
+      });
+
+      const eAApplications = allEAApplications.filter(app => {
+        // Include applications that are NOT truly processed
+        const isAccepted = app.hasAccepted && app.status === 'passed';
+        const isRejected = app.status === 'failed';
+        const isRedirected = app.status === 'redirected';
+        
+        const shouldInclude = !isAccepted && !isRejected && !isRedirected;
+        
+        if (!shouldInclude) {
+          console.log(`Excluding EA app ${app.id}: hasAccepted=${app.hasAccepted}, status=${app.status}`);
+        }
+        
+        return shouldInclude;
+      });
+
+      console.log(`Filtered to ${eAApplications.length} EA applications for All Applications tab`);
   
       // get member applications
       const memberApplications = await prisma.memberApplication.findMany({

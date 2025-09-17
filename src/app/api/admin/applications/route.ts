@@ -213,23 +213,8 @@ export async function GET(request: NextRequest) {
           { interviewSlotTimeStart: '' }
         ];
         console.log('No-schedule filter applied for EA applications:', whereClause);
-      } else if (status === 'all') {
-        // For 'all' status, exclude accepted/rejected/redirected applications but keep evaluating ones
-        whereClause.NOT = [
-          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
-          { status: 'failed' }, // Exclude rejected applications
-          { status: 'redirected' } // Exclude redirected applications
-        ];
-        console.log('EA All filter applied (excluding accepted/rejected/redirected):', whereClause);
-      } else if (!status) {
-        // If no status is provided, apply the same logic as 'all'
-        whereClause.NOT = [
-          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
-          { status: 'failed' }, // Exclude rejected applications
-          { status: 'redirected' } // Exclude redirected applications
-        ];
-        console.log('EA No status filter applied (excluding accepted/rejected/redirected):', whereClause);
       }
+      // If status is 'all' or not provided, no filter is applied for EA applications
 
       // Get total count for pagination
       const totalCount = await prisma.eAApplication.count({
@@ -322,23 +307,8 @@ export async function GET(request: NextRequest) {
           { interviewSlotTimeStart: '' }
         ];
         console.log('No-schedule filter applied for Committee applications:', whereClause);
-      } else if (status === 'all') {
-        // For 'all' status, exclude accepted/rejected/redirected applications but keep evaluating ones
-        whereClause.NOT = [
-          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
-          { status: 'failed' }, // Exclude rejected applications
-          { status: 'redirected' } // Exclude redirected applications
-        ];
-        console.log('Committee All filter applied (excluding accepted/rejected/redirected):', whereClause);
-      } else if (!status) {
-        // If no status is provided, apply the same logic as 'all'
-        whereClause.NOT = [
-          { hasAccepted: true, status: { not: null } }, // Exclude accepted applications with non-null status
-          { status: 'failed' }, // Exclude rejected applications
-          { status: 'redirected' } // Exclude redirected applications
-        ];
-        console.log('Committee No status filter applied (excluding accepted/rejected/redirected):', whereClause);
       }
+      // If status is 'all' or not provided, no filter is applied for Committee applications
 
       // Get total count for pagination
       const totalCount = await prisma.committeeApplication.count({
