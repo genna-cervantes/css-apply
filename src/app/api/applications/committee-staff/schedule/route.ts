@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { emailTemplates, sendEmail } from '@/lib/email';
+import { getPositionTitle } from '@/lib/eb-mapping';
 
 export async function POST(request: NextRequest) {
     try {
@@ -56,13 +57,17 @@ export async function POST(request: NextRequest) {
         // Send email notification with meeting link when schedule is selected
         try {
             // Get the EB profile for the interviewer to get their meeting link
+            // Convert EB role ID to position title for the query
+            const positionTitle = getPositionTitle(interviewBy);
+            console.log('Looking for EB profile:', { interviewBy, positionTitle });
             const ebProfile = await prisma.eBProfile.findFirst({
                 where: { 
-                    position: interviewBy 
+                    position: positionTitle 
                 }
             });
 
             const meetingLink = ebProfile?.meetingLink || null;
+            console.log('EB profile found:', { ebProfile: ebProfile?.position, meetingLink });
 
             const emailTemplate = emailTemplates.committeeApplication(
                 user.name ?? 'Applicant',

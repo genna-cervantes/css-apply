@@ -519,6 +519,56 @@ export const emailTemplates = {
         `
     }),
 
+    executiveAssistantRedirectedToCommittee: (userName: string, originalEbRole: string, committeeId: string): EmailTemplate => ({
+        subject: "CSSApply - Executive Assistant Application Redirected to Committee Staff",
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
+                </div>
+                
+                <h2 style="color: #1f2937;">Hello ${userName}!</h2>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Great news! Your Executive Assistant application has been redirected to a Committee Staff position 
+                    that we believe is a better fit for your skills and qualifications.
+                </p>
+                
+                <div style="background-color: #fef3c7; border: 2px solid #d97706; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #d97706; margin-top: 0;">🔄 Application Redirected:</h3>
+                    <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
+                    <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
+                    <p style="margin: 5px 0;"><strong>Original EA Role:</strong> ${capitalizeWords(originalEbRole)}</p>
+                    <p style="margin: 5px 0;"><strong>Redirected to:</strong> ${capitalizeWords(committeeId)} Committee Staff</p>
+                    <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold;">REDIRECTED</span></p>
+                </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    This redirection is based on our assessment of your qualifications and the current needs 
+                    of our organization. We believe you will have a great opportunity to contribute as 
+                    <strong>${capitalizeWords(committeeId)} Committee Staff</strong>.
+                </p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    As a Committee Staff member, you will work closely with the committee to support various 
+                    activities and projects. This role offers excellent opportunities for growth and 
+                    meaningful contribution to the CSS community.
+                </p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: genna.cervantes.cics@ust.edu.ph.
+                </p>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; font-size: 14px;">
+                        Best regards,<br>
+                        CSSApply Team
+                    </p>
+                </div>
+            </div>
+        `
+    }),
+
     // Evaluation notification templates
     committeeEvaluating: (userName: string, committee: string): EmailTemplate => ({
         subject: "CSSApply - Committee Staff Application Under Evaluation",

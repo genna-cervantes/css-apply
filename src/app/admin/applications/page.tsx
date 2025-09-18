@@ -15,6 +15,13 @@ const getCommitteeFullName = (committeeId: string): string => {
   return committee ? committee.title : committeeId;
 };
 
+// Helper function to get EB role full name
+const getEBRoleFullName = (roleId: string): string => {
+  if (!roleId || roleId.trim() === '') return 'No choice';
+  const role = roles.find(r => r.id === roleId);
+  return role ? role.title : roleId;
+};
+
 // Helper function to capitalize first letter
 const capitalizeFirstLetter = (str: string): string => {
   if (!str) return str;
@@ -250,6 +257,7 @@ const Applications = () => {
 
   // Memoized status badge component
   const getStatusBadge = useCallback((application: Application) => {
+
     if (application.type === 'member') {
       if (application.hasAccepted === true) {
         return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
@@ -264,10 +272,18 @@ const Applications = () => {
       return <span className="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">No Schedule</span>;
     }
     
-    if (application.status === 'passed' || (application.hasAccepted === true && application.status !== null)) {
-      return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
+    // Priority 1: Check for redirection first (overrides hasAccepted)
+    if (application.redirection) {
+      return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
+    }
+    
+    // Priority 2: Check status field
+    if (application.status === 'redirected') {
+      return <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Redirected</span>;
     } else if (application.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Rejected</span>;
+    } else if (application.status === 'passed' || (application.hasAccepted === true && application.status !== null)) {
+      return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Accepted</span>;
     } else if (application.status === 'evaluating') {
       return <span className="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">Under Evaluation</span>;
     } else {
@@ -535,8 +551,28 @@ const Applications = () => {
                       <div className="text-xs text-gray-600 space-y-0.5 mb-2">
                         <div>Student #: {application.studentNumber} | Section: {application.user.section}</div>
                         <div>Email: {application.user.email}</div>
-                        <div>First Choice: {getCommitteeFullName(application.firstOptionCommittee || '')}</div>
-                        <div>Second Choice: {getCommitteeFullName(application.secondOptionCommittee || '')}</div>
+                        {(() => {
+                          // Check if this is a redirected EA application by checking if redirection exists
+                          if (application.redirection) {
+                            return (
+                              <>
+                                <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
+                                <div className="text-blue-600 font-semibold">Redirected to: {application.redirection}</div>
+                              </>
+                            );
+                          } else {
+                            return (
+                              <>
+                                {application.firstOptionCommittee && (
+                                  <div>First Choice: {getCommitteeFullName(application.firstOptionCommittee)}</div>
+                                )}
+                                {application.secondOptionCommittee && (
+                                  <div>Second Choice: {getCommitteeFullName(application.secondOptionCommittee)}</div>
+                                )}
+                              </>
+                            );
+                          }
+                        })()}
                         <div>
                           {application.interviewSlotDay && application.interviewSlotTimeStart && application.interviewSlotTimeEnd ? (
                             <div>
@@ -655,7 +691,7 @@ const Applications = () => {
                           Member ID: {application.user.id.toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
-                              Accepted at: {getCommitteeFullName(application.redirection)}
+                              Redirected to: {application.redirection}
                             </div>
                           ) : (
                             <div className="text-green-600">
@@ -692,8 +728,24 @@ const Applications = () => {
                       <div className="text-xs text-gray-600 space-y-0.5 mb-2">
                         <div>Student #: {application.studentNumber} | Section: {application.user.section}</div>
                         <div>Email: {application.user.email}</div>
-                        <div>First Choice: {capitalizeFirstLetter(application.firstOptionEb || '')}</div>
-                        <div>Second Choice: {capitalizeFirstLetter(application.secondOptionEb || '')}</div>
+                        {(() => {
+                          // Check if this is a redirected EA application by checking if redirection exists
+                          if (application.redirection) {
+                            return (
+                              <>
+                                <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
+                                <div className="text-blue-600 font-semibold">Redirected to: {application.redirection}</div>
+                              </>
+                            );
+                          } else {
+                            return (
+                              <>
+                                <div>First Choice: {capitalizeFirstLetter(application.firstOptionEb || '')}</div>
+                                <div>Second Choice: {capitalizeFirstLetter(application.secondOptionEb || '')}</div>
+                              </>
+                            );
+                          }
+                        })()}
                         <div>
                           {application.interviewSlotDay && application.interviewSlotTimeStart && application.interviewSlotTimeEnd ? (
                             <div>
@@ -804,11 +856,11 @@ const Applications = () => {
                           Member ID: {application.user.id.toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
-                              Accepted at: {getCommitteeFullName(application.redirection)}
+                              Redirected to: {application.redirection}
                             </div>
                           ) : (
                             <div className="text-green-600">
-                              Accepted at: {getCommitteeFullName(application.firstOptionEb || '')}
+                              Accepted at: {getEBRoleFullName(application.firstOptionEb || '')}
                             </div>
                           )}
                         </div>
@@ -842,6 +894,19 @@ const Applications = () => {
                 committeeRoles.map(role => (
                   <option key={role.id} value={role.id}>{role.title}</option>
                 ))
+              ) : selectedApplication.type === 'ea' ? (
+                <>
+                  <optgroup label="Executive Assistant Roles">
+                    {roles.map(role => (
+                      <option key={role.id} value={role.id}>{role.title}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Committee Staff Roles">
+                    {committeeRolesSubmitted.map(role => (
+                      <option key={`committee-${role.id}`} value={`committee-${role.id}`}>{role.title} Staff</option>
+                    ))}
+                  </optgroup>
+                </>
               ) : (
                 roles.map(role => (
                   <option key={role.id} value={role.id}>{role.title}</option>

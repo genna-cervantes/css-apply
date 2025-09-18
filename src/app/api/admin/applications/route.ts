@@ -242,6 +242,7 @@ export async function GET(request: NextRequest) {
         },
       });
 
+
       if (status === 'no-schedule') {
         console.log(`Found ${eaApplications.length} EA applications with no schedule`);
         eaApplications.forEach(app => {
@@ -574,8 +575,16 @@ export async function PUT(request: NextRequest) {
         updateData.status = "failed";
       } else if (action === "redirect" && redirection) {
         updateData.hasAccepted = true;
-        updateData.status = "passed";
-        updateData.redirection = redirection;
+        updateData.status = "redirected";
+        // For EA applications, store the proper committee title instead of raw committee ID
+        if (redirection.startsWith('committee-')) {
+          const committeeId = redirection.replace('committee-', '');
+          const { committeeRolesSubmitted } = await import('@/data/committeeRoles');
+          const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
+          updateData.redirection = committee ? committee.title : committeeId;
+        } else {
+          updateData.redirection = redirection;
+        }
       } else if (action === "evaluate") {
         updateData.status = "evaluating";
       }
@@ -596,6 +605,35 @@ export async function PUT(request: NextRequest) {
         },
       });
 
+      // If redirecting EA to committee-staff, create a committee application record
+      if (action === "redirect" && redirection && redirection.startsWith('committee-')) {
+        const committeeId = redirection.replace('committee-', '');
+        
+        // Import committee roles to get proper title
+        const { committeeRolesSubmitted } = await import('@/data/committeeRoles');
+        const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
+        const committeeTitle = committee ? committee.title : committeeId;
+        
+        // Create committee application record
+        await prisma.committeeApplication.create({
+          data: {
+            studentNumber: updatedApplication.studentNumber,
+            firstOptionCommittee: updatedApplication.firstOptionEb, // Store EA first choice directly
+            secondOptionCommittee: updatedApplication.secondOptionEb, // Store EA second choice directly
+            hasAccepted: true,
+            status: "passed",
+            redirection: committeeTitle, // Store the redirected committee
+            interviewSlotDay: updatedApplication.interviewSlotDay,
+            interviewSlotTimeStart: updatedApplication.interviewSlotTimeStart,
+            interviewSlotTimeEnd: updatedApplication.interviewSlotTimeEnd,
+            interviewBy: updatedApplication.interviewBy,
+            supabaseFilePath: updatedApplication.supabaseFilePath,
+            portfolioLink: null, // EA applications don't have portfolio links
+            cv: updatedApplication.supabaseFilePath || "", // Use the CV file path as the cv field
+          }
+        });
+      }
+
       // Send appropriate email based on action
       if (updatedApplication?.user?.email && updatedApplication?.user?.name) {
         try {
@@ -615,13 +653,26 @@ export async function PUT(request: NextRequest) {
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
             console.log(`Rejection email sent to ${updatedApplication.user.email} for EA application`);
           } else if (action === "redirect" && updatedApplication?.user?.id && redirection) {
-            const emailTemplate = emailTemplates.executiveAssistantAccepted(
-              updatedApplication.user.name,
-              updatedApplication.user.id,
-              redirection
-            );
-            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
-            console.log(`Acceptance email sent to ${updatedApplication.user.email} for EA application (redirected to ${redirection})`);
+            // Check if redirecting to committee-staff
+            if (redirection.startsWith('committee-')) {
+              const committeeId = redirection.replace('committee-', '');
+              const emailTemplate = emailTemplates.executiveAssistantRedirectedToCommittee(
+                updatedApplication.user.name,
+                updatedApplication.firstOptionEb || 'Executive Assistant',
+                committeeId
+              );
+              await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+              console.log(`Committee redirection email sent to ${updatedApplication.user.email} for EA application (redirected to ${committeeId})`);
+            } else {
+              // Regular EA to EA redirection
+              const emailTemplate = emailTemplates.executiveAssistantRedirected(
+                updatedApplication.user.name,
+                updatedApplication.firstOptionEb || 'Executive Assistant',
+                redirection
+              );
+              await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+              console.log(`EA redirection email sent to ${updatedApplication.user.email} for EA application (redirected to ${redirection})`);
+            }
           } else if (action === "evaluate" && updatedApplication?.ebRole) {
             const emailTemplate = emailTemplates.executiveAssistantEvaluating(
               updatedApplication.user.name,

@@ -97,12 +97,18 @@ const Staffs = () => {
   };
 
   const getStatusBadge = (staff: CommitteeStaff) => {
-    if (staff.hasAccepted && staff.status !== null) {
-      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Accepted</span>;
+    // Priority 1: Check for redirection first (overrides hasAccepted)
+    if (staff.redirection) {
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
+    }
+    
+    // Priority 2: Check status field
+    if (staff.status === 'redirected') {
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
     } else if (staff.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] rounded-full">Rejected</span>;
-    } else if (staff.status === 'redirected') {
-      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
+    } else if (staff.hasAccepted && staff.status !== null) {
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Accepted</span>;
     } else if (!staff.interviewSlotDay || !staff.interviewSlotTimeStart) {
       return <span className="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">No Schedule</span>;
     } else {
@@ -220,13 +226,19 @@ const Staffs = () => {
                         <div className="text-xs text-[#134687] space-y-0.5">
                           <div>Student #: {staff.studentNumber} | Section: {staff.user.section}</div>
                           <div>Email: {staff.user.email}</div>
-                          <div>First Choice: {firstCommittee?.title}</div>
-                          <div>Second Choice: {secondCommittee?.title}</div>
+                          {staff.redirection ? (
+                            <>
+                              <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
+                              <div className="text-blue-600 font-semibold">Redirected to: {staff.redirection}</div>
+                            </>
+                          ) : (
+                            <>
+                              <div>First Choice: {firstCommittee?.title}</div>
+                              <div>Second Choice: {secondCommittee?.title}</div>
+                            </>
+                          )}
                           {staff.interviewSlotDay && (
                             <div>Interview: {staff.interviewSlotDay} at {staff.interviewSlotTimeStart}</div>
-                          )}
-                          {staff.redirection && (
-                            <div>Redirected to: {staff.redirection}</div>
                           )}
                           <div>Applied: {new Date(staff.createdAt).toLocaleDateString()}</div>
                         </div>

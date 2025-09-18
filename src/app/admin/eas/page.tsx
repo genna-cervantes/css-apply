@@ -95,12 +95,18 @@ const EAs = () => {
   };
 
   const getStatusBadge = (ea: EA) => {
-    if (ea.hasAccepted && ea.status !== null) {
-      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Accepted</span>;
+    // Priority 1: Check for redirection first (overrides hasAccepted)
+    if (ea.redirection) {
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
+    }
+    
+    // Priority 2: Check status field
+    if (ea.status === 'redirected') {
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
     } else if (ea.status === 'failed') {
       return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#FFBC2B] to-[#CE9823] rounded-full">Rejected</span>;
-    } else if (ea.status === 'redirected') {
-      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Redirected</span>;
+    } else if (ea.hasAccepted && ea.status !== null) {
+      return <span className="px-2 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#044FAF] to-[#134687] rounded-full">Accepted</span>;
     } else if (!ea.interviewSlotDay || !ea.interviewSlotTimeStart) {
       return <span className="px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">No Schedule</span>;
     } else {
