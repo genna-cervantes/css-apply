@@ -343,7 +343,7 @@ const Applications = () => {
       </MobileSidebar>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12">
+      <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12 overflow-y-auto h-screen">
         {/* PAGE HEADER */}
         <div className="mb-8 mt-12 md:mt-8 text-center md:text-left">
           <div className="flex justify-between items-center mb-4">

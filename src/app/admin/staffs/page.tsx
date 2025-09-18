@@ -165,7 +165,7 @@ const Staffs = () => {
       </MobileSidebar>
 
       {/* MAIN CONTENT */}
-      <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12">
+      <div className="flex-1 p-6 md:p-8 pt-16 md:pt-12 overflow-y-auto h-screen">
         {/* PAGE HEADER */}
         <div className="mb-8 mt-12 md:mt-8 text-center md:text-left">
           <div className="rounded-[45px] text-white text-lg lg:text-4xl font-poppins font-medium px-6 py-2 lg:py-4 text-center [background:linear-gradient(90deg,_#2F7EE3_0%,_#0349A2_100%)] w-fit mb-4">

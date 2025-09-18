@@ -21,7 +21,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
   return (
     <>
       {/* CSS logo inside sidebar */}
-      <div className="pt-12 pb-8 px-6 border-b">
+      <div className="pt-12 pb-8 px-6 border-b flex-shrink-0">
         <div className="flex items-center justify-center">
           <Image
             src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/Logo_CSS Apply.svg"
@@ -33,7 +33,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
       </div>
 
       {/* sidebar links */}
-      <nav className="mt-6">
+      <nav className="mt-6 flex-1 overflow-y-auto">
         <div className="space-y-2 px-4">
           {/* schedule */}
           {activePage === 'schedule' ? (
@@ -298,7 +298,7 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
       </nav>
 
       {/* logout button */}
-      <div className="absolute bottom-0 left-0 w-64 p-4 border-t">
+      <div className="p-4 border-t flex-shrink-0">
         <button 
           onClick={handleLogout}
           className="group flex items-center w-full px-4 py-3 text-gray-600 hover:bg-red-50 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"

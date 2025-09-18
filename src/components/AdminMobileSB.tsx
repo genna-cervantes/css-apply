@@ -46,11 +46,13 @@ const MobileSidebar = ({ children }: MobileSidebarProps) => {
 
       {/* SIDEBAR */}
       <div
-        className={`fixed md:static top-0 left-0 h-full md:h-auto w-64 shadow-lg transition-transform duration-300 z-40
+        className={`fixed md:static top-0 left-0 h-screen md:h-screen w-64 shadow-lg transition-transform duration-300 z-40 overflow-hidden
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
         style={{ backgroundColor: "#f6f6fe" }}
       >
-        {children}
+        <div className="h-full flex flex-col">
+          {children}
+        </div>
       </div>
 
       {/* to have a blurred bg when hamburger menu is open */}

@@ -417,8 +417,8 @@ export default function SuperAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat overflow-x-hidden">
-      <div className="max-w-7xl mx-auto w-full p-6">
+    <div className="min-h-screen bg-[#F3F3FD] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] bg-cover bg-repeat overflow-x-hidden flex">
+      <div className="max-w-7xl mx-auto w-full p-6 overflow-y-auto h-screen">
         {/* Header */}
         <div className="mb-8 mt-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
