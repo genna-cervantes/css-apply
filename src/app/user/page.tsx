@@ -349,7 +349,7 @@ export default function UserDashboard() {
                             </li>
                           </ul>
                           <a
-                            href="/user/apply/executive-assistants"
+                            href="/user/apply/executive-assistant"
                             className="whitespace-nowrap bg-[#044FAF] font-inter text-[10px] md:text-sm text-white px-3 py-2 md:px-4 md:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                           >
                             Apply as Executive Assistant
