@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { emailTemplates, sendEmail, getEBEmail } from '@/lib/email';
-import { getPositionTitle } from '@/lib/eb-mapping';
+import { emailTemplates, sendEmailWithValidation, getEBEmail } from '@/lib/email';
+import { getPositionTitle, getRoleId } from '@/lib/eb-mapping';
 import { roles } from '@/data/ebRoles';
 
 export async function POST(request: NextRequest) {
@@ -81,14 +81,17 @@ export async function POST(request: NextRequest) {
                 meetingLink || undefined,
                 interviewBy
             );
-            await sendEmail(user.email, emailTemplate.subject, emailTemplate.html);
-            console.log('Executive Assistant schedule confirmation email sent to:', user.email);
+            await sendEmailWithValidation(user.email, emailTemplate.subject, emailTemplate.html, 'EA applicant confirmation');
 
-            // Send email notification to EB interviewer
+            // Send email notification to EB interviewer with enhanced error handling
             try {
-                const ebRole = roles.find(r => r.id === interviewBy);
+                // Convert position title to role ID if needed
+                const roleId = getRoleId(interviewBy);
+                console.log(`Converting interviewBy "${interviewBy}" to roleId "${roleId}"`);
+                
+                const ebRole = roles.find(r => r.id === roleId);
                 const ebName = ebRole?.ebName || interviewBy;
-                const ebEmail = getEBEmail(interviewBy);
+                const ebEmail = getEBEmail(roleId, `EA interview notification for ${user.name}`);
                 
                 // Format interview date and time
                 const interviewDate = new Date(interviewSlotDay).toLocaleDateString('en-US', {
@@ -109,10 +112,11 @@ export async function POST(request: NextRequest) {
                     meetingLink || undefined
                 );
                 
-                await sendEmail(ebEmail, ebEmailTemplate.subject, ebEmailTemplate.html);
-                console.log('EB interview notification email sent to:', ebEmail);
+                await sendEmailWithValidation(ebEmail, ebEmailTemplate.subject, ebEmailTemplate.html, `EA interview notification to ${ebName}`);
             } catch (ebEmailError) {
-                console.error('Failed to send EB interview notification email:', ebEmailError);
+                console.error('CRITICAL: Failed to send EB interview notification email:', ebEmailError);
+                // Don't fail the entire request, but log this as a critical error
+                // The admin should be notified about this failure
             }
         } catch (emailError) {
             console.error('Failed to send executive assistant schedule confirmation email:', emailError);

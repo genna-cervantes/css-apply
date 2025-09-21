@@ -1,5 +1,5 @@
 import * as brevo from '@getbrevo/brevo';
-import { roles } from '@/data/ebRoles';
+import { getEBEmailWithFallback, ADMIN_EMAILS, validateAllEmailMappings } from '@/data/emailMappings';
 
 // Initialize Brevo API client
 const apiInstance = new brevo.TransactionalEmailsApi();
@@ -56,36 +56,75 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
     }
 };
 
-// Get EB email address by EB role ID
-export const getEBEmail = (ebRoleId: string): string => {
-    const role = roles.find(r => r.id === ebRoleId);
-    if (!role) {
-        console.warn(`EB role not found: ${ebRoleId}`);
-        return 'genna.cervantes.cics@ust.edu.ph'; // Default fallback email
+// Get EB email address by EB role ID with comprehensive error handling
+export const getEBEmail = (ebRoleId: string, context?: string): string => {
+    try {
+        return getEBEmailWithFallback(ebRoleId, context);
+    } catch (error) {
+        console.error(`Failed to get email for role ID: ${ebRoleId}`, error);
+        console.error(`CRITICAL: Email lookup failed for ${ebRoleId}. Using fallback email.`);
+        
+        // For interview notifications, we need to ensure the email is sent
+        // Use President's email as fallback but log this as a critical issue
+        console.error(`FALLBACK: Using President's email for ${ebRoleId} due to lookup failure`);
+        return ADMIN_EMAILS.PRESIDENT;
     }
-    
-    // Convert EB name to email format
-    // This is a simple mapping - you might want to create a more comprehensive mapping
-    const emailMap: { [key: string]: string } = {
-        'Genna Cervantes': 'genna.cervantes.cics@ust.edu.ph',
-        'Mar Vincent De Guzman': 'marvincent.deguzman.cics@ust.edu.ph',
-        'Christian Bhernan Buenagua': 'christianbhernan.buenagua.cics@ust.edu.ph',
-        'Joevanni Paulo Gumban': 'joevannipaulo.gumban.cics@ust.edu.ph',
-        'Marian Therese Pineza': 'mariantherese.pineza.cics@ust.edu.ph',
-        'Braven Rei Goodwin': 'bravenrei.goodwin.cics@ust.edu.ph',
-        'Kendrick Beau Calvo': 'kendrickbeau.calvo.cics@ust.edu.ph',
-        'Nigel Roland Anunciacion': 'nigelroland.anunciacion.cics@ust.edu.ph',
-        'Alexandra Antonette Palanog': 'alexandraantonette.palanog.cics@ust.edu.ph',
-        'Nikolas Josef Dalisay': 'nikolasjosef.dalisay.cics@ust.edu.ph',
-        'Chrisry Clerry Hermoso': 'chrisryclerry.hermoso.cics@ust.edu.ph',
-        'John Carlo Benter': 'johncarlo.benter.cics@ust.edu.ph',
-        'Carylle Keona Ilano': 'caryllekeona.ilano.cics@ust.edu.ph',
-        'Charmaine Chesca Villalobos': 'charmainechesca.villalobos.cics@ust.edu.ph',
-        'Zeandarra Gaile Giva': 'zeandarragaile.giva.cics@ust.edu.ph',
-        'Andrea Pauline Tan': 'andreapauline.tan.cics@ust.edu.ph'
-    };
-    
-    return emailMap[role.ebName] || 'genna.cervantes.cics@ust.edu.ph'; // Default fallback
+};
+
+// Legacy function for backward compatibility - now uses new system
+export const getEBEmailLegacy = (ebRoleId: string): string => {
+    try {
+        return getEBEmailWithFallback(ebRoleId, 'legacy-compatibility');
+    } catch {
+        console.warn(`Legacy email lookup failed for ${ebRoleId}, using President as fallback`);
+        return ADMIN_EMAILS.PRESIDENT;
+    }
+};
+
+// Validate all email mappings on startup
+export const validateEmailMappings = (): boolean => {
+    try {
+        const validation = validateAllEmailMappings();
+        if (!validation.valid) {
+            console.error('Email mapping validation failed:', validation.errors);
+            return false;
+        }
+        console.log('✅ All email mappings validated successfully');
+        return true;
+    } catch (error) {
+        console.error('Error validating email mappings:', error);
+        return false;
+    }
+};
+
+// Enhanced email sending with better error handling
+export const sendEmailWithValidation = async (
+    to: string, 
+    subject: string, 
+    html: string, 
+    context?: string
+): Promise<{ success: boolean; messageId?: string; error?: unknown }> => {
+    try {
+        // Basic email validation
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(to)) {
+            throw new Error(`Invalid email address: ${to}`);
+        }
+
+        console.log(`Sending email to: ${to}${context ? ` (${context})` : ''}`);
+        const result = await sendEmail(to, subject, html);
+        
+        if (result.success) {
+            console.log(`✅ Email sent successfully to ${to}: ${result.messageId}`);
+        } else {
+            console.error(`❌ Failed to send email to ${to}:`, result.error);
+        }
+        
+        return result;
+    } catch (error) {
+        console.error(`❌ Email sending failed for ${to}:`, error);
+        return { success: false, error };
+    }
 };
 
 // Email templates for different application types
