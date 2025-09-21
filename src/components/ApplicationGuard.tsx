@@ -35,7 +35,20 @@ export default function ApplicationGuard({
 
   const checkApplication = useCallback(async () => {
     try {
-      const response = await fetch("/api/applications/check-existing");
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
+      const response = await fetch("/api/applications/check-existing", {
+        signal: controller.signal,
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      
       if (response.ok) {
         const data = await response.json();
         
@@ -65,9 +78,17 @@ export default function ApplicationGuard({
         }
 
         setHasApplication(true);
+      } else {
+        console.error("ApplicationGuard: API response not ok:", response.status);
+        // On error, redirect to user dashboard
+        router.push("/user");
       }
     } catch (error) {
-      console.error("Error checking application:", error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error("ApplicationGuard: Request timed out");
+      } else {
+        console.error("Error checking application:", error);
+      }
       // On error, redirect to user dashboard
       router.push("/user");
     } finally {

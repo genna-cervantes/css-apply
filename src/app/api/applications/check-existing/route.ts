@@ -13,9 +13,14 @@ export async function GET() {
 
         console.log('Check-existing API: Checking for user:', session.user.email);
 
+        // Use a more efficient query with only necessary fields
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
-            include: {
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
                 memberApplication: {
                     select: {
                         id: true

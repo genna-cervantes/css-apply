@@ -156,10 +156,10 @@ function SuccessPageContent() {
           {/* Action Buttons */}
           <div className="flex gap-4 justify-center mt-4">
             <button
-              onClick={() => router.push("/user")}
+              onClick={() => router.push(`/user/apply/executive-assistant/${ebRole}/progress`)}
               className="bg-[#044FAF] text-white px-6 sm:px-8 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#04387B] transition-all duration-150 active:scale-95"
             >
-              Return to Dashboard
+              View Application Progress
             </button>
           </div>
         </div>

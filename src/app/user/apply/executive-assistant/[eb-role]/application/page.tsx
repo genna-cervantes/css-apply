@@ -7,6 +7,7 @@ import { roles } from "@/data/ebRoles";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { parseFullName } from "@/lib/name-parsing";
+import { useFormPersistence } from "@/lib/useFormPersistence";
 
 export default function ExecutiveAssistantApplication() {
   const router = useRouter();
@@ -16,27 +17,38 @@ export default function ExecutiveAssistantApplication() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const selectedRole = roles.find((r) => r.id === ebId);
 
-  const [isOpen, setIsOpen] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [hasFetchedData, setHasFetchedData] = useState(false);
 
   const [uploading, setUploading] = useState({ cv: false });
   const [uploadError, setUploadError] = useState({ cv: "" });
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     studentNumber: "",
     firstName: "",
     lastName: "",
     section: "",
     secondOptionEb: "",
     cv: "",
-  });
+  };
+
+  const initialUIState = {
+    isOpen: false,
+  };
+
+  const { formData, uiState, updateFormData, updateUIState, clearFormData, isLoaded } = useFormPersistence(
+    initialFormData,
+    `ea-application-${ebId}`,
+    [ebId], // Clear when EB role changes
+    initialUIState
+  );
 
   useEffect(() => {
     const fetchApplicationData = async () => {
-      if (status !== "authenticated" || !session?.user?.email) return;
+      if (status !== "authenticated" || !session?.user?.email || !isLoaded || hasFetchedData) return;
 
       try {
         // Prefill first and last name from Google session
@@ -44,32 +56,50 @@ export default function ExecutiveAssistantApplication() {
         if (fullName) {
           const { firstName: extractedFirstName, lastName: extractedLastName } =
             parseFullName(fullName);
-          setFormData((prev) => ({
-            ...prev,
-            firstName: prev.firstName || extractedFirstName,
-            lastName: prev.lastName || extractedLastName,
-          }));
+          updateFormData({
+            firstName: extractedFirstName,
+            lastName: extractedLastName,
+          });
         }
 
         // Fetch existing user data
         const response = await fetch("/api/applications/executive-assistant");
         if (response.ok) {
           const data = await response.json();
-          setFormData((prev) => ({
-            ...prev,
-            studentNumber: data.user?.studentNumber || "",
-            section: data.user?.section || "",
-            cv: data.application?.cv || "",
-            secondOptionEb: data.application?.secondOptionEb || "",
-          }));
+          
+          // Only update fields that are empty to preserve user input
+          const updates: Partial<typeof formData> = {};
+          
+          if (!formData.studentNumber && data.user?.studentNumber) {
+            updates.studentNumber = data.user.studentNumber;
+          }
+          
+          if (!formData.section && data.user?.section) {
+            updates.section = data.user.section;
+          }
+          
+          if (!formData.cv && data.application?.cv) {
+            updates.cv = data.application.cv;
+          }
+          
+          if (!formData.secondOptionEb && data.application?.secondOptionEb) {
+            updates.secondOptionEb = data.application.secondOptionEb;
+          }
+          
+          // Only update if there are changes to make
+          if (Object.keys(updates).length > 0) {
+            updateFormData(updates);
+          }
         }
+        
+        setHasFetchedData(true);
       } catch (err) {
         console.error("Failed to fetch application data:", err);
       }
     };
 
     fetchApplicationData();
-  }, [session, status]);
+  }, [session, status, isLoaded, updateFormData, hasFetchedData, formData.studentNumber, formData.section, formData.cv, formData.secondOptionEb]);
 
   // Check for if there are applications present
   if (status === "authenticated" && !hasCheckedApplications) {
@@ -113,24 +143,24 @@ export default function ExecutiveAssistantApplication() {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        updateUIState({ isOpen: false });
       }
     };
-    if (isOpen) {
+    if (uiState.isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen]);
+  }, [uiState.isOpen, updateUIState]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "studentNumber") {
       const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10);
-      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+      updateFormData({ [name]: numericValue });
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      updateFormData({ [name]: value });
     }
   };
 
@@ -196,6 +226,7 @@ export default function ExecutiveAssistantApplication() {
       const responseData = await response.json();
 
       if (response.ok) {
+        clearFormData(); // Clear the form data from localStorage
         router.push(`/user/apply/executive-assistant/${ebId}/schedule`);
       } else {
         setError(
@@ -258,7 +289,7 @@ export default function ExecutiveAssistantApplication() {
       const result = await response.json();
 
       if (response.ok) {
-        setFormData((prev) => ({ ...prev, cv: result.url }));
+        updateFormData({ cv: result.url });
       } else {
         setUploadError((prev) => ({
           ...prev,
@@ -271,7 +302,7 @@ export default function ExecutiveAssistantApplication() {
         ...prev,
         [type]: "Upload failed. Please try again.",
       }));
-      setFormData((prev) => ({ ...prev, cv: file.name }));
+        updateFormData({ cv: file.name });
     } finally {
       setUploading((prev) => ({ ...prev, [type]: false }));
     }
@@ -397,7 +428,7 @@ export default function ExecutiveAssistantApplication() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
+                        updateFormData({ firstName: e.target.value })
                       }
                       readOnly
                       disabled
@@ -417,7 +448,7 @@ export default function ExecutiveAssistantApplication() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
+                        updateFormData({ lastName: e.target.value })
                       }
                       readOnly
                       disabled
@@ -454,9 +485,9 @@ export default function ExecutiveAssistantApplication() {
                     >
                       <button
                         type="button"
-                        onClick={() => setIsOpen(!isOpen)}
+                        onClick={() => updateUIState({ isOpen: !uiState.isOpen })}
                         className={`w-full h-9 lg:h-12 rounded-md border-2 focus:outline-none bg-white px-2 lg:px-4 lg:py-3 text-sm lg:text-base text-left appearance-none bg-no-repeat bg-right bg-[length:16px] lg:pr-10 truncate ${
-                          isOpen ? "border-[#044FAF]" : "border-[#CDCECF]"
+                          uiState.isOpen ? "border-[#044FAF]" : "border-[#CDCECF]"
                         } ${
                           formData.secondOptionEb
                             ? "text-black"
@@ -472,7 +503,7 @@ export default function ExecutiveAssistantApplication() {
                             )?.title
                           : "Select an EB role"}
                       </button>
-                      {isOpen && (
+                      {uiState.isOpen && (
                         <div className="absolute top-full left-0 right-0 bg-white border-2 border-[#044FAF] rounded-md mt-1 shadow-lg z-10 max-h-60 overflow-y-auto">
                           {roles
                             .filter((role) => role.id !== ebId)
@@ -480,11 +511,10 @@ export default function ExecutiveAssistantApplication() {
                               <div
                                 key={role.id}
                                 onClick={() => {
-                                  setFormData({
-                                    ...formData,
+                                  updateFormData({
                                     secondOptionEb: role.id,
                                   });
-                                  setIsOpen(false);
+                                  updateUIState({ isOpen: false });
                                 }}
                                 className={`px-4 py-3 text-base text-black cursor-pointer hover:bg-[#DCECFF] transition-colors duration-150 ${
                                   formData.secondOptionEb === role.id
@@ -515,7 +545,7 @@ export default function ExecutiveAssistantApplication() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => setFormData({ ...formData, cv: "" })}
+                          onClick={() => updateFormData({ cv: "" })}
                           className="text-black hover:text-[#044FAF] lg:ml-2 lg:text-lg"
                         >
                           ×

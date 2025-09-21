@@ -32,11 +32,14 @@ export default function UserDashboard() {
         if (session.user.hasMemberApplication) {
           router.push("/user/apply/member/progress");
           return;
-        } else if (session.user.hasCommitteeApplication) {
-          // We still need to fetch the committee ID, so continue with API call
-        } else if (session.user.hasEAApplication) {
-          // We still need to fetch the EB role, so continue with API call
+        } else if (session.user.hasCommitteeApplication && session.user.committeeId) {
+          router.push(`/user/apply/committee-staff/${session.user.committeeId}/progress`);
+          return;
+        } else if (session.user.hasEAApplication && session.user.ebRole) {
+          router.push(`/user/apply/executive-assistant/${session.user.ebRole}/progress`);
+          return;
         }
+        // If we have applications but missing redirect info, continue with API call
       } else if (session?.user && !session.user.hasMemberApplication && !session.user.hasEAApplication && !session.user.hasCommitteeApplication) {
         // User has no applications, skip API call and show dashboard immediately
         setHasCheckedApplications(true);
@@ -46,10 +49,14 @@ export default function UserDashboard() {
       
       // Add a timeout to prevent hanging
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // Reduced to 3 second timeout
       
       const response = await fetch("/api/applications/check-existing", {
-        signal: controller.signal
+        signal: controller.signal,
+        cache: 'no-store', // Ensure fresh data
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
       });
       
       clearTimeout(timeoutId);
@@ -104,7 +111,7 @@ export default function UserDashboard() {
         setHasCheckedApplications(true);
         setIsLoading(false);
         setError("");
-      }, 8000); // 8 second fallback
+      }, 5000); // Reduced to 5 second fallback
 
       return () => clearTimeout(fallbackTimer);
     }

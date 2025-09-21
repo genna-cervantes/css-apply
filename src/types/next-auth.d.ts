@@ -20,6 +20,8 @@ declare module "next-auth" {
       eaApplication?: {id: string; hasAccepted: boolean; status: string};
       hasCommitteeApplication: boolean;
       committeeApplication?: {id: string; hasAccepted: boolean; status: string};
+      ebRole?: string;
+      committeeId?: string;
       applicationStatus: {
         member: {
           hasApplication: boolean;

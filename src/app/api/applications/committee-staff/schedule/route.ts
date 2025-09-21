@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { emailTemplates, sendEmail } from '@/lib/email';
+import { emailTemplates, sendEmail, getEBEmail } from '@/lib/email';
 import { getPositionTitle } from '@/lib/eb-mapping';
+import { roles } from '@/data/ebRoles';
 
 export async function POST(request: NextRequest) {
     try {
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest) {
             const meetingLink = ebProfile?.meetingLink || null;
             console.log('EB profile found:', { ebProfile: ebProfile?.position, meetingLink });
 
+            // Send email to applicant
             const emailTemplate = emailTemplates.committeeApplication(
                 user.name ?? 'Applicant',
                 user.committeeApplication.studentNumber,
@@ -79,6 +81,37 @@ export async function POST(request: NextRequest) {
             );
             await sendEmail(user.email, emailTemplate.subject, emailTemplate.html);
             console.log('Committee Staff schedule confirmation email sent to:', user.email);
+
+            // Send email notification to EB interviewer
+            try {
+                const ebRole = roles.find(r => r.id === interviewBy);
+                const ebName = ebRole?.ebName || interviewBy;
+                const ebEmail = getEBEmail(interviewBy);
+                
+                // Format interview date and time
+                const interviewDate = new Date(interviewSlotDay).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                const interviewTime = `${interviewSlotTimeStart} - ${interviewSlotTimeEnd}`;
+
+                const ebEmailTemplate = emailTemplates.ebInterviewNotificationCommittee(
+                    ebName,
+                    user.name ?? 'Applicant',
+                    user.committeeApplication.studentNumber,
+                    user.committeeApplication.firstOptionCommittee,
+                    interviewDate,
+                    interviewTime,
+                    meetingLink || undefined
+                );
+                
+                await sendEmail(ebEmail, ebEmailTemplate.subject, ebEmailTemplate.html);
+                console.log('EB interview notification email sent to:', ebEmail);
+            } catch (ebEmailError) {
+                console.error('Failed to send EB interview notification email:', ebEmailError);
+            }
         } catch (emailError) {
             console.error('Failed to send committee staff schedule confirmation email:', emailError);
         }

@@ -151,6 +151,16 @@ function MemberProgressPageContent() {
               </div>
             </div>
           </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => router.push("/user")}
+              className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
+            >
+              Back to Dashboard
+            </button>
+          </div>
         </div>
       </section>
 
