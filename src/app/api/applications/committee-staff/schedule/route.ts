@@ -45,6 +45,30 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check for slot conflicts before updating
+        const existingBookings = await prisma.committeeApplication.findMany({
+            where: {
+                AND: [
+                    { interviewSlotDay },
+                    { interviewSlotTimeStart },
+                    { interviewSlotTimeEnd },
+                    { interviewBy },
+                    { studentNumber: { not: studentNumber } } // Exclude current user
+                ]
+            }
+        });
+
+        if (existingBookings.length > 0) {
+            console.log(`Slot conflict detected for Committee application: ${studentNumber} trying to book ${interviewSlotDay} ${interviewSlotTimeStart}-${interviewSlotTimeEnd} with ${interviewBy}`);
+            return NextResponse.json(
+                { 
+                    error: 'This time slot is no longer available. Please select another time slot.',
+                    conflict: true 
+                },
+                { status: 409 }
+            );
+        }
+
         const updatedApplication = await prisma.committeeApplication.update({
             where: { studentNumber },
             data: {

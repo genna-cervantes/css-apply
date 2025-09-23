@@ -374,7 +374,13 @@ function SchedulePageContent() {
 
           router.push(`/user/apply/committee-staff/${committeeId}/success`);
         } else {
-          alert(`Error: ${result.error}`);
+          if (result.conflict) {
+            // Handle slot conflict - refresh the page to get updated availability
+            alert(`This time slot is no longer available. Please select another time slot.`);
+            window.location.reload();
+          } else {
+            alert(`Error: ${result.error}`);
+          }
         }
       } catch (error) {
         console.error("Error scheduling interview:", error);
