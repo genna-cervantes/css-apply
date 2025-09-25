@@ -46,6 +46,18 @@ export default function ExecutiveAssistantApplication() {
     initialUIState
   );
 
+  // Helper function to check if a string is a valid Supabase URL
+  const isValidSupabaseUrl = (url: string) => {
+    if (!url) return false;
+    // Check if it's a valid URL and contains supabase.co
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.includes('supabase.co') || urlObj.hostname.includes('supabase.com');
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     const fetchApplicationData = async () => {
       if (status !== "authenticated" || !session?.user?.email || !isLoaded || hasFetchedData) return;
@@ -205,6 +217,13 @@ export default function ExecutiveAssistantApplication() {
       return;
     }
 
+    // Validate that CV is a valid Supabase URL (not a filename)
+    if (!isValidSupabaseUrl(formData.cv)) {
+      setError("CV upload failed. Please re-upload your CV file.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/applications/executive-assistant", {
         method: "POST",
@@ -302,7 +321,8 @@ export default function ExecutiveAssistantApplication() {
         ...prev,
         [type]: "Upload failed. Please try again.",
       }));
-        updateFormData({ cv: file.name });
+      // Don't store filename - leave the field empty so user must retry upload
+      updateFormData({ cv: "" });
     } finally {
       setUploading((prev) => ({ ...prev, [type]: false }));
     }

@@ -182,6 +182,18 @@ export default function CommitteeApplication() {
   const requiresPortfolio = (committeeKey?: string) =>
     ["creatives", "technology", "documentation"].includes(committeeKey || "");
 
+  // Helper function to check if a string is a valid Supabase URL
+  const isValidSupabaseUrl = (url: string) => {
+    if (!url) return false;
+    // Check if it's a valid URL and contains supabase.co
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.includes('supabase.co') || urlObj.hostname.includes('supabase.com');
+    } catch {
+      return false;
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "studentNumber") {
@@ -233,12 +245,30 @@ export default function CommitteeApplication() {
       return;
     }
 
+    // Validate that CV is a valid Supabase URL (not a filename)
+    if (!isValidSupabaseUrl(formData.cv)) {
+      setError("CV upload failed. Please re-upload your CV file.");
+      setLoading(false);
+      return;
+    }
+
     if (
       (requiresPortfolio(selectedCommittee?.id) ||
         requiresPortfolio(formData.secondChoice)) &&
       !formData.portfolioLink
     ) {
       setError("Please upload or wait for your Portfolio to finish uploading");
+      setLoading(false);
+      return;
+    }
+
+    // Validate that portfolio is a valid Supabase URL (not a filename)
+    if (
+      (requiresPortfolio(selectedCommittee?.id) ||
+        requiresPortfolio(formData.secondChoice)) &&
+      !isValidSupabaseUrl(formData.portfolioLink)
+    ) {
+      setError("Portfolio upload failed. Please re-upload your Portfolio file.");
       setLoading(false);
       return;
     }
@@ -346,10 +376,11 @@ export default function CommitteeApplication() {
         ...prev,
         [type]: "Upload failed. Please try again.",
       }));
+      // Don't store filename - leave the field empty so user must retry upload
       if (type === "cv") {
-        updateFormData({ cv: file.name });
+        updateFormData({ cv: "" });
       } else {
-        updateFormData({ portfolioLink: file.name });
+        updateFormData({ portfolioLink: "" });
       }
     } finally {
       setUploading((prev) => ({ ...prev, [type]: false }));

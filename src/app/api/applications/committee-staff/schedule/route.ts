@@ -45,8 +45,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check for slot conflicts before updating
-        const existingBookings = await prisma.committeeApplication.findMany({
+        // Check for slot conflicts before updating - check BOTH EA and Committee applications
+        const existingEABookings = await prisma.eAApplication.findMany({
+            where: {
+                AND: [
+                    { interviewSlotDay },
+                    { interviewSlotTimeStart },
+                    { interviewSlotTimeEnd },
+                    { interviewBy }
+                ]
+            }
+        });
+
+        const existingCommitteeBookings = await prisma.committeeApplication.findMany({
             where: {
                 AND: [
                     { interviewSlotDay },
@@ -58,8 +69,11 @@ export async function POST(request: NextRequest) {
             }
         });
 
-        if (existingBookings.length > 0) {
+        const totalConflicts = existingEABookings.length + existingCommitteeBookings.length;
+
+        if (totalConflicts > 0) {
             console.log(`Slot conflict detected for Committee application: ${studentNumber} trying to book ${interviewSlotDay} ${interviewSlotTimeStart}-${interviewSlotTimeEnd} with ${interviewBy}`);
+            console.log(`Found ${existingEABookings.length} EA conflicts and ${existingCommitteeBookings.length} Committee conflicts`);
             return NextResponse.json(
                 { 
                     error: 'This time slot is no longer available. Please select another time slot.',
