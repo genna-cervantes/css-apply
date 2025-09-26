@@ -250,14 +250,37 @@ const Schedule = () => {
     });
 
     // Convert interview slots to FullCalendar events
-    const interviewEvents = interviewSlots.map((slot) => {
+    console.log('Generating calendar events for interview slots:', interviewSlots);
+    const interviewEvents = interviewSlots.map((slot: { id: string; day: string; name: string; timeStart: string; timeEnd: string; meetingLink?: string }) => {
+      // Ensure we have valid date and time data
+      if (!slot.day || !slot.timeStart || !slot.timeEnd) {
+        console.warn(`Invalid slot data for ${slot.name}:`, slot);
+        return null;
+      }
+
+      // Parse dates more carefully to avoid timezone issues
       const startDateTime = new Date(`${slot.day}T${slot.timeStart}:00`);
       const endDateTime = new Date(`${slot.day}T${slot.timeEnd}:00`);
+
+      // Validate the parsed dates
+      if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+        console.warn(`Invalid date parsing for ${slot.name}:`, {
+          day: slot.day,
+          timeStart: slot.timeStart,
+          timeEnd: slot.timeEnd,
+          startDateTime,
+          endDateTime
+        });
+        return null;
+      }
 
       // Create a shorter title to prevent overflow
       const shortName = slot.name.length > 15 ? `${slot.name.substring(0, 12)}...` : slot.name;
       const timeSlot = `${slot.timeStart}-${slot.timeEnd}`;
       const title = shortName; // Just show the name, FullCalendar handles the time display
+
+      console.log(`Creating event for ${slot.name}: ${slot.day} ${slot.timeStart}-${slot.timeEnd}`);
+      console.log(`Parsed dates: start=${startDateTime.toISOString()}, end=${endDateTime.toISOString()}`);
 
       return {
         id: `interview-${slot.id}`,
@@ -274,9 +297,16 @@ const Schedule = () => {
           timeSlot: timeSlot
         }
       };
-    });
+    }).filter((event): event is NonNullable<typeof event> => event !== null); // Remove any null events
+
+    console.log(`Generated ${unavailableEvents.length} unavailable events and ${interviewEvents.length} interview events`);
 
     events.push(...unavailableEvents, ...interviewEvents);
+    
+    // Debug: Log all events being passed to calendar
+    console.log('All calendar events:', events);
+    console.log('Interview events specifically:', interviewEvents);
+    
     setCalendarEvents(events);
   }, [unavailableTimeSlots, interviewSlots]);
 
@@ -317,8 +347,22 @@ const Schedule = () => {
       setUnavailableTimeSlots(unavailableRes.unavailableSlotsData || []);
       
       if (interviewRes.success && interviewRes.slots) {
+        console.log('Interview slots received:', interviewRes.slots);
+        console.log('Number of interview slots:', interviewRes.slots.length);
+        
+        // Check specifically for EA applicants
+        const eaSlots = interviewRes.slots.filter((slot: { name: string }) => 
+          slot.name.includes('KED MORENO') || slot.name.includes('MATTHEW BENEDICT AQUINO')
+        );
+        console.log('EA applicants found:', eaSlots.length);
+        eaSlots.forEach((slot: { name: string; day: string; timeStart: string; timeEnd: string }) => {
+          console.log(`EA applicant: ${slot.name} - ${slot.day} ${slot.timeStart}-${slot.timeEnd}`);
+        });
+        
         setInterviewSlots(interviewRes.slots);
       } else {
+        console.log('No interview slots received or success=false');
+        console.log('Response:', interviewRes);
         setInterviewSlots([]);
       }
       

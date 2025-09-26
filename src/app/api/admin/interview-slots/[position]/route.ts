@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { getPositionTitle, getRoleId } from '@/lib/eb-mapping';
+import { getPositionTitle } from '@/lib/eb-mapping';
 
 // GET all available interview slots
 export async function GET(request: NextRequest, { params }: { params: Promise<{ position: string }> }) {
@@ -56,32 +56,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
         const eaApplicationsSlots = await prisma.eAApplication.findMany({
             where: {
-                OR: [
-                    {
-                        interviewBy: {
-                            equals: normalizedPosition,
-                            mode: 'insensitive'
-                        }
-                    },
-                    {
-                        interviewBy: {
-                            equals: position,
-                            mode: 'insensitive'
-                        }
-                    },
-                    {
-                        interviewBy: {
-                            equals: getRoleId(position),
-                            mode: 'insensitive'
-                        }
-                    },
-                    {
-                        interviewBy: {
-                            equals: getRoleId(normalizedPosition),
-                            mode: 'insensitive'
-                        }
-                    }
-                ]
+                interviewBy: {
+                    equals: normalizedPosition,
+                    mode: 'insensitive'
+                }
             },
             select: {
                 id: true,

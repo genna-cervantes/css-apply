@@ -8,6 +8,8 @@ import { committeeRoles } from "@/data/committeeRoles";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { parseFullName } from "@/lib/name-parsing";
+import { useFormPersistence } from "@/lib/useFormPersistence";
+import { usePageReload } from "@/lib/usePageReload";
 
 export default function CommitteeApplication() {
   const router = useRouter();
@@ -15,16 +17,19 @@ export default function CommitteeApplication() {
   const { data: session, status } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
+  // Disable auto-reload on application pages to prevent data loss
+  usePageReload({ disableReload: true });
+
   const [isChecked, setIsChecked] = useState(false);
+  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [hasFetchedData, setHasFetchedData] = useState(false);
 
   const [uploading, setUploading] = useState({ cv: false, portfolio: false });
   const [uploadError, setUploadError] = useState({ cv: "", portfolio: "" });
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     studentNumber: "",
     firstName: "",
     lastName: "",
@@ -32,12 +37,23 @@ export default function CommitteeApplication() {
     secondChoice: "",
     cv: "",
     portfolioLink: "",
-  });
+  };
+
+  const initialUIState = {
+    isOpen: false,
+  };
+
+  const { formData, uiState, updateFormData, updateUIState, clearFormData, isLoaded } = useFormPersistence(
+    initialFormData,
+    `committee-application-${committeeId}`,
+    [committeeId], // Clear when committee changes
+    initialUIState
+  );
 
   // Prefill user data from session
   useEffect(() => {
     const fetchApplicationData = async () => {
-      if (status !== "authenticated" || !session?.user?.email) return;
+      if (status !== "authenticated" || !session?.user?.email || !isLoaded || hasFetchedData) return;
 
       try {
         // Prefill first and last name from Google session
@@ -45,32 +61,54 @@ export default function CommitteeApplication() {
         if (fullName) {
           const { firstName: extractedFirstName, lastName: extractedLastName } =
             parseFullName(fullName);
-          setFormData((prev) => ({
-            ...prev,
-            firstName: prev.firstName || extractedFirstName,
-            lastName: prev.lastName || extractedLastName,
-          }));
+          updateFormData({
+            firstName: extractedFirstName,
+            lastName: extractedLastName,
+          });
         }
 
         // Fetch existing user data
         const response = await fetch("/api/applications/committee-staff");
         if (response.ok) {
           const data = await response.json();
-          setFormData((prev) => ({
-            ...prev,
-            studentNumber: data.user?.studentNumber || "",
-            section: data.user?.section || "",
-            cv: data.application?.cv || "",
-            portfolioLink: data.application?.portfolioLink || "",
-          }));
+          
+          // Only update fields that are empty to preserve user input
+          const updates: Partial<typeof formData> = {};
+          
+          if (!formData.studentNumber && data.user?.studentNumber) {
+            updates.studentNumber = data.user.studentNumber;
+          }
+          
+          if (!formData.section && data.user?.section) {
+            updates.section = data.user.section;
+          }
+          
+          if (!formData.cv && data.application?.cv) {
+            updates.cv = data.application.cv;
+          }
+          
+          if (!formData.portfolioLink && data.application?.portfolioLink) {
+            updates.portfolioLink = data.application.portfolioLink;
+          }
+          
+          if (!formData.secondChoice && data.application?.secondOptionCommittee) {
+            updates.secondChoice = data.application.secondOptionCommittee;
+          }
+          
+          // Only update if there are changes to make
+          if (Object.keys(updates).length > 0) {
+            updateFormData(updates);
+          }
         }
+        
+        setHasFetchedData(true);
       } catch (err) {
         console.error("Failed to fetch application data:", err);
       }
     };
 
     fetchApplicationData();
-  }, [session, status]);
+  }, [session, status, isLoaded, updateFormData, hasFetchedData, formData.studentNumber, formData.section, formData.cv, formData.portfolioLink, formData.secondChoice]);
 
   // Check for if there are applications present
   if (status === "authenticated" && !hasCheckedApplications) {
@@ -134,27 +172,39 @@ export default function CommitteeApplication() {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        updateUIState({ isOpen: false });
       }
     };
-    if (isOpen) {
+    if (uiState.isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen]);
+  }, [uiState.isOpen, updateUIState]);
 
   const requiresPortfolio = (committeeKey?: string) =>
     ["creatives", "technology", "documentation"].includes(committeeKey || "");
+
+  // Helper function to check if a string is a valid Supabase URL
+  const isValidSupabaseUrl = (url: string) => {
+    if (!url) return false;
+    // Check if it's a valid URL and contains supabase.co
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.includes('supabase.co') || urlObj.hostname.includes('supabase.com');
+    } catch {
+      return false;
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "studentNumber") {
       const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10);
-      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+      updateFormData({ [name]: numericValue });
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      updateFormData({ [name]: value });
     }
   };
 
@@ -199,12 +249,30 @@ export default function CommitteeApplication() {
       return;
     }
 
+    // Validate that CV is a valid Supabase URL (not a filename)
+    if (!isValidSupabaseUrl(formData.cv)) {
+      setError("CV upload failed. Please re-upload your CV file.");
+      setLoading(false);
+      return;
+    }
+
     if (
       (requiresPortfolio(selectedCommittee?.id) ||
         requiresPortfolio(formData.secondChoice)) &&
       !formData.portfolioLink
     ) {
       setError("Please upload or wait for your Portfolio to finish uploading");
+      setLoading(false);
+      return;
+    }
+
+    // Validate that portfolio is a valid Supabase URL (not a filename)
+    if (
+      (requiresPortfolio(selectedCommittee?.id) ||
+        requiresPortfolio(formData.secondChoice)) &&
+      !isValidSupabaseUrl(formData.portfolioLink)
+    ) {
+      setError("Portfolio upload failed. Please re-upload your Portfolio file.");
       setLoading(false);
       return;
     }
@@ -231,6 +299,7 @@ export default function CommitteeApplication() {
       console.log("API response:", responseData);
 
       if (response.ok) {
+        clearFormData(); // Clear the form data from localStorage
         router.push(`/user/apply/committee-staff/${committeeId}/schedule`);
       } else {
         setError(
@@ -295,9 +364,9 @@ export default function CommitteeApplication() {
       if (response.ok) {
         // Update form data with the new file URL
         if (type === "cv") {
-          setFormData((prev) => ({ ...prev, cv: result.url }));
+          updateFormData({ cv: result.url });
         } else {
-          setFormData((prev) => ({ ...prev, portfolioLink: result.url }));
+          updateFormData({ portfolioLink: result.url });
         }
       } else {
         setUploadError((prev) => ({
@@ -311,10 +380,11 @@ export default function CommitteeApplication() {
         ...prev,
         [type]: "Upload failed. Please try again.",
       }));
+      // Don't store filename - leave the field empty so user must retry upload
       if (type === "cv") {
-        setFormData((prev) => ({ ...prev, cv: file.name }));
+        updateFormData({ cv: "" });
       } else {
-        setFormData((prev) => ({ ...prev, portfolioLink: file.name }));
+        updateFormData({ portfolioLink: "" });
       }
     } finally {
       setUploading((prev) => ({ ...prev, [type]: false }));
@@ -439,7 +509,7 @@ export default function CommitteeApplication() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
+                        updateFormData({ firstName: e.target.value })
                       }
                       readOnly
                       disabled
@@ -458,7 +528,7 @@ export default function CommitteeApplication() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
+                        updateFormData({ lastName: e.target.value })
                       }
                       readOnly
                       disabled
@@ -478,8 +548,7 @@ export default function CommitteeApplication() {
                         name="section"
                         value={formData.section}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
+                          updateFormData({
                             section: e.target.value,
                           })
                         }
@@ -499,9 +568,9 @@ export default function CommitteeApplication() {
                     >
                       <button
                         type="button"
-                        onClick={() => setIsOpen(!isOpen)}
+                        onClick={() => updateUIState({ isOpen: !uiState.isOpen })}
                         className={`w-full h-9 lg:h-12 rounded-md border-2 focus:outline-none bg-white px-2 lg:px-4 lg:py-3 text-sm lg:text-base text-left appearance-none bg-no-repeat bg-right bg-[length:16px] lg:pr-10 truncate ${
-                          isOpen ? "border-[#044FAF]" : "border-[#CDCECF]"
+                          uiState.isOpen ? "border-[#044FAF]" : "border-[#CDCECF]"
                         } ${
                           formData.secondChoice
                             ? "text-black"
@@ -517,7 +586,7 @@ export default function CommitteeApplication() {
                             )?.title
                           : "Select a Committee"}
                       </button>
-                      {isOpen && (
+                      {uiState.isOpen && (
                         <div className="absolute top-full left-0 right-0 bg-white border-2 border-[#044FAF] rounded-md mt-1 shadow-lg z-10 max-h-60 overflow-y-auto">
                           {committeeRoles
                             .filter((role) => role.id !== committeeId)
@@ -525,11 +594,10 @@ export default function CommitteeApplication() {
                               <div
                                 key={role.id}
                                 onClick={() => {
-                                  setFormData({
-                                    ...formData,
+                                  updateFormData({
                                     secondChoice: role.id,
                                   });
-                                  setIsOpen(false);
+                                  updateUIState({ isOpen: false });
                                 }}
                                 className={`px-4 py-3 text-base text-black cursor-pointer hover:bg-[#DCECFF] transition-colors duration-150 ${
                                   formData.secondChoice === role.id
@@ -559,7 +627,7 @@ export default function CommitteeApplication() {
                         </span>
                         <button
                           type="button"
-                          onClick={() => setFormData({ ...formData, cv: "" })}
+                          onClick={() => updateFormData({ cv: "" })}
                           className="text-black hover:text-[#044FAF] lg:ml-2 lg:text-lg"
                         >
                           ×
@@ -616,7 +684,7 @@ export default function CommitteeApplication() {
                           <button
                             type="button"
                             onClick={() =>
-                              setFormData({ ...formData, portfolioLink: "" })
+                              updateFormData({ portfolioLink: "" })
                             }
                             className="text-black hover:text-[#044FAF] lg:ml-2 lg:text-lg"
                           >

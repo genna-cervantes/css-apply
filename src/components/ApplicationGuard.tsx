@@ -35,7 +35,26 @@ export default function ApplicationGuard({
 
   const checkApplication = useCallback(async () => {
     try {
-      const response = await fetch("/api/applications/check-existing");
+      // Add a small delay for success pages to allow database to sync
+      const isSuccessPage = window.location.pathname.includes('/success');
+      if (isSuccessPage) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
+      const response = await fetch("/api/applications/check-existing", {
+        signal: controller.signal,
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      
       if (response.ok) {
         const data = await response.json();
         
@@ -65,11 +84,31 @@ export default function ApplicationGuard({
         }
 
         setHasApplication(true);
+      } else {
+        console.error("ApplicationGuard: API response not ok:", response.status);
+        // For success pages, be more lenient with errors
+        const isSuccessPage = window.location.pathname.includes('/success');
+        if (!isSuccessPage) {
+          router.push("/user");
+        } else {
+          // For success pages, just show the content even if check fails
+          setHasApplication(true);
+        }
       }
     } catch (error) {
-      console.error("Error checking application:", error);
-      // On error, redirect to user dashboard
-      router.push("/user");
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error("ApplicationGuard: Request timed out");
+      } else {
+        console.error("Error checking application:", error);
+      }
+      // For success pages, be more lenient with errors
+      const isSuccessPage = window.location.pathname.includes('/success');
+      if (!isSuccessPage) {
+        router.push("/user");
+      } else {
+        // For success pages, just show the content even if check fails
+        setHasApplication(true);
+      }
     } finally {
       setIsChecking(false);
     }

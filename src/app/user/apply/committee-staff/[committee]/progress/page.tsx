@@ -390,7 +390,7 @@ function CommitteeProgressPageContent() {
                       Member ID:
                     </span>
                     <span className={`text-sm sm:text-base ${application.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-                      {application.hasAccepted ? applicationData.user.studentNumber.toUpperCase() : 'Pending'}
+                      {application.hasAccepted ? application.id.toUpperCase() : 'Pending'}
                     </span>
                   </div>
 
@@ -441,11 +441,11 @@ function CommitteeProgressPageContent() {
                       ✅ Congratulations! You&apos;ve been accepted!
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
+                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
                       {application.redirection ? (
-                        <p><strong>Accepted at:</strong> {application.redirection}</p>
+                        <p><strong>Accepted at:</strong> {application.redirection} Committee</p>
                       ) : (
-                        <p><strong>Accepted at:</strong> {firstCommittee?.title}</p>
+                        <p><strong>Accepted at:</strong> {firstCommittee?.title} Committee</p>
                       )}
                     </div>
                   </div>
@@ -468,8 +468,8 @@ function CommitteeProgressPageContent() {
                       🔄 Application Redirected
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
-                      <p><strong>Redirected to:</strong> {application.redirection}</p>
+                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
+                      <p><strong>Redirected to:</strong> {application.redirection} Committee</p>
                     </div>
                   </div>
                 )}
@@ -478,13 +478,6 @@ function CommitteeProgressPageContent() {
           )}
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            {/* <button
-                    onClick={() => router.push("/user")}
-                    className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
-                >
-                    Back to Dashboard
-                </button> */}
-
             {!application.interviewSlotDay && (
               <button
                 onClick={() =>

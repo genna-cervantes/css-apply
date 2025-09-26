@@ -8,54 +8,77 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Header from "@/components/Header";
 import { parseFullName } from "@/lib/name-parsing";
+import { useFormPersistence } from "@/lib/useFormPersistence";
+import { usePageReload } from "@/lib/usePageReload";
 
 export default function MemberApplication() {
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [error, setError] = useState("");
+  const [hasFetchedData, setHasFetchedData] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  const [formData, setFormData] = useState({
+  // Disable auto-reload on application pages to prevent data loss
+  usePageReload({ disableReload: true });
+
+  const initialFormData = {
     studentNumber: "",
     section: "",
     firstName: "",
     lastName: "",
-  });
+  };
+
+  const { formData, updateFormData, clearFormData, isLoaded } = useFormPersistence(
+    initialFormData,
+    "member-application"
+  );
 
   useEffect(() => {
     const fetchApplicationData = async () => {
-      if (status !== "authenticated" || !session?.user?.email) return;
+      if (status !== "authenticated" || !session?.user?.email || !isLoaded || hasFetchedData) return;
 
       try {
         // Prefill first and last name from Google session
         const fullName = session?.user?.name || "";
         if (fullName) {
           const { firstName: extractedFirstName, lastName: extractedLastName } = parseFullName(fullName);
-          setFormData((prev) => ({
-            ...prev,
-            firstName: prev.firstName || extractedFirstName,
-            lastName: prev.lastName || extractedLastName,
-          }));
+          updateFormData({
+            firstName: extractedFirstName,
+            lastName: extractedLastName,
+          });
         }
 
         const response = await fetch("/api/applications/member");
         if (response.ok) {
           const data = await response.json();
-          setFormData((prev) => ({
-            ...prev,
-            studentNumber: data.user?.studentNumber || "",
-            section: data.user?.section || "",
-          }));
+          
+          // Only update fields that are empty to preserve user input
+          const updates: Partial<typeof formData> = {};
+          
+          if (!formData.studentNumber && data.user?.studentNumber) {
+            updates.studentNumber = data.user.studentNumber;
+          }
+          
+          if (!formData.section && data.user?.section) {
+            updates.section = data.user.section;
+          }
+          
+          // Only update if there are changes to make
+          if (Object.keys(updates).length > 0) {
+            updateFormData(updates);
+          }
         }
+        
+        setHasFetchedData(true);
       } catch (err) {
         console.error("Failed to fetch application data:", err);
       }
     };
 
     fetchApplicationData();
-  }, [session, status]);
+  }, [session, status, isLoaded, updateFormData, hasFetchedData, formData.studentNumber, formData.section]);
 
   if (status === "authenticated" && !hasCheckedApplications) {
     const checkApplications = async () => {
@@ -93,9 +116,9 @@ export default function MemberApplication() {
     const { name, value } = e.target;
     if (name === "studentNumber") {
       const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10);
-      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+      updateFormData({ [name]: numericValue });
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      updateFormData({ [name]: value });
     }
   };
 
@@ -135,7 +158,8 @@ export default function MemberApplication() {
       });
 
       if (response.ok) {
-        router.push("/user/apply/member/progress");
+        clearFormData(); // Clear the form data from localStorage
+        router.push("/user/apply/member/success");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Application submission failed");

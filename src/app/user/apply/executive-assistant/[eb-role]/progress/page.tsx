@@ -385,7 +385,7 @@ function EAProgressPageContent() {
                       Member ID:
                     </span>
                     <span className={`text-sm sm:text-base ${application.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-                      {application.hasAccepted ? applicationData.user.studentNumber.toUpperCase() : 'Pending'}
+                      {application.hasAccepted ? application.id.toUpperCase() : 'Pending'}
                     </span>
                   </div>
 
@@ -436,11 +436,11 @@ function EAProgressPageContent() {
                       ✅ Congratulations! You&apos;ve been accepted!
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
+                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
                       {application.redirection ? (
-                        <p><strong>Accepted at:</strong> {application.redirection}</p>
+                        <p><strong>Accepted at:</strong> Executive Assistant for {application.redirection}</p>
                       ) : (
-                        <p><strong>Accepted at:</strong> {firstEB?.title}</p>
+                        <p><strong>Accepted at:</strong> Executive Assistant for {firstEB?.title}</p>
                       )}
                     </div>
                   </div>
@@ -463,8 +463,8 @@ function EAProgressPageContent() {
                       🔄 Application Redirected
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
-                      <p><strong>Redirected to:</strong> {application.redirection}</p>
+                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
+                      <p><strong>Redirected to:</strong> Executive Assistant for {application.redirection}</p>
                     </div>
                   </div>
                 )}
@@ -473,13 +473,6 @@ function EAProgressPageContent() {
           )}
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            {/* <button
-                    onClick={() => router.push("/user")}
-                    className="bg-[#E7E3E3] text-gray-700 px-15 py-3 rounded-lg font-inter font-semibold text-sm hover:bg-[#CDCCCC] transition-all duration-150 active:scale-95"
-                >
-                    Back to Dashboard
-                </button> */}
-
             {!application.interviewSlotDay && (
               <button
                 onClick={() =>

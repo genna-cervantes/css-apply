@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Raleway, Poppins } from "next/font/google";
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
+import { UserActivityProvider } from "@/contexts/UserActivityContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -93,7 +94,9 @@ export default function RootLayout({
       className={`${inter.variable} ${raleway.variable} ${poppins.variable}`}
     >
       <SessionWrapper>
-        <body suppressHydrationWarning={true}>{children}</body>
+        <UserActivityProvider enableReload={false} idleTimeout={300000} reloadInterval={60000}>
+          <body suppressHydrationWarning={true}>{children}</body>
+        </UserActivityProvider>
       </SessionWrapper>
     </html>
   );

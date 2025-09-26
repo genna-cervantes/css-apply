@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
-import { emailTemplates, sendEmail } from '@/lib/email';
-import { getPositionTitle } from '@/lib/eb-mapping';
+import { emailTemplates, sendEmailWithValidation, getEBEmail } from '@/lib/email';
+import { getPositionTitle, getRoleId } from '@/lib/eb-mapping';
+import { roles } from '@/data/ebRoles';
 
 export async function POST(request: NextRequest) {
     try {
@@ -44,6 +45,44 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check for slot conflicts before updating - check BOTH EA and Committee applications
+        const existingEABookings = await prisma.eAApplication.findMany({
+            where: {
+                AND: [
+                    { interviewSlotDay },
+                    { interviewSlotTimeStart },
+                    { interviewSlotTimeEnd },
+                    { interviewBy }
+                ]
+            }
+        });
+
+        const existingCommitteeBookings = await prisma.committeeApplication.findMany({
+            where: {
+                AND: [
+                    { interviewSlotDay },
+                    { interviewSlotTimeStart },
+                    { interviewSlotTimeEnd },
+                    { interviewBy },
+                    { studentNumber: { not: studentNumber } } // Exclude current user
+                ]
+            }
+        });
+
+        const totalConflicts = existingEABookings.length + existingCommitteeBookings.length;
+
+        if (totalConflicts > 0) {
+            console.log(`Slot conflict detected for Committee application: ${studentNumber} trying to book ${interviewSlotDay} ${interviewSlotTimeStart}-${interviewSlotTimeEnd} with ${interviewBy}`);
+            console.log(`Found ${existingEABookings.length} EA conflicts and ${existingCommitteeBookings.length} Committee conflicts`);
+            return NextResponse.json(
+                { 
+                    error: 'This time slot is no longer available. Please select another time slot.',
+                    conflict: true 
+                },
+                { status: 409 }
+            );
+        }
+
         const updatedApplication = await prisma.committeeApplication.update({
             where: { studentNumber },
             data: {
@@ -69,6 +108,7 @@ export async function POST(request: NextRequest) {
             const meetingLink = ebProfile?.meetingLink || null;
             console.log('EB profile found:', { ebProfile: ebProfile?.position, meetingLink });
 
+            // Send email to applicant
             const emailTemplate = emailTemplates.committeeApplication(
                 user.name ?? 'Applicant',
                 user.committeeApplication.studentNumber,
@@ -77,8 +117,43 @@ export async function POST(request: NextRequest) {
                 meetingLink || undefined,
                 interviewBy
             );
-            await sendEmail(user.email, emailTemplate.subject, emailTemplate.html);
-            console.log('Committee Staff schedule confirmation email sent to:', user.email);
+            await sendEmailWithValidation(user.email, emailTemplate.subject, emailTemplate.html, 'Committee Staff applicant confirmation');
+
+            // Send email notification to EB interviewer with enhanced error handling
+            try {
+                // Convert position title to role ID if needed
+                const roleId = getRoleId(interviewBy);
+                console.log(`Converting interviewBy "${interviewBy}" to roleId "${roleId}"`);
+                
+                const ebRole = roles.find(r => r.id === roleId);
+                const ebName = ebRole?.ebName || interviewBy;
+                const ebEmail = getEBEmail(roleId, `Committee Staff interview notification for ${user.name}`);
+                
+                // Format interview date and time
+                const interviewDate = new Date(interviewSlotDay).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                const interviewTime = `${interviewSlotTimeStart} - ${interviewSlotTimeEnd}`;
+
+                const ebEmailTemplate = emailTemplates.ebInterviewNotificationCommittee(
+                    ebName,
+                    user.name ?? 'Applicant',
+                    user.committeeApplication.studentNumber,
+                    user.committeeApplication.firstOptionCommittee,
+                    interviewDate,
+                    interviewTime,
+                    meetingLink || undefined
+                );
+                
+                await sendEmailWithValidation(ebEmail, ebEmailTemplate.subject, ebEmailTemplate.html, `Committee Staff interview notification to ${ebName}`);
+            } catch (ebEmailError) {
+                console.error('CRITICAL: Failed to send EB interview notification email:', ebEmailError);
+                // Don't fail the entire request, but log this as a critical error
+                // The admin should be notified about this failure
+            }
         } catch (emailError) {
             console.error('Failed to send committee staff schedule confirmation email:', emailError);
         }

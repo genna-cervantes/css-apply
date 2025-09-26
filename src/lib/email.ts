@@ -1,4 +1,5 @@
 import * as brevo from '@getbrevo/brevo';
+import { getEBEmailWithFallback, ADMIN_EMAILS, validateAllEmailMappings } from '@/data/emailMappings';
 
 // Initialize Brevo API client
 const apiInstance = new brevo.TransactionalEmailsApi();
@@ -55,6 +56,77 @@ export const sendEmail = async (to: string, subject: string, html: string) => {
     }
 };
 
+// Get EB email address by EB role ID with comprehensive error handling
+export const getEBEmail = (ebRoleId: string, context?: string): string => {
+    try {
+        return getEBEmailWithFallback(ebRoleId, context);
+    } catch (error) {
+        console.error(`Failed to get email for role ID: ${ebRoleId}`, error);
+        console.error(`CRITICAL: Email lookup failed for ${ebRoleId}. Using fallback email.`);
+        
+        // For interview notifications, we need to ensure the email is sent
+        // Use President's email as fallback but log this as a critical issue
+        console.error(`FALLBACK: Using President's email for ${ebRoleId} due to lookup failure`);
+        return ADMIN_EMAILS.PRESIDENT;
+    }
+};
+
+// Legacy function for backward compatibility - now uses new system
+export const getEBEmailLegacy = (ebRoleId: string): string => {
+    try {
+        return getEBEmailWithFallback(ebRoleId, 'legacy-compatibility');
+    } catch {
+        console.warn(`Legacy email lookup failed for ${ebRoleId}, using President as fallback`);
+        return ADMIN_EMAILS.PRESIDENT;
+    }
+};
+
+// Validate all email mappings on startup
+export const validateEmailMappings = (): boolean => {
+    try {
+        const validation = validateAllEmailMappings();
+        if (!validation.valid) {
+            console.error('Email mapping validation failed:', validation.errors);
+            return false;
+        }
+        console.log('✅ All email mappings validated successfully');
+        return true;
+    } catch (error) {
+        console.error('Error validating email mappings:', error);
+        return false;
+    }
+};
+
+// Enhanced email sending with better error handling
+export const sendEmailWithValidation = async (
+    to: string, 
+    subject: string, 
+    html: string, 
+    context?: string
+): Promise<{ success: boolean; messageId?: string; error?: unknown }> => {
+    try {
+        // Basic email validation
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(to)) {
+            throw new Error(`Invalid email address: ${to}`);
+        }
+
+        console.log(`Sending email to: ${to}${context ? ` (${context})` : ''}`);
+        const result = await sendEmail(to, subject, html);
+        
+        if (result.success) {
+            console.log(`✅ Email sent successfully to ${to}: ${result.messageId}`);
+        } else {
+            console.error(`❌ Failed to send email to ${to}:`, result.error);
+        }
+        
+        return result;
+    } catch (error) {
+        console.error(`❌ Email sending failed for ${to}:`, error);
+        return { success: false, error };
+    }
+};
+
 // Email templates for different application types
 export const emailTemplates = {
     memberApplication: (userName: string, studentNumber: string): EmailTemplate => ({
@@ -65,7 +137,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName}!</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName}!</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for submitting your member application to CSSApply! We have successfully received your application.
@@ -104,7 +176,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName}!</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName}!</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for submitting your committee staff application to CSSApply! We have successfully received your application.
@@ -161,7 +233,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName}!</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName}!</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for submitting your executive assistant application to CSSApply! We have successfully received your application.
@@ -352,7 +424,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName},</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName},</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for your interest in joining the Computer Science Society Committee Staff. 
@@ -395,7 +467,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName},</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName},</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for your interest in joining the Computer Science Society Executive Assistant. 
@@ -439,7 +511,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName},</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName},</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     We have reviewed your committee staff application and would like to offer you an opportunity 
@@ -483,7 +555,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName},</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName},</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     We have reviewed your executive assistant application and would like to offer you an opportunity 
@@ -527,7 +599,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
                 
-                <h2 style="color: #1f2937;">Hello ${userName}!</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName}!</h2>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Great news! Your Executive Assistant application has been redirected to a Committee Staff position 
@@ -578,7 +650,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
 
-                <h2 style="color: #1f2937;">Hello ${userName},</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName},</h2>
 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for your interest in joining the Computer Science Society Committee Staff. 
@@ -622,7 +694,7 @@ export const emailTemplates = {
                     <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
                 </div>
 
-                <h2 style="color: #1f2937;">Hello ${userName},</h2>
+                <h2 style="color: #1f2937;">Hello, ${userName},</h2>
 
                 <p style="color: #4b5563; line-height: 1.6;">
                     Thank you for your interest in joining the Computer Science Society Executive Assistant. 
@@ -648,6 +720,95 @@ export const emailTemplates = {
                     Thank you for your patience during this process.
                 </p>
 
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; font-size: 14px;">
+                        Best regards,<br>
+                        CSSApply Team
+                    </p>
+                </div>
+            </div>
+        `
+    }),
+
+    // EB Interview Notification Templates
+    ebInterviewNotificationEA: (ebName: string, applicantName: string, studentNumber: string, ebRole: string, interviewDate: string, interviewTime: string, meetingLink?: string): EmailTemplate => ({
+        subject: `CSSApply - New Executive Assistant Interview Scheduled - ${applicantName}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
+                </div>
+                
+                <h2 style="color: #1f2937;">Hello, ${ebName}!</h2>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    You have a new interview scheduled for an Executive Assistant application. 
+                    An applicant has booked an interview slot for the <strong>${capitalizeWords(ebRole)}</strong> position.
+                </p>
+                
+                <div style="background-color: #e0f2fe; border: 2px solid #0284c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #0284c7; margin-top: 0;">📅 Interview Details:</h3>
+                    <p style="margin: 5px 0;"><strong>Applicant Name:</strong> ${applicantName}</p>
+                    <p style="margin: 5px 0;"><strong>Student Number:</strong> ${studentNumber}</p>
+                    <p style="margin: 5px 0;"><strong>Position:</strong> ${capitalizeWords(ebRole)} Executive Assistant</p>
+                    <p style="margin: 5px 0;"><strong>Interview Date:</strong> ${interviewDate}</p>
+                    <p style="margin: 5px 0;"><strong>Interview Time:</strong> ${interviewTime}</p>
+                    ${meetingLink ? `<p style="margin: 5px 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}" target="_blank" style="color: #0284c7;">${meetingLink}</a></p>` : ''}
+                </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Please prepare for the interview and ensure you have access to the applicant's CV and application details 
+                    through the admin dashboard.
+                </p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    If you need to reschedule or have any questions, please contact the admin team.
+                </p>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                    <p style="color: #9ca3af; font-size: 14px;">
+                        Best regards,<br>
+                        CSSApply Team
+                    </p>
+                </div>
+            </div>
+        `
+    }),
+
+    ebInterviewNotificationCommittee: (ebName: string, applicantName: string, studentNumber: string, committee: string, interviewDate: string, interviewTime: string, meetingLink?: string): EmailTemplate => ({
+        subject: `CSSApply - New Committee Staff Interview Scheduled - ${applicantName}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #134687; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 1px;">CSSApply</h1>
+                </div>
+                
+                <h2 style="color: #1f2937;">Hello, ${ebName}!</h2>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    You have a new interview scheduled for a Committee Staff application. 
+                    An applicant has booked an interview slot for the <strong>${getCommitteeFullName(committee)}</strong> position.
+                </p>
+                
+                <div style="background-color: #e0f2fe; border: 2px solid #0284c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="color: #0284c7; margin-top: 0;">📅 Interview Details:</h3>
+                    <p style="margin: 5px 0;"><strong>Applicant Name:</strong> ${applicantName}</p>
+                    <p style="margin: 5px 0;"><strong>Student Number:</strong> ${studentNumber}</p>
+                    <p style="margin: 5px 0;"><strong>Committee:</strong> ${getCommitteeFullName(committee)}</p>
+                    <p style="margin: 5px 0;"><strong>Interview Date:</strong> ${interviewDate}</p>
+                    <p style="margin: 5px 0;"><strong>Interview Time:</strong> ${interviewTime}</p>
+                    ${meetingLink ? `<p style="margin: 5px 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}" target="_blank" style="color: #0284c7;">${meetingLink}</a></p>` : ''}
+                </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Please prepare for the interview and ensure you have access to the applicant's CV, portfolio, and application details 
+                    through the admin dashboard.
+                </p>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    If you need to reschedule or have any questions, please contact the admin team.
+                </p>
+                
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
                     <p style="color: #9ca3af; font-size: 14px;">
                         Best regards,<br>

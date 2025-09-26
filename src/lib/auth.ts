@@ -22,6 +22,8 @@ interface UserSession {
   hasMemberApplication?: boolean;
   hasEAApplication?: boolean;
   hasCommitteeApplication?: boolean;
+  ebRole?: string;
+  committeeId?: string;
   ebProfile?: {position: string; committees: string[]; isActive: boolean} | null;
 }
 
@@ -103,10 +105,8 @@ export const authOptions: NextAuthOptions = {
         (session.user as UserSession).role = token.role as string;
         (session.user as UserSession).dbId = token.dbId as string;
 
-        const shouldFetchFullData =
-          session.user.role === "admin" ||
-          session.user.role === "super_admin" ||
-          token.fetchFullData === true;
+        // Always fetch application data for all users to enable faster loading
+        const shouldFetchFullData = true;
 
         if (shouldFetchFullData) {
           try {
@@ -133,6 +133,7 @@ export const authOptions: NextAuthOptions = {
                     id: true,
                     hasAccepted: true,
                     status: true,
+                    firstOptionEb: true,
                   },
                 },
                 committeeApplication: {
@@ -140,6 +141,7 @@ export const authOptions: NextAuthOptions = {
                     id: true,
                     hasAccepted: true,
                     status: true,
+                    firstOptionCommittee: true,
                   },
                 },
                 ebProfile: {
@@ -171,6 +173,10 @@ export const authOptions: NextAuthOptions = {
                 !!dbUser.eaApplication;
               (session.user as UserSession).hasCommitteeApplication =
                 !!dbUser.committeeApplication;
+              
+              // Add redirect information for faster navigation
+              (session.user as UserSession).ebRole = dbUser.eaApplication?.firstOptionEb;
+              (session.user as UserSession).committeeId = dbUser.committeeApplication?.firstOptionCommittee;
 
               // Check if user has completed their profile
               (session.user as UserSession).hasCompletedProfile =
