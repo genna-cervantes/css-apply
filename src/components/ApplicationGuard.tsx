@@ -35,6 +35,12 @@ export default function ApplicationGuard({
 
   const checkApplication = useCallback(async () => {
     try {
+      // Add a small delay for success pages to allow database to sync
+      const isSuccessPage = window.location.pathname.includes('/success');
+      if (isSuccessPage) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
       // Add timeout to prevent hanging
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
@@ -80,8 +86,14 @@ export default function ApplicationGuard({
         setHasApplication(true);
       } else {
         console.error("ApplicationGuard: API response not ok:", response.status);
-        // On error, redirect to user dashboard
-        router.push("/user");
+        // For success pages, be more lenient with errors
+        const isSuccessPage = window.location.pathname.includes('/success');
+        if (!isSuccessPage) {
+          router.push("/user");
+        } else {
+          // For success pages, just show the content even if check fails
+          setHasApplication(true);
+        }
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -89,8 +101,14 @@ export default function ApplicationGuard({
       } else {
         console.error("Error checking application:", error);
       }
-      // On error, redirect to user dashboard
-      router.push("/user");
+      // For success pages, be more lenient with errors
+      const isSuccessPage = window.location.pathname.includes('/success');
+      if (!isSuccessPage) {
+        router.push("/user");
+      } else {
+        // For success pages, just show the content even if check fails
+        setHasApplication(true);
+      }
     } finally {
       setIsChecking(false);
     }

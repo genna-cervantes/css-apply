@@ -144,7 +144,7 @@ function MemberProgressPageContent() {
                       Member ID:
                     </span>
                     <span className={`text-sm sm:text-base ${applicationData.application?.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-                      {applicationData.application?.hasAccepted ? applicationData.user.id.toUpperCase() : 'Pending'}
+                      {applicationData.application?.hasAccepted ? applicationData.application.id.toUpperCase() : 'Pending'}
                     </span>
                   </div>
                 </div>

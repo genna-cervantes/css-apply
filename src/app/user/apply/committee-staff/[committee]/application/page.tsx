@@ -9,12 +9,16 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { parseFullName } from "@/lib/name-parsing";
 import { useFormPersistence } from "@/lib/useFormPersistence";
+import { usePageReload } from "@/lib/usePageReload";
 
 export default function CommitteeApplication() {
   const router = useRouter();
   const { committee: committeeId } = useParams<{ committee: string }>();
   const { data: session, status } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Disable auto-reload on application pages to prevent data loss
+  usePageReload({ disableReload: true });
 
   const [isChecked, setIsChecked] = useState(false);
   const [hasCheckedApplications, setHasCheckedApplications] = useState(false);

@@ -385,7 +385,7 @@ function EAProgressPageContent() {
                       Member ID:
                     </span>
                     <span className={`text-sm sm:text-base ${application.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-                      {application.hasAccepted ? applicationData.user.studentNumber.toUpperCase() : 'Pending'}
+                      {application.hasAccepted ? application.id.toUpperCase() : 'Pending'}
                     </span>
                   </div>
 
@@ -436,11 +436,11 @@ function EAProgressPageContent() {
                       ✅ Congratulations! You&apos;ve been accepted!
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
+                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
                       {application.redirection ? (
-                        <p><strong>Accepted at:</strong> {application.redirection}</p>
+                        <p><strong>Accepted at:</strong> Executive Assistant for {application.redirection}</p>
                       ) : (
-                        <p><strong>Accepted at:</strong> {firstEB?.title}</p>
+                        <p><strong>Accepted at:</strong> Executive Assistant for {firstEB?.title}</p>
                       )}
                     </div>
                   </div>
@@ -463,8 +463,8 @@ function EAProgressPageContent() {
                       🔄 Application Redirected
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {applicationData.user.studentNumber.toUpperCase()}</p>
-                      <p><strong>Redirected to:</strong> {application.redirection}</p>
+                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
+                      <p><strong>Redirected to:</strong> Executive Assistant for {application.redirection}</p>
                     </div>
                   </div>
                 )}

@@ -9,6 +9,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import { parseFullName } from "@/lib/name-parsing";
 import { useFormPersistence } from "@/lib/useFormPersistence";
+import { usePageReload } from "@/lib/usePageReload";
 
 export default function MemberApplication() {
   const [isChecked, setIsChecked] = useState(false);
@@ -18,6 +19,9 @@ export default function MemberApplication() {
   const [hasFetchedData, setHasFetchedData] = useState(false);
   const router = useRouter();
   const { data: session, status } = useSession();
+
+  // Disable auto-reload on application pages to prevent data loss
+  usePageReload({ disableReload: true });
 
   const initialFormData = {
     studentNumber: "",
@@ -155,7 +159,7 @@ export default function MemberApplication() {
 
       if (response.ok) {
         clearFormData(); // Clear the form data from localStorage
-        router.push("/user/apply/member/progress");
+        router.push("/user/apply/member/success");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Application submission failed");

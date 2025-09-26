@@ -8,10 +8,14 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { parseFullName } from "@/lib/name-parsing";
 import { useFormPersistence } from "@/lib/useFormPersistence";
+import { usePageReload } from "@/lib/usePageReload";
 
 export default function ExecutiveAssistantApplication() {
   const router = useRouter();
   const { "eb-role": ebId } = useParams<{ "eb-role": string }>();
+
+  // Disable auto-reload on application pages to prevent data loss
+  usePageReload({ disableReload: true });
 
   const { data: session, status } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
