@@ -711,11 +711,11 @@ const Schedule = () => {
                     }}
                     selectConstraint={{
                       start: "2025-09-16",
-                      end: "2025-10-04",
+                      end: "2025-10-05",
                     }}
                     validRange={{
                       start: "2025-09-16",
-                      end: "2025-10-04",
+                      end: "2025-10-05",
                     }}
                     eventOverlap={false}
                     nowIndicator={true}
