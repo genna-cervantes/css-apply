@@ -43,7 +43,7 @@ export default function ApplicationGuard({
       
       // Add timeout to prevent hanging
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 second timeout
       
       const response = await fetch("/api/applications/check-existing", {
         signal: controller.signal,
@@ -86,13 +86,33 @@ export default function ApplicationGuard({
         setHasApplication(true);
       } else {
         console.error("ApplicationGuard: API response not ok:", response.status);
-        // For success pages, be more lenient with errors
-        const isSuccessPage = window.location.pathname.includes('/success');
-        if (!isSuccessPage) {
-          router.push("/user");
-        } else {
-          // For success pages, just show the content even if check fails
+        // Be more lenient on application flow pages (especially schedule) to avoid bounce redirects
+        const pathname = window.location.pathname;
+        const isSuccessPage = pathname.includes('/success');
+        const isSchedulePage = pathname.includes('/schedule');
+        const isApplicationFlow = pathname.startsWith('/user/apply');
+
+        if (isSuccessPage || isSchedulePage) {
+          // Allow rendering despite transient check failures
           setHasApplication(true);
+        } else if (isApplicationFlow) {
+          // Redirect to appropriate application entry (not user dashboard)
+          let defaultRedirectPath = "";
+          switch (applicationType) {
+            case "member":
+              defaultRedirectPath = "/user/apply/member";
+              break;
+            case "committee":
+              defaultRedirectPath = "/user/apply/committee-staff";
+              break;
+            case "ea":
+              defaultRedirectPath = "/user/apply/executive-assistant";
+              break;
+          }
+          const targetPath = redirectPath || defaultRedirectPath || "/user";
+          router.push(targetPath);
+        } else {
+          router.push("/user");
         }
       }
     } catch (error) {
@@ -101,13 +121,31 @@ export default function ApplicationGuard({
       } else {
         console.error("Error checking application:", error);
       }
-      // For success pages, be more lenient with errors
-      const isSuccessPage = window.location.pathname.includes('/success');
-      if (!isSuccessPage) {
-        router.push("/user");
-      } else {
-        // For success pages, just show the content even if check fails
+      // Be more lenient on application flow pages (especially schedule) to avoid bounce redirects
+      const pathname = window.location.pathname;
+      const isSuccessPage = pathname.includes('/success');
+      const isSchedulePage = pathname.includes('/schedule');
+      const isApplicationFlow = pathname.startsWith('/user/apply');
+
+      if (isSuccessPage || isSchedulePage) {
         setHasApplication(true);
+      } else if (isApplicationFlow) {
+        let defaultRedirectPath = "";
+        switch (applicationType) {
+          case "member":
+            defaultRedirectPath = "/user/apply/member";
+            break;
+          case "committee":
+            defaultRedirectPath = "/user/apply/committee-staff";
+            break;
+          case "ea":
+            defaultRedirectPath = "/user/apply/executive-assistant";
+            break;
+        }
+        const targetPath = redirectPath || defaultRedirectPath || "/user";
+        router.push(targetPath);
+      } else {
+        router.push("/user");
       }
     } finally {
       setIsChecking(false);

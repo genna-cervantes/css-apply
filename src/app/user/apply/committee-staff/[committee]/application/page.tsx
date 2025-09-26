@@ -296,7 +296,6 @@ export default function CommitteeApplication() {
       });
 
       const responseData = await response.json();
-      console.log("API response:", responseData);
 
       if (response.ok) {
         clearFormData(); // Clear the form data from localStorage
