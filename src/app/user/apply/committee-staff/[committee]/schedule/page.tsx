@@ -137,7 +137,7 @@ function SchedulePageContent() {
       const hardcodedDates = [];
       const start = new Date();
       start.setHours(0, 0, 0, 0);
-      const end = new Date(2025, 8, 26);
+      const end = new Date(2025, 9, 4);
       end.setHours(23, 59, 59, 999);
 
       for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
