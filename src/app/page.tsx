@@ -893,7 +893,7 @@ function HomeContent() {
             </div>
 
             <div className="flex flex-col text-xs md:text-sm lg:text-md lg:flex-row gap-4 lg:gap-7 mt-7 font-inter">
-              <button
+              {/* <button
                 onClick={() => handleApplyClick("/user/apply/member")}
                 className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
               >
@@ -914,7 +914,7 @@ function HomeContent() {
                 className="bg-white lg:w-72 px-7 py-2 lg:py-4 rounded-3xl shadow-[0_12px_36px_rgba(0,0,0,0.55)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.65)] hover:bg-[#d5d5d5] hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 Apply as Executive Assistant
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
