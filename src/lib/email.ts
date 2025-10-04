@@ -353,20 +353,20 @@ export const emailTemplates = {
                     We look forward to seeing you at our upcoming events and activities. Welcome to the CSS family!
                 </p>
                 
-                <!-- Follow Us Section -->
+                <!-- Join Group Section -->
                 <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
-                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
                     <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
-                        Follow our official Facebook page for the latest updates, events, and announcements:
+                        Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/USTCSS" 
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
-                            📘 Follow CSS Facebook Page
+                            👥 Join UST CSS Members 25'-26' Group
                         </a>
                     </div>
                     <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
-                        Stay updated with our latest news, events, and opportunities!
+                        Connect with fellow members and stay updated with exclusive announcements!
                     </p>
                 </div>
                 
@@ -449,20 +449,20 @@ export const emailTemplates = {
                     We look forward to working with you!
                 </p>
                 
-                <!-- Follow Us Section -->
+                <!-- Join Group Section -->
                 <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
-                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
                     <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
-                        Follow our official Facebook page for the latest updates, events, and announcements:
+                        Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/USTCSS" 
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
-                            📘 Follow CSS Facebook Page
+                            👥 Join UST CSS Members 25'-26' Group
                         </a>
                     </div>
                     <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
-                        Stay updated with our latest news, events, and opportunities!
+                        Connect with fellow members and stay updated with exclusive announcements!
                     </p>
                 </div>
                 
@@ -545,20 +545,20 @@ export const emailTemplates = {
                     We look forward to working with you!
                 </p>
                 
-                <!-- Follow Us Section -->
+                <!-- Join Group Section -->
                 <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
-                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
                     <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
-                        Follow our official Facebook page for the latest updates, events, and announcements:
+                        Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/USTCSS" 
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
-                            📘 Follow CSS Facebook Page
+                            👥 Join UST CSS Members 25'-26' Group
                         </a>
                     </div>
                     <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
-                        Stay updated with our latest news, events, and opportunities!
+                        Connect with fellow members and stay updated with exclusive announcements!
                     </p>
                 </div>
                 
@@ -735,20 +735,20 @@ export const emailTemplates = {
                     Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
                 
-                <!-- Follow Us Section -->
+                <!-- Join Group Section -->
                 <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
-                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
                     <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
-                        Follow our official Facebook page for the latest updates, events, and announcements:
+                        Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/USTCSS" 
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
-                            📘 Follow CSS Facebook Page
+                            👥 Join UST CSS Members 25'-26' Group
                         </a>
                     </div>
                     <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
-                        Stay updated with our latest news, events, and opportunities!
+                        Connect with fellow members and stay updated with exclusive announcements!
                     </p>
                 </div>
                 
@@ -837,20 +837,20 @@ export const emailTemplates = {
                     Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
                 
-                <!-- Follow Us Section -->
+                <!-- Join Group Section -->
                 <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
-                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
                     <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
-                        Follow our official Facebook page for the latest updates, events, and announcements:
+                        Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/USTCSS" 
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
-                            📘 Follow CSS Facebook Page
+                            👥 Join UST CSS Members 25'-26' Group
                         </a>
                     </div>
                     <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
-                        Stay updated with our latest news, events, and opportunities!
+                        Connect with fellow members and stay updated with exclusive announcements!
                     </p>
                 </div>
                 
@@ -945,20 +945,20 @@ export const emailTemplates = {
                     Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
                 
-                <!-- Follow Us Section -->
+                <!-- Join Group Section -->
                 <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
-                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
                     <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
-                        Follow our official Facebook page for the latest updates, events, and announcements:
+                        Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/USTCSS" 
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
-                            📘 Follow CSS Facebook Page
+                            👥 Join UST CSS Members 25'-26' Group
                         </a>
                     </div>
                     <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
-                        Stay updated with our latest news, events, and opportunities!
+                        Connect with fellow members and stay updated with exclusive announcements!
                     </p>
                 </div>
                 
