@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import ApplicationGuard from "@/components/ApplicationGuard";
 import { roles } from "@/data/ebRoles";
 import { useSession } from "next-auth/react";
+import { truncateToLast7 } from "@/lib/truncate-utils";
 import type React from "react";
 
 function EAProgressPageContent() {
@@ -385,7 +386,7 @@ function EAProgressPageContent() {
                       Member ID:
                     </span>
                     <span className={`text-sm sm:text-base ${application.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-                      {application.hasAccepted ? application.id.toUpperCase() : 'Pending'}
+                      {application.hasAccepted ? truncateToLast7(application.id).toUpperCase() : 'Pending'}
                     </span>
                   </div>
 
@@ -436,7 +437,7 @@ function EAProgressPageContent() {
                       ✅ Congratulations! You&apos;ve been accepted!
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
+                      <p><strong>Member ID:</strong> {truncateToLast7(application.id).toUpperCase()}</p>
                       {application.redirection ? (
                         <p><strong>Accepted at:</strong> Executive Assistant for {application.redirection}</p>
                       ) : (
@@ -463,7 +464,7 @@ function EAProgressPageContent() {
                       🔄 Application Redirected
                     </div>
                     <div className="text-gray-600">
-                      <p><strong>Member ID:</strong> {application.id.toUpperCase()}</p>
+                      <p><strong>Member ID:</strong> {truncateToLast7(application.id).toUpperCase()}</p>
                       <p><strong>Redirected to:</strong> Executive Assistant for {application.redirection}</p>
                     </div>
                   </div>

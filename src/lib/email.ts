@@ -1,5 +1,6 @@
 import * as brevo from '@getbrevo/brevo';
 import { getEBEmailWithFallback, ADMIN_EMAILS, validateAllEmailMappings } from '@/data/emailMappings';
+import { truncateToLast7 } from '@/lib/truncate-utils';
 
 // Initialize Brevo API client
 const apiInstance = new brevo.TransactionalEmailsApi();
@@ -303,13 +304,13 @@ export const emailTemplates = {
                 <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #059669; margin-top: 0;">🎉 Acceptance Details:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
-                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${truncateToLast7(userId).toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Member</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
                 </div>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Your Member ID (<strong>${userId.toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Your Member ID (<strong>${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
                     Please keep this information safe as you'll need it for future activities and events.
                 </p>
                 
@@ -345,14 +346,14 @@ export const emailTemplates = {
                 <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #059669; margin-top: 0;">🎉 Acceptance Details:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
-                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${truncateToLast7(userId).toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
                     <p style="margin: 5px 0;"><strong>Committee:</strong> ${getCommitteeFullName(committee)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
                 </div>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Your Member ID (<strong>${userId.toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Your Member ID (<strong>${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
                     Please keep this information safe as you'll need it for committee activities and events.
                 </p>
                 
@@ -389,14 +390,14 @@ export const emailTemplates = {
                 <div style="background-color: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #059669; margin-top: 0;">🎉 Acceptance Details:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
-                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${userId.toUpperCase()}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${truncateToLast7(userId).toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
                     <p style="margin: 5px 0;"><strong>EA Role:</strong> ${capitalizeWords(ebRole)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">ACCEPTED</span></p>
                 </div>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Your Member ID (<strong>${userId.toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Your Member ID (<strong>${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
                     Please keep this information safe as you'll need it for executive assistant activities and events.
                 </p>
                 
@@ -503,7 +504,7 @@ export const emailTemplates = {
     }),
 
     // Redirection notification templates
-    committeeRedirected: (userName: string, originalCommittee: string, redirectedCommittee: string): EmailTemplate => ({
+    committeeRedirected: (userName: string, userId: string, originalCommittee: string, redirectedCommittee: string): EmailTemplate => ({
         subject: "CSSApply - Committee Staff Application Redirected",
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -521,11 +522,17 @@ export const emailTemplates = {
                 <div style="background-color: #fef3c7; border: 2px solid #d97706; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #d97706; margin-top: 0;">🔄 Application Redirected:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${truncateToLast7(userId).toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Committee Staff</p>
                     <p style="margin: 5px 0;"><strong>Original Committee:</strong> ${getCommitteeFullName(originalCommittee)}</p>
                     <p style="margin: 5px 0;"><strong>Redirected to:</strong> ${getCommitteeFullName(redirectedCommittee)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold;">REDIRECTED</span></p>
                 </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Your Member ID (<strong>${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for committee activities and events.
+                </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     This redirection is based on our assessment of your qualifications and the current needs 
@@ -534,7 +541,7 @@ export const emailTemplates = {
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: genna.cervantes.cics@ust.edu.ph.
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
@@ -547,7 +554,7 @@ export const emailTemplates = {
         `
     }),
 
-    executiveAssistantRedirected: (userName: string, originalEbRole: string, redirectedEbRole: string): EmailTemplate => ({
+    executiveAssistantRedirected: (userName: string, userId: string, originalEbRole: string, redirectedEbRole: string): EmailTemplate => ({
         subject: "CSSApply - Executive Assistant Application Redirected",
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -565,11 +572,17 @@ export const emailTemplates = {
                 <div style="background-color: #fef3c7; border: 2px solid #d97706; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #d97706; margin-top: 0;">🔄 Application Redirected:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${truncateToLast7(userId).toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
                     <p style="margin: 5px 0;"><strong>Original EA Role:</strong> ${capitalizeWords(originalEbRole)}</p>
                     <p style="margin: 5px 0;"><strong>Redirected to:</strong> ${capitalizeWords(redirectedEbRole)}</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold;">REDIRECTED</span></p>
                 </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Your Member ID (<strong>${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for executive assistant activities and events.
+                </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     This redirection is based on our assessment of your qualifications and the current needs 
@@ -578,7 +591,7 @@ export const emailTemplates = {
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: genna.cervantes.cics@ust.edu.ph.
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
@@ -591,7 +604,7 @@ export const emailTemplates = {
         `
     }),
 
-    executiveAssistantRedirectedToCommittee: (userName: string, originalEbRole: string, committeeId: string): EmailTemplate => ({
+    executiveAssistantRedirectedToCommittee: (userName: string, userId: string, originalEbRole: string, committeeId: string): EmailTemplate => ({
         subject: "CSSApply - Executive Assistant Application Redirected to Committee Staff",
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -609,11 +622,17 @@ export const emailTemplates = {
                 <div style="background-color: #fef3c7; border: 2px solid #d97706; padding: 20px; border-radius: 8px; margin: 20px 0;">
                     <h3 style="color: #d97706; margin-top: 0;">🔄 Application Redirected:</h3>
                     <p style="margin: 5px 0;"><strong>Name:</strong> ${userName}</p>
+                    <p style="margin: 5px 0;"><strong>Member ID:</strong> ${truncateToLast7(userId).toUpperCase()}</p>
                     <p style="margin: 5px 0;"><strong>Application Type:</strong> Executive Assistant</p>
                     <p style="margin: 5px 0;"><strong>Original EA Role:</strong> ${capitalizeWords(originalEbRole)}</p>
                     <p style="margin: 5px 0;"><strong>Redirected to:</strong> ${capitalizeWords(committeeId)} Committee Staff</p>
                     <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold;">REDIRECTED</span></p>
                 </div>
+                
+                <p style="color: #4b5563; line-height: 1.6;">
+                    Your Member ID (<strong>${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for committee activities and events.
+                </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
                     This redirection is based on our assessment of your qualifications and the current needs 
@@ -628,7 +647,7 @@ export const emailTemplates = {
                 </p>
                 
                 <p style="color: #4b5563; line-height: 1.6;">
-                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: genna.cervantes.cics@ust.edu.ph.
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">

@@ -395,6 +395,68 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Clean up orphaned committee application records
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check if user has admin access
+    const userRole = session.user.role;
+    const hasAdminAccess = userRole === "admin" || userRole === "super_admin";
+
+    if (!hasAdminAccess) {
+      return NextResponse.json(
+        { error: "Forbidden - Admin access required" },
+        { status: 403 }
+      );
+    }
+
+    // Find and delete orphaned committee application records
+    // These are committee applications with status "redirected" where the corresponding EA application is "failed"
+    const orphanedCommitteeApps = await prisma.committeeApplication.findMany({
+      where: {
+        status: "redirected"
+      },
+      include: {
+        user: {
+          include: {
+            eaApplication: true
+          }
+        }
+      }
+    });
+
+    let cleanedCount = 0;
+    for (const committeeApp of orphanedCommitteeApps) {
+      // Check if the corresponding EA application exists and is failed
+      if (committeeApp.user.eaApplication && committeeApp.user.eaApplication.status === "failed") {
+        await prisma.committeeApplication.delete({
+          where: { id: committeeApp.id }
+        });
+        cleanedCount++;
+        console.log(`Cleaned up orphaned committee application for student: ${committeeApp.studentNumber}`);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Cleaned up ${cleanedCount} orphaned committee application records`,
+      cleanedCount
+    });
+
+  } catch (error) {
+    console.error("Error cleaning up orphaned records:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 // UPDATE application status (accept/reject)
 export async function PUT(request: NextRequest) {
   try {
@@ -544,13 +606,14 @@ export async function PUT(request: NextRequest) {
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
             console.log(`Rejection email sent to ${updatedApplication.user.email} for committee application`);
           } else if (action === "redirect" && updatedApplication?.user?.id && redirection) {
-            const emailTemplate = emailTemplates.committeeAccepted(
+            const emailTemplate = emailTemplates.committeeRedirected(
               updatedApplication.user.name,
               updatedApplication.user.id,
+              updatedApplication.firstOptionCommittee || 'Original Committee',
               redirection
             );
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
-            console.log(`Acceptance email sent to ${updatedApplication.user.email} for committee application (redirected to ${redirection})`);
+            console.log(`Redirect email sent to ${updatedApplication.user.email} for committee application (redirected to ${redirection})`);
           } else if (action === "evaluate" && updatedApplication?.firstOptionCommittee) {
             const emailTemplate = emailTemplates.committeeEvaluating(
               updatedApplication.user.name,
@@ -565,14 +628,54 @@ export async function PUT(request: NextRequest) {
         }
       }
     } else if (type === "ea") {
+      // First get the current application data to check if it was redirected
+      const currentApplication = await prisma.eAApplication.findUnique({
+        where: { id: applicationId },
+        select: { status: true, redirection: true, studentNumber: true }
+      });
+
       const updateData: {hasAccepted?: boolean; status?: string; redirection?: string} = {};
 
       if (action === "accept") {
         updateData.hasAccepted = true;
         updateData.status = "passed";
+        
+        // If this EA application was redirected to a committee, clean up the committee application record
+        if (currentApplication?.status === "redirected" && currentApplication?.redirection) {
+          try {
+            await prisma.committeeApplication.deleteMany({
+              where: {
+                studentNumber: currentApplication.studentNumber,
+                status: "redirected",
+                redirection: currentApplication.redirection
+              }
+            });
+            console.log(`Cleaned up committee application record for accepted EA application: ${currentApplication.studentNumber}`);
+          } catch (error) {
+            console.error('Error cleaning up committee application record:', error);
+            // Don't fail the request if cleanup fails
+          }
+        }
       } else if (action === "reject") {
         updateData.hasAccepted = false;
         updateData.status = "failed";
+        
+        // If this EA application was redirected to a committee, clean up the committee application record
+        if (currentApplication?.status === "redirected" && currentApplication?.redirection) {
+          try {
+            await prisma.committeeApplication.deleteMany({
+              where: {
+                studentNumber: currentApplication.studentNumber,
+                status: "redirected",
+                redirection: currentApplication.redirection
+              }
+            });
+            console.log(`Cleaned up committee application record for rejected EA application: ${currentApplication.studentNumber}`);
+          } catch (error) {
+            console.error('Error cleaning up committee application record:', error);
+            // Don't fail the request if cleanup fails
+          }
+        }
       } else if (action === "redirect" && redirection) {
         updateData.hasAccepted = true;
         updateData.status = "redirected";
@@ -620,8 +723,8 @@ export async function PUT(request: NextRequest) {
             studentNumber: updatedApplication.studentNumber,
             firstOptionCommittee: updatedApplication.firstOptionEb, // Store EA first choice directly
             secondOptionCommittee: updatedApplication.secondOptionEb, // Store EA second choice directly
-            hasAccepted: true,
-            status: "passed",
+            hasAccepted: false, // Don't mark as accepted since this is a redirection
+            status: "redirected", // Mark as redirected instead of passed
             redirection: committeeTitle, // Store the redirected committee
             interviewSlotDay: updatedApplication.interviewSlotDay,
             interviewSlotTimeStart: updatedApplication.interviewSlotTimeStart,
@@ -658,6 +761,7 @@ export async function PUT(request: NextRequest) {
               const committeeId = redirection.replace('committee-', '');
               const emailTemplate = emailTemplates.executiveAssistantRedirectedToCommittee(
                 updatedApplication.user.name,
+                updatedApplication.user.id,
                 updatedApplication.firstOptionEb || 'Executive Assistant',
                 committeeId
               );
@@ -667,6 +771,7 @@ export async function PUT(request: NextRequest) {
               // Regular EA to EA redirection
               const emailTemplate = emailTemplates.executiveAssistantRedirected(
                 updatedApplication.user.name,
+                updatedApplication.user.id,
                 updatedApplication.firstOptionEb || 'Executive Assistant',
                 redirection
               );

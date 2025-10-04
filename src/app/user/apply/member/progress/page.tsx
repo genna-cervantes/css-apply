@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ApplicationGuard from "@/components/ApplicationGuard";
 import { useSession } from "next-auth/react";
+import { truncateToLast7 } from "@/lib/truncate-utils";
 
 function MemberProgressPageContent() {
   const router = useRouter();
@@ -144,7 +145,7 @@ function MemberProgressPageContent() {
                       Member ID:
                     </span>
                     <span className={`text-sm sm:text-base ${applicationData.application?.hasAccepted ? 'text-green-600 font-semibold' : 'text-gray-500'}`}>
-                      {applicationData.application?.hasAccepted ? applicationData.application.id.toUpperCase() : 'Pending'}
+                      {applicationData.application?.hasAccepted ? truncateToLast7(applicationData.application.id).toUpperCase() : 'Pending'}
                     </span>
                   </div>
                 </div>
