@@ -353,6 +353,23 @@ export const emailTemplates = {
                     We look forward to seeing you at our upcoming events and activities. Welcome to the CSS family!
                 </p>
                 
+                <!-- Follow Us Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Follow our official Facebook page for the latest updates, events, and announcements:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/USTCSS" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            📘 Follow CSS Facebook Page
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Stay updated with our latest news, events, and opportunities!
+                    </p>
+                </div>
+                
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
                     <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
                         Best regards,<br>
@@ -432,6 +449,23 @@ export const emailTemplates = {
                     We look forward to working with you!
                 </p>
                 
+                <!-- Follow Us Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Follow our official Facebook page for the latest updates, events, and announcements:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/USTCSS" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            📘 Follow CSS Facebook Page
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Stay updated with our latest news, events, and opportunities!
+                    </p>
+                </div>
+                
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
                     <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
                         Best regards,<br>
@@ -510,6 +544,23 @@ export const emailTemplates = {
                     As an Executive Assistant for ${capitalizeWords(ebRole)}, you'll play a crucial role in supporting our leadership team. 
                     We look forward to working with you!
                 </p>
+                
+                <!-- Follow Us Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Follow our official Facebook page for the latest updates, events, and announcements:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/USTCSS" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            📘 Follow CSS Facebook Page
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Stay updated with our latest news, events, and opportunities!
+                    </p>
+                </div>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
                     <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
@@ -684,6 +735,23 @@ export const emailTemplates = {
                     Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
                 
+                <!-- Follow Us Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Follow our official Facebook page for the latest updates, events, and announcements:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/USTCSS" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            📘 Follow CSS Facebook Page
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Stay updated with our latest news, events, and opportunities!
+                    </p>
+                </div>
+                
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
                     <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
                         Best regards,<br>
@@ -768,6 +836,23 @@ export const emailTemplates = {
                 <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
                     Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
+                
+                <!-- Follow Us Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Follow our official Facebook page for the latest updates, events, and announcements:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/USTCSS" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            📘 Follow CSS Facebook Page
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Stay updated with our latest news, events, and opportunities!
+                    </p>
+                </div>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
                     <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
@@ -859,6 +944,23 @@ export const emailTemplates = {
                 <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
                     Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
                 </p>
+                
+                <!-- Follow Us Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">📱 Stay Connected</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Follow our official Facebook page for the latest updates, events, and announcements:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/USTCSS" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            📘 Follow CSS Facebook Page
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Stay updated with our latest news, events, and opportunities!
+                    </p>
+                </div>
                 
                 <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
                     <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
