@@ -285,12 +285,12 @@ export default function UserDashboard() {
                               One-time membership fee of ₱250
                             </li>
                           </ul>
-                          <a
+                          {/* <a
                             href="/user/apply/member"
                             className="whitespace-nowrap bg-[#044FAF] font-inter text-[11px] md:text-sm text-white px-3 py-2 md:px-4 md:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                           >
                             Apply as Member
-                          </a>
+                          </a> */}
                         </div>
                       </div>
                     </div>
@@ -319,12 +319,12 @@ export default function UserDashboard() {
                               One-time membership fee of ₱250
                             </li>
                           </ul>
-                          <a
+                          {/* <a
                             href="/user/apply/committee-staff"
                             className="whitespace-nowrap bg-[#044FAF] font-inter text-[11px] md:text-sm text-white px-3 py-2 md:px-4 md:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                           >
                             Apply as Committee Staff
-                          </a>
+                          </a> */}
                         </div>
                       </div>
                     </div>
@@ -355,12 +355,12 @@ export default function UserDashboard() {
                               One-time membership fee of ₱250
                             </li>
                           </ul>
-                          <a
+                          {/* <a
                             href="/user/apply/executive-assistant"
                             className="whitespace-nowrap bg-[#044FAF] font-inter text-[10px] md:text-sm text-white px-3 py-2 md:px-4 md:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                           >
                             Apply as Executive Assistant
-                          </a>
+                          </a> */}
                         </div>
                       </div>
                     </div>
@@ -407,12 +407,12 @@ export default function UserDashboard() {
                         One-time membership fee of ₱250
                       </li>
                     </ul>
-                    <a
+                    {/* <a
                       href="/user/apply/member"
                       className="whitespace-nowrap bg-[#044FAF] font-inter text-xs xl:text-sm text-white px-4 xl:px-6 py-2.5 xl:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                     >
                       Apply as Member
-                    </a>
+                    </a> */}
                   </div>
                 </div>
               </div>
@@ -436,12 +436,12 @@ export default function UserDashboard() {
                         One-time membership fee of ₱250
                       </li>
                     </ul>
-                    <a
+                    {/* <a
                       href="/user/apply/committee-staff"
                       className="whitespace-nowrap bg-[#044FAF] font-inter text-xs xl:text-sm text-white px-4 xl:px-6 py-2.5 xl:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                     >
                       Apply as Committee Staff
-                    </a>
+                    </a> */}
                   </div>
                 </div>
               </div>
@@ -469,12 +469,12 @@ export default function UserDashboard() {
                         One-time membership fee of ₱250
                       </li>
                     </ul>
-                    <a
+                    {/* <a
                       href="/user/apply/executive-assistant"
                       className="whitespace-nowrap bg-[#044FAF] font-inter text-xs xl:text-sm text-white px-4 xl:px-6 py-2.5 xl:py-3 rounded-md hover:bg-[#04387B] transition-all duration-300 ease-in-out transform hover:scale-102 active:scale-98 text-center mt-2 flex-shrink-0 shadow-md hover:shadow-lg"
                     >
                       Apply as Executive Assistant
-                    </a>
+                    </a> */}
                   </div>
                 </div>
               </div>
