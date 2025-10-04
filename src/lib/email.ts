@@ -322,7 +322,7 @@ export const emailTemplates = {
                     <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
                     
                     <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
-                        To complete your membership, please proceed with the payment using the GCash QR code below:
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
                     </p>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -417,7 +417,7 @@ export const emailTemplates = {
                     <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
                     
                     <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
-                        To complete your membership, please proceed with the payment using the GCash QR code below:
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
                     </p>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -513,7 +513,7 @@ export const emailTemplates = {
                     <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
                     
                     <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
-                        To complete your membership, please proceed with the payment using the GCash QR code below:
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
                     </p>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -698,7 +698,7 @@ export const emailTemplates = {
                     <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
                     
                     <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
-                        To complete your membership, please proceed with the payment using the GCash QR code below:
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
                     </p>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -800,7 +800,7 @@ export const emailTemplates = {
                     <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
                     
                     <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
-                        To complete your membership, please proceed with the payment using the GCash QR code below:
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
                     </p>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -902,7 +902,7 @@ export const emailTemplates = {
                     <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
                     
                     <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
-                        To complete your membership, please proceed with the payment using the GCash QR code below:
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
                     </p>
                     
                     <div style="text-align: center; margin: 20px 0;">
