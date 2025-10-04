@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
 import SidebarContent from '@/components/AdminSidebar';
+import { truncateToLast7 } from '@/lib/truncate-utils';
 
 interface Member {
   id: string;
@@ -161,7 +162,7 @@ const Members = () => {
                         <div>Student #: {member.studentNumber} | Section: {member.user.section}</div>
                         <div>Email: {member.user.email}</div>
                         {member.hasAccepted && (
-                          <div className="text-green-600 font-semibold">Member ID: {member.user.id.toUpperCase()}</div>
+                          <div className="text-green-600 font-semibold">Member ID: {truncateToLast7(member.user.id).toUpperCase()}</div>
                         )}
                         {member.paymentProof && (
                           <div>Payment Proof: {member.paymentProof}</div>

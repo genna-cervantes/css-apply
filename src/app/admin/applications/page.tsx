@@ -7,6 +7,7 @@ import MobileSidebar from '@/components/AdminMobileSB';
 import SidebarContent from '@/components/AdminSidebar';
 import { committeeRoles, committeeRolesSubmitted } from '@/data/committeeRoles';
 import { roles } from '@/data/ebRoles';
+import { truncateToLast7 } from '@/lib/truncate-utils';
 import { LucideChevronDown, LucideChevronUp } from "lucide-react";
 
 // Helper function to get committee full name
@@ -520,7 +521,7 @@ const Applications = () => {
                       )}
                       {application.hasAccepted && (
                         <div className="text-xs text-green-600 font-semibold text-left sm:text-right">
-                          Member ID: {application.user.id.toUpperCase()}
+                          Member ID: {truncateToLast7(application.user.id).toUpperCase()}
                         </div>
                       )}
                     </div>
@@ -688,7 +689,7 @@ const Applications = () => {
                       )}
                       {application.hasAccepted && (
                         <div className="text-xs text-green-600 font-semibold text-left sm:text-right">
-                          Member ID: {application.user.id.toUpperCase()}
+                          Member ID: {truncateToLast7(application.user.id).toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
                               Redirected to: {application.redirection}
@@ -853,7 +854,7 @@ const Applications = () => {
                       )}
                       {application.hasAccepted && (
                         <div className="text-xs text-green-600 font-semibold text-left sm:text-right">
-                          Member ID: {application.user.id.toUpperCase()}
+                          Member ID: {truncateToLast7(application.user.id).toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
                               Redirected to: {application.redirection}
