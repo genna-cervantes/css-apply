@@ -396,7 +396,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Clean up orphaned committee application records
-export async function DELETE(request: NextRequest) {
+export async function DELETE(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
