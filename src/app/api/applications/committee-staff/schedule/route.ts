@@ -72,8 +72,6 @@ export async function POST(request: NextRequest) {
         const totalConflicts = existingEABookings.length + existingCommitteeBookings.length;
 
         if (totalConflicts > 0) {
-            console.log(`Slot conflict detected for Committee application: ${studentNumber} trying to book ${interviewSlotDay} ${interviewSlotTimeStart}-${interviewSlotTimeEnd} with ${interviewBy}`);
-            console.log(`Found ${existingEABookings.length} EA conflicts and ${existingCommitteeBookings.length} Committee conflicts`);
             return NextResponse.json(
                 { 
                     error: 'This time slot is no longer available. Please select another time slot.',
@@ -98,7 +96,6 @@ export async function POST(request: NextRequest) {
             // Get the EB profile for the interviewer to get their meeting link
             // Convert EB role ID to position title for the query
             const positionTitle = getPositionTitle(interviewBy);
-            console.log('Looking for EB profile:', { interviewBy, positionTitle });
             const ebProfile = await prisma.eBProfile.findFirst({
                 where: { 
                     position: positionTitle 
@@ -106,7 +103,6 @@ export async function POST(request: NextRequest) {
             });
 
             const meetingLink = ebProfile?.meetingLink || null;
-            console.log('EB profile found:', { ebProfile: ebProfile?.position, meetingLink });
 
             // Send email to applicant
             const emailTemplate = emailTemplates.committeeApplication(
@@ -123,7 +119,6 @@ export async function POST(request: NextRequest) {
             try {
                 // Convert position title to role ID if needed
                 const roleId = getRoleId(interviewBy);
-                console.log(`Converting interviewBy "${interviewBy}" to roleId "${roleId}"`);
                 
                 const ebRole = roles.find(r => r.id === roleId);
                 const ebName = ebRole?.ebName || interviewBy;

@@ -43,7 +43,7 @@ function HomeContent() {
     }
   };
 
-  const handleApplyClick = async (targetPath: string) => {
+  const _handleApplyClick = async (targetPath: string) => {
     setIsLoggingIn(true);
     try {
       const result = await signIn("google", {

@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log(`Conflict resolved for ${applicationType} application: ${studentNumber}. Reason: ${reason || 'No reason provided'}`);
 
         return NextResponse.json({
             success: true,

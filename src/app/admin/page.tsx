@@ -250,7 +250,6 @@ const Schedule = () => {
     });
 
     // Convert interview slots to FullCalendar events
-    console.log('Generating calendar events for interview slots:', interviewSlots);
     const interviewEvents = interviewSlots.map((slot: { id: string; day: string; name: string; timeStart: string; timeEnd: string; meetingLink?: string }) => {
       // Ensure we have valid date and time data
       if (!slot.day || !slot.timeStart || !slot.timeEnd) {
@@ -279,8 +278,6 @@ const Schedule = () => {
       const timeSlot = `${slot.timeStart}-${slot.timeEnd}`;
       const title = shortName; // Just show the name, FullCalendar handles the time display
 
-      console.log(`Creating event for ${slot.name}: ${slot.day} ${slot.timeStart}-${slot.timeEnd}`);
-      console.log(`Parsed dates: start=${startDateTime.toISOString()}, end=${endDateTime.toISOString()}`);
 
       return {
         id: `interview-${slot.id}`,
@@ -299,13 +296,10 @@ const Schedule = () => {
       };
     }).filter((event): event is NonNullable<typeof event> => event !== null); // Remove any null events
 
-    console.log(`Generated ${unavailableEvents.length} unavailable events and ${interviewEvents.length} interview events`);
 
     events.push(...unavailableEvents, ...interviewEvents);
     
     // Debug: Log all events being passed to calendar
-    console.log('All calendar events:', events);
-    console.log('Interview events specifically:', interviewEvents);
     
     setCalendarEvents(events);
   }, [unavailableTimeSlots, interviewSlots]);
@@ -347,22 +341,16 @@ const Schedule = () => {
       setUnavailableTimeSlots(unavailableRes.unavailableSlotsData || []);
       
       if (interviewRes.success && interviewRes.slots) {
-        console.log('Interview slots received:', interviewRes.slots);
-        console.log('Number of interview slots:', interviewRes.slots.length);
         
         // Check specifically for EA applicants
         const eaSlots = interviewRes.slots.filter((slot: { name: string }) => 
           slot.name.includes('KED MORENO') || slot.name.includes('MATTHEW BENEDICT AQUINO')
         );
-        console.log('EA applicants found:', eaSlots.length);
         eaSlots.forEach((slot: { name: string; day: string; timeStart: string; timeEnd: string }) => {
-          console.log(`EA applicant: ${slot.name} - ${slot.day} ${slot.timeStart}-${slot.timeEnd}`);
         });
         
         setInterviewSlots(interviewRes.slots);
       } else {
-        console.log('No interview slots received or success=false');
-        console.log('Response:', interviewRes);
         setInterviewSlots([]);
       }
       

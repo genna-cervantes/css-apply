@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const status = searchParams.get('status');
+    const committee = searchParams.get('committee');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const skip = (page - 1) * limit;
@@ -289,6 +290,33 @@ export async function GET(request: NextRequest) {
     if (type === 'committee') {
       const whereClause: Record<string, unknown> = {};
       
+      // Filter by committee if provided
+      if (committee && committee !== 'all') {
+        // For committee-specific filtering, we need to handle redirected applications
+        // A redirected application should only appear in the committee they were redirected TO
+        // We need to handle both committee ID and committee title since redirections store the full title
+        
+        // Get the committee title for the given committee ID
+        const { committeeRolesSubmitted } = await import('@/data/committeeRoles');
+        const committeeData = committeeRolesSubmitted.find(c => c.id === committee);
+        const committeeTitle = committeeData?.title;
+        
+        whereClause.OR = [
+          // Direct applications to this committee (not redirected)
+          { 
+            firstOptionCommittee: committee,
+            redirection: null // Not redirected
+          },
+          // Applications redirected TO this committee (by ID or title)
+          ...(committeeTitle ? [
+            { redirection: committee }, // By committee ID
+            { redirection: committeeTitle } // By committee title
+          ] : [
+            { redirection: committee } // Fallback to just committee ID
+          ])
+        ];
+      }
+      
       // Filter by status if provided
       if (status === 'accepted') {
         whereClause.hasAccepted = true;
@@ -303,6 +331,9 @@ export async function GET(request: NextRequest) {
         whereClause.status = 'evaluating';
       } else if (status === 'rejected') {
         whereClause.status = 'failed';
+      } else if (status === 'redirected') {
+        whereClause.redirection = { not: null }; // Show only applications with redirection
+        console.log('Redirected filter applied for Committee applications:', whereClause);
       } else if (status === 'no-schedule') {
         whereClause.OR = [
           { interviewSlotDay: null },

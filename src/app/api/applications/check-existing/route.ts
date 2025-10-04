@@ -11,7 +11,6 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        console.log('Check-existing API: Checking for user:', session.user.email);
 
         // Use a more efficient query with only necessary fields
         const user = await prisma.user.findUnique({
@@ -42,7 +41,6 @@ export async function GET() {
         });
 
         if (!user) {
-            console.log('Check-existing API: User not found in database, creating basic record');
             // For new users, create a basic user record if it doesn't exist
             try {
                 await prisma.user.create({
@@ -53,7 +51,6 @@ export async function GET() {
                     }
                 });
                 
-                console.log('Check-existing API: Created new user record');
                 
                 const existingApplications = {
                     hasMemberApplication: false,
@@ -78,7 +75,6 @@ export async function GET() {
             }
         }
 
-        console.log('Check-existing API: User found, checking applications');
 
         const existingApplications = {
             hasMemberApplication: !!user.memberApplication,
@@ -94,7 +90,6 @@ export async function GET() {
             committeeId: user.committeeApplication?.firstOptionCommittee
         };
 
-        console.log('Check-existing API: Returning applications data:', existingApplications);
         return NextResponse.json(existingApplications);
     } catch (error) {
         console.error('Check-existing API: Error checking existing applications:', error);

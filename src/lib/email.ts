@@ -360,7 +360,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>
@@ -456,7 +456,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>
@@ -552,7 +552,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>
@@ -742,7 +742,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>
@@ -844,7 +844,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>
@@ -952,7 +952,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>
@@ -1237,7 +1237,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>
@@ -1343,7 +1343,7 @@ export const emailTemplates = {
                         Join our exclusive private FB group for members to stay connected and receive updates:
                     </p>
                     <div style="text-align: center;">
-                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                        <a href="https://fb.me/g/6UCY6FrzU/L7r94Zcj" 
                            style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
                             👥 Join UST CSS Members 25'-26' Group
                         </a>

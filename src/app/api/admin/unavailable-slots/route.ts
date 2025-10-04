@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
             currentSlots: 0
         }))
 
-        console.log('unavailableSlotsData', unavailableSlotsData);
 
         // Get current unavailable slots for this EB from database
         const currentDbSlots = await prisma.availableEBInterviewTime.findMany({
@@ -35,7 +34,6 @@ export async function POST(request: NextRequest) {
             }
         })
 
-        console.log('currentDbSlots', currentDbSlots);
 
         // Get IDs of slots being passed in (with EB suffix to match DB format)
         const incomingSlotIds = unavailableSlots.map(slot => `${slot.id}-${slot.eb}`)
@@ -45,7 +43,6 @@ export async function POST(request: NextRequest) {
             !incomingSlotIds.includes(dbSlot.id)
         )
 
-        console.log('slotsToDelete', slotsToDelete);
 
         // Delete removed slots
         if (slotsToDelete.length > 0) {
@@ -68,7 +65,6 @@ export async function POST(request: NextRequest) {
             !remainingDbSlotIds.includes(slot.id)
         )
         
-        console.log('newSlotsToCreate', newSlotsToCreate);
         
         // Only create truly new slots
         if (newSlotsToCreate.length > 0) {
@@ -77,7 +73,6 @@ export async function POST(request: NextRequest) {
             })
         }
 
-        console.log('unavailableSlotsData', unavailableSlotsData);
 
         return NextResponse.json({ 
             success: true, 

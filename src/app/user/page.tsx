@@ -24,7 +24,6 @@ export default function UserDashboard() {
 
   const checkApplications = useCallback(async () => {
     try {
-      console.log("UserDashboard: Checking existing applications...");
       setError("");
       
       // Check if we have application data in session first (optimistic loading)
@@ -81,10 +80,8 @@ export default function UserDashboard() {
             return;
           }
         }
-        console.log("UserDashboard: No existing applications found, showing dashboard");
       } else if (response.status === 404) {
         // User not found - this is expected for new users, just show dashboard
-        console.log("UserDashboard: User not found (new user), showing dashboard");
       } else {
         console.error("UserDashboard: API response not ok:", response.status, response.statusText);
         const errorData = await response.json().catch(() => ({}));
@@ -119,37 +116,30 @@ export default function UserDashboard() {
 
   // Handle authentication status changes and application checking
   useEffect(() => {
-    console.log("UserDashboard: useEffect triggered", { status, hasSession: !!session, hasCheckedApplications });
     
     if (status === "loading") {
-      console.log("UserDashboard: Still loading...");
       return;
     }
 
     if (status === "unauthenticated") {
-      console.log("UserDashboard: User not authenticated, redirecting to home");
       router.push("/");
       return;
     }
 
     if (status === "authenticated" && session) {
-      console.log("UserDashboard: User authenticated", { email: session.user?.email, role: session.user?.role });
       
       // Check for .cics@ust.edu.ph users and redirect if not admin
       if (session?.user?.email.match(/\.cics@ust\.edu\.ph$/) && 
           session?.user?.role !== 'admin' && 
           session?.user?.role !== 'super_admin') {
-        console.log("UserDashboard: .cics user without admin role, redirecting to home");
         router.push("/");
         return;
       }
 
       // Check for existing applications
       if (!hasCheckedApplications) {
-        console.log("UserDashboard: Checking applications for the first time");
         checkApplications();
       } else {
-        console.log("UserDashboard: Applications already checked, setting loading to false");
         setIsLoading(false);
       }
     }
@@ -158,7 +148,6 @@ export default function UserDashboard() {
   // Separate effect to handle initial load for existing users
   useEffect(() => {
     if (status === "authenticated" && session && !hasCheckedApplications && !isLoading) {
-      console.log("UserDashboard: Fallback check for existing users");
       checkApplications();
     }
   }, [status, session, hasCheckedApplications, isLoading, checkApplications]);

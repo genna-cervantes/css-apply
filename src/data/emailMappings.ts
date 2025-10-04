@@ -102,7 +102,6 @@ export function getEmailByName(name: string): string | null {
   );
 
   if (foundEntry) {
-    console.log(`Fuzzy match found for "${name}": ${foundEntry[0]} -> ${foundEntry[1]}`);
     return foundEntry[1];
   }
 
@@ -122,7 +121,6 @@ export function getEmailByPositionTitle(positionTitle: string): string | null {
   // Map position titles to role IDs, then get email
   const roleId = getRoleId(positionTitle);
   if (roleId !== positionTitle) {
-    console.log(`Position title "${positionTitle}" mapped to role ID "${roleId}"`);
     return getEmailByRoleId(roleId);
   }
 
@@ -135,12 +133,10 @@ export function getEmailByPositionTitle(positionTitle: string): string | null {
  * This is the main function that should be used throughout the application
  */
 export function getEBEmailWithFallback(roleId: string, context?: string): string {
-  console.log(`Getting email for role ID: ${roleId}${context ? ` (${context})` : ''}`);
 
   // Try role ID mapping first
   const roleEmail = getEmailByRoleId(roleId);
   if (roleEmail && isValidUSTEmail(roleEmail)) {
-    console.log(`✅ Found email via role ID: ${roleEmail}`);
     return roleEmail;
   }
 
@@ -149,7 +145,6 @@ export function getEBEmailWithFallback(roleId: string, context?: string): string
   if (role) {
     const nameEmail = getEmailByName(role.ebName);
     if (nameEmail && isValidUSTEmail(nameEmail)) {
-      console.log(`✅ Found email via name mapping: ${nameEmail}`);
       return nameEmail;
     }
   }
@@ -157,7 +152,6 @@ export function getEBEmailWithFallback(roleId: string, context?: string): string
   // Try position title mapping (fallback for committee staff interviews)
   const positionEmail = getEmailByPositionTitle(roleId);
   if (positionEmail && isValidUSTEmail(positionEmail)) {
-    console.log(`✅ Found email via position title mapping: ${positionEmail}`);
     return positionEmail;
   }
 

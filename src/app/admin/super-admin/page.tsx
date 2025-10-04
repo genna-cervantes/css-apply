@@ -149,7 +149,6 @@ export default function SuperAdminDashboard() {
         const data = await response.json();
         setSearchResults(data.users);
         setIsGlobalSearch(true);
-        console.log('Search results:', data.users);
       }
     } catch (error) {
       console.error('Error searching users:', error);

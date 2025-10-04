@@ -37,7 +37,8 @@ const Staffs = () => {
   const router = useRouter();
   const [staffs, setStaffs] = useState<CommitteeStaff[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule'>('all');
+  const [selectedStatus, setSelectedStatus] = useState<'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule' | 'redirected'>('all');
+  const [selectedCommittee, setSelectedCommittee] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -55,7 +56,8 @@ const Staffs = () => {
         type: 'committee',
         page: currentPage.toString(),
         limit: '10',
-        ...(selectedStatus !== 'all' && { status: selectedStatus })
+        ...(selectedStatus !== 'all' && { status: selectedStatus }),
+        ...(selectedCommittee !== 'all' && { committee: selectedCommittee })
       });
 
       const response = await fetch(`/api/admin/applications?${params}`);
@@ -69,7 +71,7 @@ const Staffs = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedStatus, currentPage]);
+  }, [selectedStatus, selectedCommittee, currentPage]);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -87,13 +89,50 @@ const Staffs = () => {
     fetchStaffs();
   }, [status, session, router, selectedStatus, fetchStaffs]);
 
-  // Reset to page 1 when status changes
+  // Reset to page 1 when status or committee changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedStatus]);
+  }, [selectedStatus, selectedCommittee]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleCSVExport = async (committee?: string) => {
+    try {
+      const params = new URLSearchParams({
+        type: 'committee',
+        ...(committee && committee !== 'all' && { committee }),
+        ...(selectedCommittee !== 'all' && !committee && { committee: selectedCommittee })
+        // Note: We don't pass status since we only export accepted applications
+      });
+      
+      const response = await fetch(`/api/admin/export/csv?${params}`);
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Get filename from response headers
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition 
+          ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
+          : `committee-staff-applications-${new Date().toISOString().split('T')[0]}.csv`;
+        
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert('Failed to export CSV');
+      }
+    } catch (error) {
+      console.error('CSV export error:', error);
+      alert('Error exporting CSV');
+    }
   };
 
   const getStatusBadge = (staff: CommitteeStaff) => {
@@ -185,20 +224,64 @@ const Staffs = () => {
 
         {/* FILTERS */}
         <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6 mb-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div>
-              <label className="block text-sm font-medium text-[#134687] mb-2">Status</label>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule')}
-                className="px-3 py-2 border-2 border-[#005FD9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#044FAF]"
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex flex-wrap gap-4 items-center">
+              <div>
+                <label className="block text-sm font-medium text-[#134687] mb-2">Status</label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule' | 'redirected')}
+                  className="px-3 py-2 border-2 border-[#005FD9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#044FAF]"
+                >
+                  <option value="all">All Applications</option>
+                  <option value="accepted">Accepted</option>
+                  <option value="pending">Pending</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="no-schedule">No Schedule</option>
+                  <option value="redirected">Redirected</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-[#134687] mb-2">Committee</label>
+                <select
+                  value={selectedCommittee}
+                  onChange={(e) => setSelectedCommittee(e.target.value)}
+                  className="px-3 py-2 border-2 border-[#005FD9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#044FAF]"
+                >
+                  <option value="all">All Committees</option>
+                  {committeeRoles.map((committee) => (
+                    <option key={committee.id} value={committee.id}>
+                      {committee.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
+            {/* CSV Export Buttons */}
+            <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+              <button 
+                onClick={() => handleCSVExport()}
+                className="px-4 py-2 bg-gradient-to-r from-[#10B981] to-[#059669] text-white text-sm rounded-md hover:from-[#059669] hover:to-[#047857] transition-all duration-200 flex items-center gap-2 w-full sm:w-auto"
+                title="Export All Accepted Committee Staff Applications to CSV"
               >
-                <option value="all">All Applications</option>
-                <option value="accepted">Accepted</option>
-                <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
-                <option value="no-schedule">No Schedule</option>
-              </select>
+                📊 Export Accepted CSV
+              </button>
+              
+              {/* Committee-specific export buttons */}
+              <div className="flex flex-wrap gap-1 w-full sm:w-auto">
+                {committeeRoles.map((committee) => (
+                  <button
+                    key={committee.id}
+                    onClick={() => handleCSVExport(committee.id)}
+                    className="px-3 py-2 bg-gradient-to-r from-[#3B82F6] to-[#2563EB] text-white text-xs rounded-md hover:from-[#2563EB] hover:to-[#1D4ED8] transition-all duration-200 flex-shrink-0"
+                    title={`Export Accepted ${committee.title} Applications to CSV`}
+                  >
+                    {committee.title.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

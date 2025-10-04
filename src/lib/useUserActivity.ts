@@ -174,14 +174,12 @@ export function useUserActivity(options: UseUserActivityOptions = {}) {
             // Check if auto-reload is disabled for this page
             if (window.__DISABLE_AUTO_RELOAD__) {
               if (process.env.NODE_ENV === 'development') {
-                console.log('Auto-reload skipped - disabled for this page');
               }
               return prev;
             }
             
             // Silent reload - no console logs in production
             if (process.env.NODE_ENV === 'development') {
-              console.log('Auto-reloading due to inactivity');
             }
             window.location.reload();
           }

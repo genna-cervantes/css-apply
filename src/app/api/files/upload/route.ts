@@ -7,7 +7,6 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
     try {
-        console.log('Upload API called');
         const session = await getServerSession(authOptions);
         
         if (!session || !session?.user?.email) {
@@ -183,7 +182,6 @@ export async function POST(request: NextRequest) {
                 if (deleteError) {
                     console.error('Error deleting old file:', deleteError);
                 } else {
-                    console.log('Old file deleted successfully');
                 }
             } catch (deleteError) {
                 console.error('Error deleting old file:', deleteError);
@@ -199,7 +197,6 @@ export async function POST(request: NextRequest) {
                     supabaseFilePath: filePath
                 };
 
-                console.log('Updating existing EA application with:', updateAppData);
 
                 await prisma.eAApplication.update({
                     where: { studentNumber },
@@ -217,7 +214,6 @@ export async function POST(request: NextRequest) {
                         supabaseFilePath: filePath
                     };
 
-                console.log('Updating existing committee application with:', updateAppData);
 
                 await prisma.committeeApplication.update({
                     where: { studentNumber },
@@ -226,7 +222,6 @@ export async function POST(request: NextRequest) {
             }
         } else {
             // Don't create a new application here - just return the file URL
-            console.log('No existing application found - file uploaded but no application record created yet');
         }
 
         return NextResponse.json({

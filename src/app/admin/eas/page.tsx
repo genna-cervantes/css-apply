@@ -90,6 +90,41 @@ const EAs = () => {
     setCurrentPage(1);
   }, [selectedStatus]);
 
+  const handleCSVExport = async () => {
+    try {
+      const params = new URLSearchParams({
+        type: 'ea'
+        // Note: We don't pass status since we only export accepted applications
+      });
+      
+      const response = await fetch(`/api/admin/export/csv?${params}`);
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Get filename from response headers
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition 
+          ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
+          : `accepted-ea-applications-${new Date().toISOString().split('T')[0]}.csv`;
+        
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        alert('Failed to export CSV');
+      }
+    } catch (error) {
+      console.error('CSV export error:', error);
+      alert('Error exporting CSV');
+    }
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -165,20 +200,33 @@ const EAs = () => {
 
         {/* FILTERS */}
         <div className="bg-white rounded-xl shadow-sm border-2 border-[#005FD9] p-6 mb-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div>
-              <label className="block text-sm font-medium text-[#134687] mb-2">Status</label>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule')}
-                className="px-3 py-2 border-2 border-[#005FD9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#044FAF]"
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex flex-wrap gap-4 items-center">
+              <div>
+                <label className="block text-sm font-medium text-[#134687] mb-2">Status</label>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'accepted' | 'pending' | 'rejected' | 'no-schedule')}
+                  className="px-3 py-2 border-2 border-[#005FD9] rounded-md focus:outline-none focus:ring-2 focus:ring-[#044FAF]"
+                >
+                  <option value="all">All Applications</option>
+                  <option value="accepted">Accepted</option>
+                  <option value="pending">Pending</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="no-schedule">No Schedule</option>
+                </select>
+              </div>
+            </div>
+            
+            {/* CSV Export Button */}
+            <div className="flex gap-2 items-center">
+              <button 
+                onClick={() => handleCSVExport()}
+                className="px-4 py-2 bg-gradient-to-r from-[#10B981] to-[#059669] text-white text-sm rounded-md hover:from-[#059669] hover:to-[#047857] transition-all duration-200 flex items-center gap-2"
+                title="Export All Accepted Executive Assistant Applications to CSV"
               >
-                <option value="all">All Applications</option>
-                <option value="accepted">Accepted</option>
-                <option value="pending">Pending</option>
-                <option value="rejected">Rejected</option>
-                <option value="no-schedule">No Schedule</option>
-              </select>
+                📊 Export Accepted CSV
+              </button>
             </div>
           </div>
         </div>
