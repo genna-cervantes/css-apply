@@ -893,6 +893,9 @@ const Applications = () => {
               <option value="">Select committee/role</option>
               {selectedApplication.type === 'committee' ? (
                 <>
+                <optgroup label="Member">
+                  <option value="member">Member</option>
+                </optgroup>
                 <optgroup label="Executive Assistant Roles">
                   {roles.map(role => (
                     <option key={role.id} value={role.id}>{role.title}</option>
@@ -906,6 +909,9 @@ const Applications = () => {
               </>
               ) : selectedApplication.type === 'ea' ? (
                 <>
+                  <optgroup label="Member">
+                    <option value="member">Member</option>
+                  </optgroup>
                   <optgroup label="Executive Assistant Roles">
                     {roles.map(role => (
                       <option key={role.id} value={role.id}>{role.title}</option>

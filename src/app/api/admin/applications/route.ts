@@ -566,7 +566,7 @@ export async function PUT(request: NextRequest) {
       } else if (action === "redirect" && redirection) {
         updateData.hasAccepted = true;
         updateData.status = "passed";
-        updateData.redirection = redirection;
+        updateData.redirection = redirection === 'member' ? 'Member' : redirection;
       } else if (action === "evaluate") {
         updateData.status = "evaluating";
       }
@@ -606,14 +606,36 @@ export async function PUT(request: NextRequest) {
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
             console.log(`Rejection email sent to ${updatedApplication.user.email} for committee application`);
           } else if (action === "redirect" && updatedApplication?.user?.id && redirection) {
-            const emailTemplate = emailTemplates.committeeRedirected(
-              updatedApplication.user.name,
-              updatedApplication.user.id,
-              updatedApplication.firstOptionCommittee || 'Original Committee',
-              redirection
-            );
-            await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
-            console.log(`Redirect email sent to ${updatedApplication.user.email} for committee application (redirected to ${redirection})`);
+            // Check if redirecting to member
+            if (redirection === 'member') {
+              // Create MemberApplication record for the redirected user
+              await prisma.memberApplication.create({
+                data: {
+                  studentNumber: updatedApplication.studentNumber,
+                  hasAccepted: true, // Mark as accepted since this is a redirection
+                  paymentProof: "", // Will be updated when payment is received
+                }
+              });
+              console.log(`MemberApplication created for Committee redirection: ${updatedApplication.user.email}`);
+
+              const emailTemplate = emailTemplates.committeeRedirectedToMember(
+                updatedApplication.user.name,
+                updatedApplication.user.id,
+                updatedApplication.firstOptionCommittee || 'Original Committee'
+              );
+              await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+              console.log(`Member redirection email sent to ${updatedApplication.user.email} for committee application`);
+            } else {
+              // Regular committee redirection
+              const emailTemplate = emailTemplates.committeeRedirected(
+                updatedApplication.user.name,
+                updatedApplication.user.id,
+                updatedApplication.firstOptionCommittee || 'Original Committee',
+                redirection
+              );
+              await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+              console.log(`Redirect email sent to ${updatedApplication.user.email} for committee application (redirected to ${redirection})`);
+            }
           } else if (action === "evaluate" && updatedApplication?.firstOptionCommittee) {
             const emailTemplate = emailTemplates.committeeEvaluating(
               updatedApplication.user.name,
@@ -686,7 +708,7 @@ export async function PUT(request: NextRequest) {
           const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
           updateData.redirection = committee ? committee.title : committeeId;
         } else {
-          updateData.redirection = redirection;
+          updateData.redirection = redirection === 'member' ? 'Member' : redirection;
         }
       } else if (action === "evaluate") {
         updateData.status = "evaluating";
@@ -756,8 +778,26 @@ export async function PUT(request: NextRequest) {
             await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
             console.log(`Rejection email sent to ${updatedApplication.user.email} for EA application`);
           } else if (action === "redirect" && updatedApplication?.user?.id && redirection) {
-            // Check if redirecting to committee-staff
-            if (redirection.startsWith('committee-')) {
+            // Check if redirecting to member
+            if (redirection === 'member') {
+              // Create MemberApplication record for the redirected user
+              await prisma.memberApplication.create({
+                data: {
+                  studentNumber: updatedApplication.studentNumber,
+                  hasAccepted: true, // Mark as accepted since this is a redirection
+                  paymentProof: "", // Will be updated when payment is received
+                }
+              });
+              console.log(`MemberApplication created for EA redirection: ${updatedApplication.user.email}`);
+
+              const emailTemplate = emailTemplates.executiveAssistantRedirectedToMember(
+                updatedApplication.user.name,
+                updatedApplication.user.id,
+                updatedApplication.firstOptionEb || 'Executive Assistant'
+              );
+              await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+              console.log(`Member redirection email sent to ${updatedApplication.user.email} for EA application`);
+            } else if (redirection.startsWith('committee-')) {
               const committeeId = redirection.replace('committee-', '');
               const emailTemplate = emailTemplates.executiveAssistantRedirectedToCommittee(
                 updatedApplication.user.name,

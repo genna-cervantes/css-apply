@@ -1148,5 +1148,218 @@ export const emailTemplates = {
                 </div>
             </div>
         `
+    }),
+
+    // Member redirection templates
+    committeeRedirectedToMember: (userName: string, userId: string, originalCommittee: string): EmailTemplate => ({
+        subject: "CSSApply - Committee Staff Application Redirected to Member",
+        html: `
+            <div style="font-family: 'Inter', 'Raleway', 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; color: #1f2937;">
+                <div style="text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(19, 70, 135, 0.3);">
+                    <h1 style="color: white; font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">CSSApply</h1>
+                    <p style="color: #e0e7ff; font-size: 14px; margin: 5px 0 0 0; font-weight: 300;">Computer Science Society</p>
+                </div>
+                
+                <h2 style="color: #134687; font-family: 'Raleway', sans-serif; font-size: 24px; margin-bottom: 20px;">Application Update - ${userName}</h2>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    Great news! Your Committee Staff application has been redirected to a Member position. 
+                    We believe this will be a great opportunity for you to contribute to the CSS community!
+                </p>
+                
+                <div style="background-color: #ffffff; border: 2px solid #d97706; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(217, 119, 6, 0.15);">
+                    <h3 style="color: #d97706; margin-top: 0; font-family: 'Raleway', sans-serif; font-size: 20px;">🔄 Application Redirected:</h3>
+                    <div style="display: grid; gap: 8px;">
+                        <p style="margin: 0; color: #1f2937;"><strong>Name:</strong> ${userName}</p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Member ID:</strong> <span style="color: #134687; font-weight: bold;">${truncateToLast7(userId).toUpperCase()}</span></p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Original Application:</strong> ${getCommitteeFullName(originalCommittee)} Committee Staff</p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Redirected to:</strong> Member</p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold; background-color: #fef3c7; padding: 4px 8px; border-radius: 6px;">REDIRECTED</span></p>
+                    </div>
+                </div>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    Your Member ID (<strong style="color: #134687;">${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for future activities and events.
+                </p>
+                
+                <!-- Payment Instructions Section -->
+                <div style="background-color: #ffffff; border: 2px solid #f59e0b; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(245, 158, 11, 0.2);">
+                    <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
+                    
+                    <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
+                    </p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <img src="https://itvimtcxzsubgcbnknvq.supabase.co/storage/v1/object/sign/payment/CSSPayment-Cropped.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zZDI2NmE0Mi02NGNmLTQzZjItOTE5Mi00OTk1MmViZDMxY2QiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwYXltZW50L0NTU1BheW1lbnQtQ3JvcHBlZC5qcGciLCJpYXQiOjE3NTk1ODE4MjksImV4cCI6MTc5MTExNzgyOX0.SVFyO2WgwnA0pasjevIYWNESH6udyOLJiivdGob-FP4" 
+                             alt="GCash QR Code for CSS Payment" 
+                             style="max-width: 300px; width: 100%; height: auto; border: 3px solid #134687; border-radius: 12px; box-shadow: 0 4px 12px rgba(19, 70, 135, 0.3);">
+                    </div>
+                    
+                    <div style="background-color: #ffffff; border: 2px solid #dc2626; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);">
+                        <h4 style="color: #dc2626; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 18px;">⚠️ IMPORTANT PAYMENT MESSAGE</h4>
+                        <p style="color: #dc2626; line-height: 1.6; text-align: center; font-weight: bold; margin: 0; font-size: 16px;">
+                            When sending your payment via GCash QR, you MUST include this message:
+                        </p>
+                        <div style="background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            <code style="color: white; font-weight: bold; font-size: 18px; font-family: 'Poppins', monospace;">Member ID: ${truncateToLast7(userId).toUpperCase()}</code>
+                        </div>
+                        <p style="color: #dc2626; line-height: 1.6; text-align: center; font-size: 14px; margin: 0;">
+                            This message is required for payment verification and processing.
+                        </p>
+                    </div>
+                    
+                    <p style="color: #92400e; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px;">
+                        Please keep a screenshot of your payment confirmation for your records.
+                    </p>
+                </div>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    This redirection is based on our assessment of your qualifications and the current needs 
+                    of our organization. We believe you will have a great opportunity to contribute as a 
+                    <strong style="color: #134687;">Member</strong>.
+                </p>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    As a Member, you'll be involved in exciting projects and initiatives. 
+                    We look forward to working with you!
+                </p>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
+                </p>
+                
+                <!-- Join Group Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Join our exclusive private FB group for members to stay connected and receive updates:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            👥 Join UST CSS Members 25'-26' Group
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Connect with fellow members and stay updated with exclusive announcements!
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
+                        Best regards,<br>
+                        <strong style="color: #134687;">CSSApply Team</strong>
+                    </p>
+                </div>
+            </div>
+        `
+    }),
+
+    executiveAssistantRedirectedToMember: (userName: string, userId: string, originalEbRole: string): EmailTemplate => ({
+        subject: "CSSApply - Executive Assistant Application Redirected to Member",
+        html: `
+            <div style="font-family: 'Inter', 'Raleway', 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; color: #1f2937;">
+                <div style="text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(19, 70, 135, 0.3);">
+                    <h1 style="color: white; font-size: 32px; font-weight: bold; margin: 0; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">CSSApply</h1>
+                    <p style="color: #e0e7ff; font-size: 14px; margin: 5px 0 0 0; font-weight: 300;">Computer Science Society</p>
+                </div>
+                
+                <h2 style="color: #134687; font-family: 'Raleway', sans-serif; font-size: 24px; margin-bottom: 20px;">Application Update - ${userName}</h2>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    Great news! Your Executive Assistant application has been redirected to a Member position. 
+                    We believe this will be a great opportunity for you to contribute to the CSS community!
+                </p>
+                
+                <div style="background-color: #ffffff; border: 2px solid #d97706; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(217, 119, 6, 0.15);">
+                    <h3 style="color: #d97706; margin-top: 0; font-family: 'Raleway', sans-serif; font-size: 20px;">🔄 Application Redirected:</h3>
+                    <div style="display: grid; gap: 8px;">
+                        <p style="margin: 0; color: #1f2937;"><strong>Name:</strong> ${userName}</p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Member ID:</strong> <span style="color: #134687; font-weight: bold;">${truncateToLast7(userId).toUpperCase()}</span></p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Original Application:</strong> ${capitalizeWords(originalEbRole)} Executive Assistant</p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Redirected to:</strong> Member</p>
+                        <p style="margin: 0; color: #1f2937;"><strong>Status:</strong> <span style="color: #d97706; font-weight: bold; background-color: #fef3c7; padding: 4px 8px; border-radius: 6px;">REDIRECTED</span></p>
+                    </div>
+                </div>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    Your Member ID (<strong style="color: #134687;">${truncateToLast7(userId).toUpperCase()}</strong>) is now your official identifier within the organization. 
+                    Please keep this information safe as you'll need it for future activities and events.
+                </p>
+                
+                <!-- Payment Instructions Section -->
+                <div style="background-color: #ffffff; border: 2px solid #f59e0b; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(245, 158, 11, 0.2);">
+                    <h3 style="color: #92400e; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">💳 Payment Instructions</h3>
+                    
+                    <p style="color: #92400e; line-height: 1.6; font-weight: bold; text-align: center; margin-bottom: 20px; font-size: 16px;">
+                        To complete your membership, please proceed with the payment of <strong style="color: #134687; font-size: 18px;">₱250.00</strong> using the GCash QR code below:
+                    </p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <img src="https://itvimtcxzsubgcbnknvq.supabase.co/storage/v1/object/sign/payment/CSSPayment-Cropped.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zZDI2NmE0Mi02NGNmLTQzZjItOTE5Mi00OTk1MmViZDMxY2QiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwYXltZW50L0NTU1BheW1lbnQtQ3JvcHBlZC5qcGciLCJpYXQiOjE3NTk1ODE4MjksImV4cCI6MTc5MTExNzgyOX0.SVFyO2WgwnA0pasjevIYWNESH6udyOLJiivdGob-FP4" 
+                             alt="GCash QR Code for CSS Payment" 
+                             style="max-width: 300px; width: 100%; height: auto; border: 3px solid #134687; border-radius: 12px; box-shadow: 0 4px 12px rgba(19, 70, 135, 0.3);">
+                    </div>
+                    
+                    <div style="background-color: #ffffff; border: 2px solid #dc2626; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);">
+                        <h4 style="color: #dc2626; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 18px;">⚠️ IMPORTANT PAYMENT MESSAGE</h4>
+                        <p style="color: #dc2626; line-height: 1.6; text-align: center; font-weight: bold; margin: 0; font-size: 16px;">
+                            When sending your payment via GCash QR, you MUST include this message:
+                        </p>
+                        <div style="background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            <code style="color: white; font-weight: bold; font-size: 18px; font-family: 'Poppins', monospace;">Member ID: ${truncateToLast7(userId).toUpperCase()}</code>
+                        </div>
+                        <p style="color: #dc2626; line-height: 1.6; text-align: center; font-size: 14px; margin: 0;">
+                            This message is required for payment verification and processing.
+                        </p>
+                    </div>
+                    
+                    <p style="color: #92400e; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px;">
+                        Please keep a screenshot of your payment confirmation for your records.
+                    </p>
+                </div>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    This redirection is based on our assessment of your qualifications and the current needs 
+                    of our organization. We believe you will have a great opportunity to contribute as a 
+                    <strong style="color: #134687;">Member</strong>.
+                </p>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    As a Member, you'll be involved in exciting projects and initiatives. 
+                    We look forward to working with you!
+                </p>
+                
+                <p style="color: #1f2937; line-height: 1.6; font-size: 16px;">
+                    Please let us know if you accept this redirection or if you have any questions about this change. Please contact: css.cics@ust.edu.ph.
+                </p>
+                
+                <!-- Join Group Section -->
+                <div style="background-color: #ffffff; border: 2px solid #134687; padding: 25px; border-radius: 12px; margin: 25px 0; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.15);">
+                    <h3 style="color: #134687; margin-top: 0; text-align: center; font-family: 'Raleway', sans-serif; font-size: 20px;">👥 Join Our Community</h3>
+                    <p style="color: #1f2937; line-height: 1.6; text-align: center; font-size: 16px; margin-bottom: 15px;">
+                        Join our exclusive private FB group for members to stay connected and receive updates:
+                    </p>
+                    <div style="text-align: center;">
+                        <a href="https://www.facebook.com/share/g/17F4dTkzvu/" 
+                           style="display: inline-block; background: linear-gradient(135deg, #134687 0%, #0f3a6b 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(19, 70, 135, 0.3);">
+                            👥 Join UST CSS Members 25'-26' Group
+                        </a>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; text-align: center; font-size: 14px; margin-top: 15px; margin-bottom: 0;">
+                        Connect with fellow members and stay updated with exclusive announcements!
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+                    <p style="color: #6b7280; font-size: 14px; font-family: 'Inter', sans-serif;">
+                        Best regards,<br>
+                        <strong style="color: #134687;">CSSApply Team</strong>
+                    </p>
+                </div>
+            </div>
+        `
     })
 };
