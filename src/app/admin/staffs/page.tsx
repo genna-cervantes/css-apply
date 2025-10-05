@@ -41,6 +41,30 @@ const getRedirectionDisplayName = (redirection: string): string => {
   return redirection;
 };
 
+// Helper function to get the correct redirection message
+const getRedirectionMessage = (redirection: string): string => {
+  if (!redirection) return '';
+  
+  // Check if redirected to EA role
+  const ebRole = roles.find(r => r.id === redirection);
+  if (ebRole) {
+    return 'Committee Applicant Redirected to EA';
+  }
+  
+  // Check if redirected to committee (from EA)
+  if (redirection.startsWith('committee-')) {
+    return 'EA Applicant Redirected to Staff';
+  }
+  
+  // Check if redirected to member
+  if (redirection === 'member') {
+    return 'Committee Applicant Redirected to Member';
+  }
+  
+  // Default case (committee to committee)
+  return 'Committee Applicant Redirected';
+};
+
 interface CommitteeStaff {
   id: string;
   studentNumber: string;
@@ -344,7 +368,7 @@ const Staffs = () => {
                           <div>Email: {staff.user.email}</div>
                           {staff.redirection ? (
                             <>
-                              <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
+                              <div className="text-blue-600 font-semibold">{getRedirectionMessage(staff.redirection)}</div>
                               <div className="text-blue-600 font-semibold">Redirected to: {getRedirectionDisplayName(staff.redirection)}</div>
                             </>
                           ) : (

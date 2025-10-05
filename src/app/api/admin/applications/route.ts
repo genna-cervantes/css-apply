@@ -657,15 +657,50 @@ export async function PUT(request: NextRequest) {
               await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
               console.log(`Member redirection email sent to ${updatedApplication.user.email} for committee application`);
             } else {
-              // Regular committee redirection
-              const emailTemplate = emailTemplates.committeeRedirected(
-                updatedApplication.user.name,
-                updatedApplication.user.id,
-                updatedApplication.firstOptionCommittee || 'Original Committee',
-                redirection
-              );
-              await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
-              console.log(`Redirect email sent to ${updatedApplication.user.email} for committee application (redirected to ${redirection})`);
+              // Check if redirecting to an EA role
+              const { roles } = await import('@/data/ebRoles');
+              const eaRole = roles.find(r => r.id === redirection);
+              
+              if (eaRole) {
+                // Create EAApplication record for the redirected user
+                await prisma.eAApplication.create({
+                  data: {
+                    studentNumber: updatedApplication.studentNumber,
+                    ebRole: redirection,
+                    firstOptionEb: redirection,
+                    secondOptionEb: "", // No second option for redirected applications
+                    cv: "", // Will be updated when they provide CV
+                    supabaseFilePath: "", // Will be updated when they provide CV
+                    interviewSlotDay: "",
+                    interviewSlotTimeStart: "",
+                    interviewSlotTimeEnd: "",
+                    hasAccepted: true, // Mark as accepted since this is a redirection
+                    hasFinishedInterview: false,
+                    status: "redirected",
+                    redirection: null, // This is the destination, not a redirection from here
+                  }
+                });
+                console.log(`EAApplication created for Committee redirection to ${redirection}: ${updatedApplication.user.email}`);
+
+                const emailTemplate = emailTemplates.committeeRedirected(
+                  updatedApplication.user.name,
+                  updatedApplication.user.id,
+                  updatedApplication.firstOptionCommittee || 'Original Committee',
+                  eaRole.title
+                );
+                await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+                console.log(`EA redirection email sent to ${updatedApplication.user.email} for committee application (redirected to ${eaRole.title})`);
+              } else {
+                // Regular committee redirection (to another committee)
+                const emailTemplate = emailTemplates.committeeRedirected(
+                  updatedApplication.user.name,
+                  updatedApplication.user.id,
+                  updatedApplication.firstOptionCommittee || 'Original Committee',
+                  redirection
+                );
+                await sendEmail(updatedApplication.user.email, emailTemplate.subject, emailTemplate.html);
+                console.log(`Redirect email sent to ${updatedApplication.user.email} for committee application (redirected to ${redirection})`);
+              }
             }
           } else if (action === "evaluate" && updatedApplication?.firstOptionCommittee) {
             const emailTemplate = emailTemplates.committeeEvaluating(
@@ -768,17 +803,16 @@ export async function PUT(request: NextRequest) {
         // Import committee roles to get proper title
         const { committeeRolesSubmitted } = await import('@/data/committeeRoles');
         const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
-        const committeeTitle = committee ? committee.title : committeeId;
         
         // Create committee application record
         await prisma.committeeApplication.create({
           data: {
             studentNumber: updatedApplication.studentNumber,
-            firstOptionCommittee: updatedApplication.firstOptionEb, // Store EA first choice directly
-            secondOptionCommittee: updatedApplication.secondOptionEb, // Store EA second choice directly
-            hasAccepted: false, // Don't mark as accepted since this is a redirection
-            status: "redirected", // Mark as redirected instead of passed
-            redirection: committeeTitle, // Store the redirected committee
+            firstOptionCommittee: committeeId, // Store the committee they're redirected TO
+            secondOptionCommittee: "", // No second choice for redirected applications
+            hasAccepted: true, // Mark as accepted since this is a redirection
+            status: "redirected", // Mark as redirected
+            redirection: null, // This is the destination, not a redirection from here
             interviewSlotDay: updatedApplication.interviewSlotDay,
             interviewSlotTimeStart: updatedApplication.interviewSlotTimeStart,
             interviewSlotTimeEnd: updatedApplication.interviewSlotTimeEnd,

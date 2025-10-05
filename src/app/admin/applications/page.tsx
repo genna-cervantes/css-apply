@@ -48,6 +48,48 @@ const getRedirectionDisplayName = (redirection: string): string => {
   return redirection;
 };
 
+// Helper function to get the correct redirection message for Committee applications
+const getCommitteeRedirectionMessage = (redirection: string): string => {
+  if (!redirection) return '';
+  
+  // Check if redirected to EA role
+  const ebRole = roles.find(r => r.id === redirection);
+  if (ebRole) {
+    return 'Committee Applicant Redirected to EA';
+  }
+  
+  // Check if redirected to committee (from EA)
+  if (redirection.startsWith('committee-')) {
+    return 'EA Applicant Redirected to Staff';
+  }
+  
+  // Check if redirected to member
+  if (redirection === 'member') {
+    return 'Committee Applicant Redirected to Member';
+  }
+  
+  // Default case (committee to committee)
+  return 'Committee Applicant Redirected';
+};
+
+// Helper function to get the correct redirection message for EA applications
+const getEARedirectionMessage = (redirection: string): string => {
+  if (!redirection) return '';
+  
+  // Check if redirected to committee
+  if (redirection.startsWith('committee-')) {
+    return 'EA Applicant Redirected to Staff';
+  }
+  
+  // Check if redirected to member
+  if (redirection === 'member') {
+    return 'EA Applicant Redirected to Member';
+  }
+  
+  // Default case (EA to EA)
+  return 'EA Applicant Redirected';
+};
+
 // Helper function to get EB role full name
 const getEBRoleFullName = (roleId: string): string => {
   if (!roleId || roleId.trim() === '') return 'No choice';
@@ -585,11 +627,11 @@ const Applications = () => {
                         <div>Student #: {application.studentNumber} | Section: {application.user.section}</div>
                         <div>Email: {application.user.email}</div>
                         {(() => {
-                          // Check if this is a redirected EA application by checking if redirection exists
+                          // Check if this is a redirected application by checking if redirection exists
                           if (application.redirection) {
                             return (
                               <>
-                                <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
+                                <div className="text-blue-600 font-semibold">{getCommitteeRedirectionMessage(application.redirection)}</div>
                                 <div className="text-blue-600 font-semibold">Redirected to: {getRedirectionDisplayName(application.redirection)}</div>
                               </>
                             );
@@ -766,7 +808,7 @@ const Applications = () => {
                           if (application.redirection) {
                             return (
                               <>
-                                <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
+                                <div className="text-blue-600 font-semibold">{getEARedirectionMessage(application.redirection)}</div>
                                 <div className="text-blue-600 font-semibold">Redirected to: {getRedirectionDisplayName(application.redirection)}</div>
                               </>
                             );
