@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ApplicationGuard from "@/components/ApplicationGuard";
@@ -486,9 +487,11 @@ function EAProgressPageContent() {
                 </p>
                 
                 <div className="text-center mb-4 sm:mb-6">
-                  <img 
+                  <Image 
                     src="https://itvimtcxzsubgcbnknvq.supabase.co/storage/v1/object/sign/payment/CSSPayment-Cropped.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zZDI2NmE0Mi02NGNmLTQzZjItOTE5Mi00OTk1MmViZDMxY2QiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwYXltZW50L0NTU1BheW1lbnQtQ3JvcHBlZC5qcGciLCJpYXQiOjE3NTk1ODE4MjksImV4cCI6MTc5MTExNzgyOX0.SVFyO2WgwnA0pasjevIYWNESH6udyOLJiivdGob-FP4" 
                     alt="GCash QR Code for CSS Payment" 
+                    width={300}
+                    height={300}
                     className="max-w-[250px] sm:max-w-[300px] w-full h-auto border-3 border-[#134687] rounded-xl shadow-lg mx-auto"
                   />
                 </div>

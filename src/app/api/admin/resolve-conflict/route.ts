@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { studentNumber, applicationType, reason } = await request.json();
+        const { studentNumber, applicationType } = await request.json();
 
         if (!studentNumber || !applicationType) {
             return NextResponse.json(

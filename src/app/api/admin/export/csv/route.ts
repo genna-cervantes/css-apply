@@ -112,34 +112,41 @@ async function exportMemberApplications(_status: string | null) {
 }
 
 async function exportCommitteeApplications(committee: string | null, _status: string | null) {
-  const whereClause: Record<string, unknown> = {
-    OR: [
-      { hasAccepted: true }, // Accepted applications
-      { redirection: { not: null } } // Redirected applications
-    ]
-  };
+  const whereClause: Record<string, unknown> = {};
   
   if (committee && committee !== 'all') {
-    // For committee-specific exports, include both direct applications and redirected applications
-    // We need to handle both committee ID and committee title since redirections store the full title
+    // For committee-specific exports, we need to be more precise about what to include:
+    // 1. Applications accepted TO this committee (firstOptionCommittee = committee AND hasAccepted = true)
+    // 2. Applications redirected TO this committee (redirection contains committee-related values)
     
     // Get the committee title for the given committee ID
     const { committeeRolesSubmitted } = await import('@/data/committeeRoles');
     const committeeData = committeeRolesSubmitted.find(c => c.id === committee);
     const committeeTitle = committeeData?.title;
     
-    whereClause.AND = [
+    whereClause.OR = [
+      // Case 1: Applications accepted TO this committee
       {
-        OR: [
-          { firstOptionCommittee: committee }, // Direct applications to this committee
-          ...(committeeTitle ? [
-            { redirection: committee }, // By committee ID
-            { redirection: committeeTitle } // By committee title
-          ] : [
-            { redirection: committee } // Fallback to just committee ID
-          ])
-        ]
-      }
+        firstOptionCommittee: committee,
+        hasAccepted: true,
+        redirection: null // Not redirected elsewhere
+      },
+      // Case 2: Applications redirected TO this committee
+      ...(committeeTitle ? [
+        { redirection: committee }, // By committee ID
+        { redirection: committeeTitle }, // By committee title
+        { redirection: `committee-${committee}` }, // By committee-{id} format
+        { redirection: `${committeeTitle} Staff` } // By committee title + Staff format
+      ] : [
+        { redirection: committee }, // Fallback to just committee ID
+        { redirection: `committee-${committee}` } // Fallback to committee-{id} format
+      ])
+    ];
+  } else {
+    // For 'all' committee exports, include all accepted and redirected applications
+    whereClause.OR = [
+      { hasAccepted: true }, // Accepted applications
+      { redirection: { not: null } } // Redirected applications
     ];
   }
   

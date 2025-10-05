@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
 import SidebarContent from '@/components/AdminSidebar';
-import { committeeRoles, committeeRolesSubmitted } from '@/data/committeeRoles';
+import { committeeRolesSubmitted } from '@/data/committeeRoles';
 import { roles } from '@/data/ebRoles';
 import { truncateToLast7 } from '@/lib/truncate-utils';
 import { LucideChevronDown, LucideChevronUp } from "lucide-react";
@@ -14,6 +14,38 @@ import { LucideChevronDown, LucideChevronUp } from "lucide-react";
 const getCommitteeFullName = (committeeId: string): string => {
   const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
   return committee ? committee.title : committeeId;
+};
+
+// Helper function to convert redirection value to proper committee name
+const getRedirectionDisplayName = (redirection: string): string => {
+  if (!redirection) return '';
+  
+  // Handle committee-{id} format (from EA to Committee Staff redirection)
+  if (redirection.startsWith('committee-')) {
+    const committeeId = redirection.replace('committee-', '');
+    const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
+    return committee ? `${committee.title} Staff` : redirection;
+  }
+  
+  // Handle direct committee ID
+  const committee = committeeRolesSubmitted.find(c => c.id === redirection);
+  if (committee) {
+    return committee.title;
+  }
+  
+  // Handle EB role
+  const ebRole = roles.find(r => r.id === redirection);
+  if (ebRole) {
+    return ebRole.title;
+  }
+  
+  // Handle member redirection
+  if (redirection === 'member') {
+    return 'Member';
+  }
+  
+  // Fallback to original value
+  return redirection;
 };
 
 // Helper function to get EB role full name
@@ -558,7 +590,7 @@ const Applications = () => {
                             return (
                               <>
                                 <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
-                                <div className="text-blue-600 font-semibold">Redirected to: {application.redirection}</div>
+                                <div className="text-blue-600 font-semibold">Redirected to: {getRedirectionDisplayName(application.redirection)}</div>
                               </>
                             );
                           } else {
@@ -692,7 +724,7 @@ const Applications = () => {
                           Member ID: {truncateToLast7(application.user.id).toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
-                              Redirected to: {application.redirection}
+                              Redirected to: {getRedirectionDisplayName(application.redirection)}
                             </div>
                           ) : (
                             <div className="text-green-600">
@@ -735,7 +767,7 @@ const Applications = () => {
                             return (
                               <>
                                 <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
-                                <div className="text-blue-600 font-semibold">Redirected to: {application.redirection}</div>
+                                <div className="text-blue-600 font-semibold">Redirected to: {getRedirectionDisplayName(application.redirection)}</div>
                               </>
                             );
                           } else {
@@ -857,7 +889,7 @@ const Applications = () => {
                           Member ID: {truncateToLast7(application.user.id).toUpperCase()}
                           {application.redirection ? (
                             <div className="text-blue-600">
-                              Redirected to: {application.redirection}
+                              Redirected to: {getRedirectionDisplayName(application.redirection)}
                             </div>
                           ) : (
                             <div className="text-green-600">

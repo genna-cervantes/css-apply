@@ -5,8 +5,41 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import MobileSidebar from '@/components/AdminMobileSB';
 import SidebarContent from '@/components/AdminSidebar';
-import { committeeRoles } from '@/data/committeeRoles';
+import { committeeRoles, committeeRolesSubmitted } from '@/data/committeeRoles';
+import { roles } from '@/data/ebRoles';
 import { Download } from "lucide-react";
+
+// Helper function to convert redirection value to proper committee name
+const getRedirectionDisplayName = (redirection: string): string => {
+  if (!redirection) return '';
+  
+  // Handle committee-{id} format (from EA to Committee Staff redirection)
+  if (redirection.startsWith('committee-')) {
+    const committeeId = redirection.replace('committee-', '');
+    const committee = committeeRolesSubmitted.find(c => c.id === committeeId);
+    return committee ? `${committee.title} Staff` : redirection;
+  }
+  
+  // Handle direct committee ID
+  const committee = committeeRolesSubmitted.find(c => c.id === redirection);
+  if (committee) {
+    return committee.title;
+  }
+  
+  // Handle EB role
+  const ebRole = roles.find(r => r.id === redirection);
+  if (ebRole) {
+    return ebRole.title;
+  }
+  
+  // Handle member redirection
+  if (redirection === 'member') {
+    return 'Member';
+  }
+  
+  // Fallback to original value
+  return redirection;
+};
 
 interface CommitteeStaff {
   id: string;
@@ -312,7 +345,7 @@ const Staffs = () => {
                           {staff.redirection ? (
                             <>
                               <div className="text-blue-600 font-semibold">EA Applicant Redirected to Staff</div>
-                              <div className="text-blue-600 font-semibold">Redirected to: {staff.redirection}</div>
+                              <div className="text-blue-600 font-semibold">Redirected to: {getRedirectionDisplayName(staff.redirection)}</div>
                             </>
                           ) : (
                             <>
