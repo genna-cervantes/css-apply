@@ -2,6 +2,10 @@ import { BrevoClient } from "@getbrevo/brevo";
 import { createLogger } from "@/lib/logger";
 
 const emailLogger = createLogger("email");
+const appBaseUrl = (
+    process.env.NEXTAUTH_URL || "https://ust-css-apply.vercel.app"
+).replace(/\/+$/, "");
+const emailLogoUrl = `${appBaseUrl}/assets/css-apply-static-images/assets/logos/Logo_CSS_Apply_Email.png`;
 
 const brevo = new BrevoClient({
     apiKey: process.env.BREVO_API_KEY || "",
@@ -241,7 +245,7 @@ const wrapEmail = (title: string, innerHtml: string): string => `
 <body>
   <div class="email-container">
     <div class="header-logo">
-      <img src="https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/logos/Logo_CSS%20Apply.svg" alt="CSSApply Logo" />
+      <img src="${emailLogoUrl}" alt="CSSApply Logo" width="126" height="35" style="display: block; width: 126px; height: 35px; margin: 0 auto; border: 0;" />
     </div>
     <div class="email-card">
       ${title ? `<h2 style="color: #134687; font-size: 22px; margin-top: 0; margin-bottom: 20px;">${title}</h2>` : ""}
