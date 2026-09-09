@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { getPositionTitle } from "@/lib/eb-mapping";
 import { committeeApplicationSchema } from "@/lib/schemas";
+import { isMembershipExpired } from "@/lib/membership-expiration";
 import {
   assertNoOtherApplication,
   assertStudentNumberOwnership,
@@ -162,7 +163,10 @@ export async function POST(request: NextRequest) {
       "Committee application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -182,7 +186,16 @@ export async function GET() {
         },
         memberships: {
           where: { recruitmentCycle: { isActive: true } },
-          select: { memberId: true },
+          select: {
+            memberId: true,
+            photoPath: true,
+            recruitmentCycle: {
+              select: {
+                schoolYear: true,
+                membershipExpiration: true,
+              },
+            },
+          },
           take: 1,
         },
       },
@@ -192,6 +205,10 @@ export async function GET() {
     }
 
     const application = user.committeeApplications[0] ?? null;
+    const membership = user.memberships[0];
+    const hasValidMembership =
+      Boolean(membership) &&
+      !isMembershipExpired(membership?.recruitmentCycle.membershipExpiration);
     let meetingLink: string | null = null;
     if (application?.interviewBy) {
       meetingLink =
@@ -223,7 +240,9 @@ export async function GET() {
         dateOfBirth: user.dateOfBirth,
         isOldCssMember: user.isOldCssMember,
         memberships:
-          application?.paymentStatus === "approved" ? user.memberships : [],
+          application?.paymentStatus === "approved" && hasValidMembership
+            ? user.memberships
+            : [],
       },
       meetingLink,
     });
@@ -232,7 +251,10 @@ export async function GET() {
       "Get committee application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -265,7 +287,10 @@ export async function DELETE() {
 
     const application = user.committeeApplications[0];
     if (!application) {
-      return NextResponse.json({ error: "No application found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No application found" },
+        { status: 404 },
+      );
     }
     if (application.hasAccepted) {
       return NextResponse.json(
@@ -297,6 +322,9 @@ export async function DELETE() {
       "Delete committee application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

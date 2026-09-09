@@ -8,6 +8,7 @@ declare module "next-auth" {
       dbId: string;
       email: string;
       name: string;
+      image?: string | null;
       role: string;
       studentNumber?: string;
       section?: string;

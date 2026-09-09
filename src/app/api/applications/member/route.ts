@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { memberApplicationSchema } from "@/lib/schemas";
+import { isMembershipExpired } from "@/lib/membership-expiration";
 import {
   assertNoOtherApplication,
   assertStudentNumberOwnership,
@@ -33,8 +34,17 @@ export async function POST(request: NextRequest) {
 
     const result = await prisma.$transaction(async (tx) => {
       await lockApplicantCycle(tx, session.user.email!, cycle.id);
-      await assertStudentNumberOwnership(tx, studentNumber, session.user.email!);
-      await assertNoOtherApplication(tx, session.user.email!, cycle.id, "member");
+      await assertStudentNumberOwnership(
+        tx,
+        studentNumber,
+        session.user.email!,
+      );
+      await assertNoOtherApplication(
+        tx,
+        session.user.email!,
+        cycle.id,
+        "member",
+      );
 
       const existingApplication = await tx.memberApplication.findFirst({
         where: {
@@ -78,7 +88,11 @@ export async function POST(request: NextRequest) {
         result.updatedUser.name,
         studentNumber,
       );
-      await sendEmail(result.updatedUser.email, template.subject, template.html);
+      await sendEmail(
+        result.updatedUser.email,
+        template.subject,
+        template.html,
+      );
     } catch (emailError) {
       console.error(
         "Failed to send member application confirmation",
@@ -102,14 +116,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(ruleError.body, { status: ruleError.status });
     }
 
-    if (error instanceof Error && error.message === "ACCEPTED_MEMBER_APPLICATION") {
+    if (
+      error instanceof Error &&
+      error.message === "ACCEPTED_MEMBER_APPLICATION"
+    ) {
       return NextResponse.json(
         { error: "You already have an accepted member application" },
         { status: 409 },
       );
     }
 
-    if (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
       return NextResponse.json(
         { error: "This student number already has an application" },
         { status: 409 },
@@ -120,7 +142,10 @@ export async function POST(request: NextRequest) {
       "Member application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -140,7 +165,16 @@ export async function GET() {
         },
         memberships: {
           where: { recruitmentCycle: { isActive: true } },
-          select: { memberId: true },
+          select: {
+            memberId: true,
+            photoPath: true,
+            recruitmentCycle: {
+              select: {
+                schoolYear: true,
+                membershipExpiration: true,
+              },
+            },
+          },
           take: 1,
         },
       },
@@ -150,9 +184,15 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const application = user.memberApplications[0] ?? null;
+    const membership = user.memberships[0];
+    const hasValidMembership =
+      Boolean(membership) &&
+      !isMembershipExpired(membership?.recruitmentCycle.membershipExpiration);
+
     return NextResponse.json({
-      hasApplication: Boolean(user.memberApplications[0]),
-      application: user.memberApplications[0] ?? null,
+      hasApplication: Boolean(application),
+      application,
       user: {
         id: user.id,
         studentNumber: user.studentNumber,
@@ -163,7 +203,7 @@ export async function GET() {
         dateOfBirth: user.dateOfBirth,
         isOldCssMember: user.isOldCssMember,
         memberships:
-          user.memberApplications[0]?.paymentStatus === "approved"
+          application?.paymentStatus === "approved" && hasValidMembership
             ? user.memberships
             : [],
       },
@@ -173,6 +213,9 @@ export async function GET() {
       "Get member application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

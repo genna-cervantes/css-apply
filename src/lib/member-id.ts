@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client";
 const MEMBER_ID_PREFIX = "CSS";
 const MEMBER_ID_SEQUENCE_WIDTH = 4;
 
-function getSchoolYearCode(schoolYear: string) {
+export function getSchoolYearCode(schoolYear: string) {
   const years = schoolYear.match(/\d{4}/g);
 
   if (years && years.length >= 2) {
@@ -13,7 +13,7 @@ function getSchoolYearCode(schoolYear: string) {
   return schoolYear.replace(/\D/g, "").slice(-4).padStart(4, "0");
 }
 
-function formatMemberId(schoolYear: string, sequence: number) {
+export function formatMemberId(schoolYear: string, sequence: number) {
   const sequenceCode = sequence
     .toString()
     .padStart(MEMBER_ID_SEQUENCE_WIDTH, "0");
@@ -81,8 +81,7 @@ export async function ensureCycleMemberId(
 }
 
 export function getDisplayMemberId(user: {
-  id: string;
   memberships?: Array<{ memberId: string }> | null;
 }) {
-  return user.memberships?.[0]?.memberId ?? user.id.slice(-7).toUpperCase();
+  return user.memberships?.[0]?.memberId ?? "";
 }

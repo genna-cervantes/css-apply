@@ -1,33 +1,60 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { supabase } from "@/lib/supabase";
+import { getCachedStorageImage } from "@/lib/storage-image-cache";
 
 const CONFIG_KEY = "payment_qr_image_path";
 const BUCKET_NAME = "payment";
+const VERSIONED_PAYMENT_QR_PATH =
+  /^payment\/payment-qr-\d+\.(?:jpe?g|png|webp)$/i;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const config = await prisma.systemConfig.findUnique({
-      where: { key: CONFIG_KEY },
-    });
+    const versionedImagePath = request.nextUrl.searchParams.get("v");
+    let imagePath =
+      versionedImagePath && VERSIONED_PAYMENT_QR_PATH.test(versionedImagePath)
+        ? versionedImagePath
+        : null;
 
-    if (!config?.value) {
-      return NextResponse.json({ error: "Payment QR not configured" }, { status: 404 });
+    if (!imagePath) {
+      const config = await prisma.systemConfig.findUnique({
+        where: { key: CONFIG_KEY },
+        select: { value: true },
+      });
+      imagePath = config?.value ?? null;
     }
 
-    const { data, error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .download(config.value);
-
-    if (error || !data) {
-      console.error("Payment QR download error:", error);
-      return NextResponse.json({ error: "Payment QR not found" }, { status: 404 });
+    if (!imagePath) {
+      return NextResponse.json(
+        { error: "Payment QR not configured" },
+        { status: 404 },
+      );
     }
+
+    const data = await getCachedStorageImage(BUCKET_NAME, imagePath);
+
+    if (!data) {
+      console.error("Payment QR download failed");
+      return NextResponse.json(
+        { error: "Payment QR not found" },
+        { status: 404 },
+      );
+    }
+
+    const isVersionedRequest = versionedImagePath === imagePath;
 
     return new NextResponse(data, {
       headers: {
         "Content-Type": data.type || "image/png",
-        "Cache-Control": "public, max-age=300",
+        "Cache-Control": isVersionedRequest
+          ? "public, max-age=31536000, s-maxage=31536000, immutable"
+          : "public, max-age=300, s-maxage=3600, stale-while-revalidate=86400",
+        ...(isVersionedRequest
+          ? {
+              "CDN-Cache-Control": "public, max-age=31536000, immutable",
+              "Vercel-CDN-Cache-Control": "public, max-age=31536000, immutable",
+            }
+          : {}),
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error) {

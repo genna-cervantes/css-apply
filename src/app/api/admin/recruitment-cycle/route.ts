@@ -1,18 +1,24 @@
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getMembershipDateKey } from "@/lib/membership-expiration";
 import { Prisma } from "@prisma/client";
+import { PUBLIC_EB_ROLES_CACHE_TAG } from "@/lib/cache-tags";
 
 const toDateOnlyTimestamp = (value: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return Number.NaN;
+
   const [year, month, day] = value.split("-").map(Number);
-  return Date.UTC(year, month - 1, day);
+  const timestamp = Date.UTC(year, month - 1, day);
+  const normalized = new Date(timestamp).toISOString().slice(0, 10);
+
+  return normalized === value ? timestamp : Number.NaN;
 };
 
-const getTodayDateOnlyTimestamp = () => {
-  const now = new Date();
-  return Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-};
+const getTodayDateOnlyTimestamp = () =>
+  toDateOnlyTimestamp(getMembershipDateKey());
 
 const isPrismaUniqueError = (error: unknown) =>
   typeof error === "object" &&
@@ -80,14 +86,21 @@ export async function POST(request: NextRequest) {
       applicationStart,
       interviewStart,
       interviewEnd,
+      membershipExpiration,
       isActive,
     } = body;
 
-    if (!schoolYear || !applicationStart || !interviewStart || !interviewEnd) {
+    if (
+      !schoolYear ||
+      !applicationStart ||
+      !interviewStart ||
+      !interviewEnd ||
+      !membershipExpiration
+    ) {
       return NextResponse.json(
         {
           error:
-            "Missing required fields: schoolYear, applicationStart, interviewStart, interviewEnd",
+            "Missing required fields: schoolYear, applicationStart, interviewStart, interviewEnd, membershipExpiration",
         },
         { status: 400 },
       );
@@ -96,15 +109,31 @@ export async function POST(request: NextRequest) {
     const applicationStartTime = toDateOnlyTimestamp(applicationStart);
     const interviewStartTime = toDateOnlyTimestamp(interviewStart);
     const interviewEndTime = toDateOnlyTimestamp(interviewEnd);
+    const membershipExpirationTime = toDateOnlyTimestamp(membershipExpiration);
     const todayTime = getTodayDateOnlyTimestamp();
 
     if (
-      applicationStartTime < todayTime ||
-      interviewStartTime < todayTime ||
-      interviewEndTime < todayTime
+      ![
+        applicationStartTime,
+        interviewStartTime,
+        interviewEndTime,
+        membershipExpirationTime,
+      ].every(Number.isFinite)
     ) {
       return NextResponse.json(
-        { error: "Recruitment cycle dates cannot be set in the past" },
+        { error: "Recruitment cycle dates must be valid calendar dates" },
+        { status: 400 },
+      );
+    }
+
+    if (
+      !id &&
+      (applicationStartTime < todayTime ||
+        interviewStartTime < todayTime ||
+        interviewEndTime < todayTime)
+    ) {
+      return NextResponse.json(
+        { error: "New recruitment cycle dates cannot be set in the past" },
         { status: 400 },
       );
     }
@@ -119,6 +148,16 @@ export async function POST(request: NextRequest) {
     if (interviewEndTime < interviewStartTime) {
       return NextResponse.json(
         { error: "Interview last day cannot be before interview start" },
+        { status: 400 },
+      );
+    }
+
+    if (membershipExpirationTime < interviewEndTime) {
+      return NextResponse.json(
+        {
+          error:
+            "Membership expiration cannot be before the interview period ends",
+        },
         { status: 400 },
       );
     }
@@ -141,6 +180,7 @@ export async function POST(request: NextRequest) {
         applicationStart: new Date(applicationStart),
         interviewStart: new Date(interviewStart),
         interviewEnd: new Date(interviewEnd),
+        membershipExpiration: new Date(`${membershipExpiration}T00:00:00.000Z`),
         isActive: isActive ?? false,
       };
 
@@ -158,6 +198,7 @@ export async function POST(request: NextRequest) {
       });
     });
 
+    revalidateTag(PUBLIC_EB_ROLES_CACHE_TAG);
     return NextResponse.json({ success: true, cycle });
   } catch (error) {
     console.error("Error managing recruitment cycle:", error);
@@ -202,6 +243,7 @@ export async function DELETE(request: NextRequest) {
 
     await prisma.recruitmentCycle.delete({ where: { id } });
 
+    revalidateTag(PUBLIC_EB_ROLES_CACHE_TAG);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting recruitment cycle:", error);

@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { getPositionTitle } from "@/lib/eb-mapping";
 import { executiveAssociateApplicationSchema } from "@/lib/schemas";
+import { isMembershipExpired } from "@/lib/membership-expiration";
 import {
   assertAvailableExecutiveAssociateChoices,
   assertNoOtherApplication,
@@ -149,7 +150,9 @@ export async function POST(request: NextRequest) {
       error.message === "ACCEPTED_EXECUTIVE_ASSOCIATE_APPLICATION"
     ) {
       return NextResponse.json(
-        { error: "You already have an accepted Executive Associate application" },
+        {
+          error: "You already have an accepted Executive Associate application",
+        },
         { status: 409 },
       );
     }
@@ -169,7 +172,10 @@ export async function POST(request: NextRequest) {
       "Executive Associate application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -189,7 +195,16 @@ export async function GET() {
         },
         memberships: {
           where: { recruitmentCycle: { isActive: true } },
-          select: { memberId: true },
+          select: {
+            memberId: true,
+            photoPath: true,
+            recruitmentCycle: {
+              select: {
+                schoolYear: true,
+                membershipExpiration: true,
+              },
+            },
+          },
           take: 1,
         },
       },
@@ -199,6 +214,10 @@ export async function GET() {
     }
 
     const application = user.executiveAssociateApplications[0] ?? null;
+    const membership = user.memberships[0];
+    const hasValidMembership =
+      Boolean(membership) &&
+      !isMembershipExpired(membership?.recruitmentCycle.membershipExpiration);
     let meetingLink: string | null = null;
     if (application?.interviewBy) {
       meetingLink =
@@ -230,7 +249,9 @@ export async function GET() {
         dateOfBirth: user.dateOfBirth,
         isOldCssMember: user.isOldCssMember,
         memberships:
-          application?.paymentStatus === "approved" ? user.memberships : [],
+          application?.paymentStatus === "approved" && hasValidMembership
+            ? user.memberships
+            : [],
       },
       ebRole: application?.ebRole,
       meetingLink,
@@ -240,7 +261,10 @@ export async function GET() {
       "Get Executive Associate application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -273,7 +297,10 @@ export async function DELETE() {
 
     const application = user.executiveAssociateApplications[0];
     if (!application) {
-      return NextResponse.json({ error: "No application found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No application found" },
+        { status: 404 },
+      );
     }
     if (application.hasAccepted) {
       return NextResponse.json(
@@ -288,7 +315,10 @@ export async function DELETE() {
         .from("ea-applications")
         .remove([cvPath]);
       if (storageError) {
-        console.error("Executive Associate file cleanup failed", storageError.name);
+        console.error(
+          "Executive Associate file cleanup failed",
+          storageError.name,
+        );
       }
     }
 
@@ -304,6 +334,9 @@ export async function DELETE() {
       "Delete Executive Associate application error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

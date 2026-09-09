@@ -1,9 +1,12 @@
 import { randomUUID } from "crypto";
+import { revalidateTag } from "next/cache";
 import { after, NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { supabase } from "@/lib/supabase";
+import { PUBLIC_EB_ROLES_CACHE_TAG } from "@/lib/cache-tags";
+import { optimizeImageToWebp } from "@/lib/image-optimization";
 
 const BUCKET_NAME = "eb-profile-images";
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
@@ -32,12 +35,20 @@ async function authorizeSuperAdmin() {
 
 function hasValidImageSignature(bytes: Uint8Array, type: AllowedImageType) {
   if (type === "image/jpeg") {
-    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    return (
+      bytes.length >= 3 &&
+      bytes[0] === 0xff &&
+      bytes[1] === 0xd8 &&
+      bytes[2] === 0xff
+    );
   }
 
   if (type === "image/png") {
     const signature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
-    return bytes.length >= signature.length && signature.every((value, index) => bytes[index] === value);
+    return (
+      bytes.length >= signature.length &&
+      signature.every((value, index) => bytes[index] === value)
+    );
   }
 
   return (
@@ -101,7 +112,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!profile?.imagePath) {
-      return NextResponse.json({ error: "EB image not configured" }, { status: 404 });
+      return NextResponse.json(
+        { error: "EB image not configured" },
+        { status: 404 },
+      );
     }
 
     const { data, error } = await supabase.storage
@@ -110,13 +124,21 @@ export async function GET(request: NextRequest) {
 
     if (error || !data) {
       console.error("EB image download failed");
-      return NextResponse.json({ error: "EB image not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "EB image not found" },
+        { status: 404 },
+      );
     }
+
+    const isVersionedRequest =
+      request.nextUrl.searchParams.get("v") === profile.imagePath;
 
     return new NextResponse(data, {
       headers: {
         "Content-Type": data.type || "image/jpeg",
-        "Cache-Control": "private, max-age=300",
+        "Cache-Control": isVersionedRequest
+          ? "private, max-age=31536000, immutable"
+          : "private, max-age=300",
         "X-Content-Type-Options": "nosniff",
       },
     });
@@ -125,7 +147,10 @@ export async function GET(request: NextRequest) {
       "Get EB image failed",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -137,14 +162,20 @@ export async function POST(request: NextRequest) {
 
     const body: unknown = await request.json();
     if (!body || typeof body !== "object") {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 },
+      );
     }
 
     const payload = body as Record<string, unknown>;
     const action = payload.action;
     const userId = typeof payload.userId === "string" ? payload.userId : "";
     if (!userId || (action !== "prepare" && action !== "complete")) {
-      return NextResponse.json({ error: "Invalid upload request" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid upload request" },
+        { status: 400 },
+      );
     }
 
     const profile = await prisma.eBProfile.findUnique({
@@ -152,20 +183,29 @@ export async function POST(request: NextRequest) {
       select: { id: true, imagePath: true },
     });
     if (!profile) {
-      return NextResponse.json({ error: "EB profile not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "EB profile not found" },
+        { status: 404 },
+      );
     }
 
     if (action === "prepare") {
       await ensureBucket();
-      const fileType = typeof payload.fileType === "string" ? payload.fileType : "";
-      const fileSize = typeof payload.fileSize === "number" ? payload.fileSize : 0;
+      const fileType =
+        typeof payload.fileType === "string" ? payload.fileType : "";
+      const fileSize =
+        typeof payload.fileSize === "number" ? payload.fileSize : 0;
       if (!ALLOWED_IMAGE_TYPES.includes(fileType as AllowedImageType)) {
         return NextResponse.json(
           { error: "Only JPEG, PNG, and WebP images are allowed" },
           { status: 400 },
         );
       }
-      if (!Number.isSafeInteger(fileSize) || fileSize <= 0 || fileSize > MAX_IMAGE_SIZE) {
+      if (
+        !Number.isSafeInteger(fileSize) ||
+        fileSize <= 0 ||
+        fileSize > MAX_IMAGE_SIZE
+      ) {
         return NextResponse.json(
           { error: "Image must be 10MB or smaller" },
           { status: 400 },
@@ -192,8 +232,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const imagePath = typeof payload.imagePath === "string" ? payload.imagePath : "";
-    const fileType = typeof payload.fileType === "string" ? payload.fileType : "";
+    const imagePath =
+      typeof payload.imagePath === "string" ? payload.imagePath : "";
+    const fileType =
+      typeof payload.fileType === "string" ? payload.fileType : "";
     const expectedPrefix = `profiles/${profile.id}/`;
     if (
       !imagePath.startsWith(expectedPrefix) ||
@@ -201,13 +243,20 @@ export async function POST(request: NextRequest) {
       !ALLOWED_IMAGE_TYPES.includes(fileType as AllowedImageType) ||
       !imagePath.endsWith(`.${EXTENSION_BY_TYPE[fileType as AllowedImageType]}`)
     ) {
-      return NextResponse.json({ error: "Invalid uploaded image" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid uploaded image" },
+        { status: 400 },
+      );
     }
 
     const storage = supabase.storage.from(BUCKET_NAME);
-    const { data: uploadedImage, error: downloadError } = await storage.download(imagePath);
+    const { data: uploadedImage, error: downloadError } =
+      await storage.download(imagePath);
     if (downloadError || !uploadedImage) {
-      return NextResponse.json({ error: "Uploaded image was not found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Uploaded image was not found" },
+        { status: 400 },
+      );
     }
 
     const bytes = new Uint8Array(await uploadedImage.arrayBuffer());
@@ -223,27 +272,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let optimizedImage: Buffer;
+    try {
+      optimizedImage = await optimizeImageToWebp(bytes, {
+        maxWidth: 1600,
+        maxHeight: 1600,
+        quality: 82,
+      });
+    } catch {
+      await storage.remove([imagePath]);
+      return NextResponse.json(
+        { error: "The uploaded image could not be optimized" },
+        { status: 400 },
+      );
+    }
+
+    const optimizedImagePath = `profiles/${profile.id}/${randomUUID()}.webp`;
+    const { error: optimizedUploadError } = await storage.upload(
+      optimizedImagePath,
+      optimizedImage,
+      {
+        cacheControl: "31536000",
+        contentType: "image/webp",
+        upsert: false,
+      },
+    );
+    if (optimizedUploadError) {
+      await storage.remove([imagePath]);
+      throw new Error("Unable to store optimized EB image");
+    }
+
     try {
       await prisma.eBProfile.update({
         where: { userId },
-        data: { imagePath },
+        data: { imagePath: optimizedImagePath },
       });
     } catch (error) {
-      await storage.remove([imagePath]);
+      await storage.remove([imagePath, optimizedImagePath]);
       throw error;
     }
 
-    if (profile.imagePath && profile.imagePath !== imagePath) {
-      const previousImagePath = profile.imagePath;
+    const obsoletePaths = [imagePath, profile.imagePath].filter(
+      (path): path is string => Boolean(path) && path !== optimizedImagePath,
+    );
+    if (obsoletePaths.length > 0) {
       after(async () => {
-        const { error: removeError } = await storage.remove([previousImagePath]);
+        const { error: removeError } = await storage.remove(obsoletePaths);
         if (removeError) console.error("Previous EB image cleanup failed");
       });
     }
 
+    revalidateTag(PUBLIC_EB_ROLES_CACHE_TAG);
     return NextResponse.json({
       success: true,
-      imageUrl: `/api/admin/eb-profiles/image?userId=${encodeURIComponent(userId)}&v=${encodeURIComponent(imagePath)}`,
+      imageUrl: `/api/admin/eb-profiles/image?userId=${encodeURIComponent(userId)}&v=${encodeURIComponent(optimizedImagePath)}`,
     });
   } catch (error) {
     if (error instanceof SyntaxError) {
@@ -253,7 +335,10 @@ export async function POST(request: NextRequest) {
       "Update EB image failed",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -275,7 +360,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!profile) {
-      return NextResponse.json({ error: "EB profile not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "EB profile not found" },
+        { status: 404 },
+      );
     }
 
     await prisma.eBProfile.update({
@@ -293,12 +381,16 @@ export async function DELETE(request: NextRequest) {
       });
     }
 
+    revalidateTag(PUBLIC_EB_ROLES_CACHE_TAG);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(
       "Remove EB image failed",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

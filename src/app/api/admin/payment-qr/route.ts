@@ -1,7 +1,9 @@
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PAYMENT_QR_CACHE_TAG } from "@/lib/cache-tags";
 import { supabase } from "@/lib/supabase";
 
 const CONFIG_KEY = "payment_qr_image_path";
@@ -57,7 +59,10 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: "QR image is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "QR image is required" },
+        { status: 400 },
+      );
     }
 
     if (!file.type.startsWith("image/")) {
@@ -105,6 +110,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidateTag(PAYMENT_QR_CACHE_TAG);
     return NextResponse.json({
       url: `/api/payment-qr/image?v=${encodeURIComponent(filePath)}`,
     });

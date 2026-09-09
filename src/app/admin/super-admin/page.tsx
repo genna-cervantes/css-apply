@@ -14,6 +14,7 @@ import AdminContentLoading from "@/components/AdminContentLoading";
 import FormProcessingOverlay from "@/components/FormProcessingOverlay";
 import MobileSidebar from "@/components/AdminMobileSB";
 import SidebarContent from "@/components/AdminSidebar";
+import DigitalIdCard from "@/components/DigitalIdCard";
 import {
   EXCLUSIVE_PERK_IMAGE_TYPES,
   MAX_EXCLUSIVE_PERK_IMAGE_SIZE,
@@ -37,7 +38,9 @@ async function readApiResponse(response: Response) {
     if (response.status === 413 || text.startsWith("Request En")) {
       throw new Error("The selected file is too large for the upload service");
     }
-    throw new Error("The server returned an invalid response. Please try again.");
+    throw new Error(
+      "The server returned an invalid response. Please try again.",
+    );
   }
 }
 
@@ -83,6 +86,7 @@ interface RecruitmentCycleForm {
   applicationStart: string;
   interviewStart: string;
   interviewEnd: string;
+  membershipExpiration: string;
   isActive: boolean;
 }
 
@@ -92,6 +96,7 @@ interface RecruitmentCycle {
   applicationStart: string;
   interviewStart: string;
   interviewEnd: string;
+  membershipExpiration: string | null;
   isActive: boolean;
 }
 
@@ -145,6 +150,25 @@ const ROLE_OPTIONS = [
 
 const swrFetcher = (url: string) => fetch(url).then((r) => r.json());
 
+const toManilaDateInput = (value?: string | null) => {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Manila",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(
+    parts.map(({ type, value }) => [type, value]),
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
 // ─── Components ──────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -165,9 +189,7 @@ function StatCard({
         {isLoading ? (
           <LoadingSpinner label={`Loading ${label}`} size="sm" />
         ) : (
-          <p className="text-2xl font-bold text-[#044FAF] font-mono">
-            {value}
-          </p>
+          <p className="text-2xl font-bold text-[#044FAF] font-mono">{value}</p>
         )}
       </div>
     </div>
@@ -313,9 +335,7 @@ const isTab = (value: string | null): value is Tab =>
   value === "users" || value === "settings" || value === "email";
 
 const isSettingsSection = (value: string | null): value is SettingsSection =>
-  value === "general" ||
-  value === "executive-board" ||
-  value === "recruitment";
+  value === "general" || value === "executive-board" || value === "recruitment";
 
 export default function SuperAdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("users");
@@ -730,7 +750,9 @@ function UsersTab() {
       setSelectedUser(null);
       await fetchUsers(currentPage);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Error saving EB profile");
+      toast.error(
+        error instanceof Error ? error.message : "Error saving EB profile",
+      );
     } finally {
       setIsSavingEb(false);
     }
@@ -758,7 +780,9 @@ function UsersTab() {
     oldRole: string,
     newRole: string,
   ) => {
-    const withoutUser = pendingChanges.filter((change) => change.userId !== userId);
+    const withoutUser = pendingChanges.filter(
+      (change) => change.userId !== userId,
+    );
     const nextChanges =
       newRole === oldRole
         ? withoutUser
@@ -810,11 +834,7 @@ function UsersTab() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard label="users" value={stats.totalUsers} isLoading={loading} />
-        <StatCard
-          label="eb"
-          value={stats.totalEbMembers}
-          isLoading={loading}
-        />
+        <StatCard label="eb" value={stats.totalEbMembers} isLoading={loading} />
         <StatCard
           label="admins"
           value={stats.totalAdmins}
@@ -932,8 +952,7 @@ function UsersTab() {
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-xs font-semibold text-[#044FAF] font-mono">
-                          {user.memberships?.[0]?.memberId ??
-                            user.id.slice(-7).toUpperCase()}
+                          {user.memberships?.[0]?.memberId ?? "Not issued"}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -1029,9 +1048,7 @@ function UsersTab() {
                     />
                   </div>
                   <p className="text-[11px] font-mono text-[#044FAF]">
-                    Member ID:{" "}
-                    {user.memberships?.[0]?.memberId ??
-                      user.id.slice(-7).toUpperCase()}
+                    Member ID: {user.memberships?.[0]?.memberId ?? "Not issued"}
                   </p>
                   {(user.ebProfile?.position ||
                     user.ebProfile?.committees.length) && (
@@ -1142,100 +1159,102 @@ function UsersTab() {
                 disabled={isSavingEb}
                 className={`space-y-4 transition ${isSavingEb ? "pointer-events-none opacity-45 grayscale" : ""}`}
               >
-              <div>
-                <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-                  Position *
-                </label>
-                <select
-                  required
-                  value={ebForm.position}
-                  onChange={(e) =>
-                    setEbForm({ ...ebForm, position: e.target.value })
-                  }
-                  className="w-full border border-[#005FD9]/15 rounded-lg px-3 py-2 text-sm focus:ring-[#044FAF]/20 focus:border-[#044FAF]/40"
-                >
-                  <option value="">Select</option>
-                  {EB_POSITIONS.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-                  Committees *
-                </label>
-                <div className="max-h-32 overflow-y-auto border border-[#005FD9]/15 rounded-lg p-2 space-y-1 bg-[#F3F3FD]/50">
-                  {EB_COMMITTEES.map((committee) => (
-                    <label
-                      key={committee.id}
-                      className="flex items-center gap-2 text-sm cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={ebForm.committees.includes(committee.id)}
-                        onChange={(e) => {
-                          const updated = e.target.checked
-                            ? [...ebForm.committees, committee.id]
-                            : ebForm.committees.filter(
-                                (x) => x !== committee.id,
-                              );
-                          setEbForm({ ...ebForm, committees: updated });
-                        }}
-                        className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
-                      />
-                      <span className="text-[#134687] text-xs">
-                        {committee.title}
-                      </span>
-                    </label>
-                  ))}
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    Position *
+                  </label>
+                  <select
+                    required
+                    value={ebForm.position}
+                    onChange={(e) =>
+                      setEbForm({ ...ebForm, position: e.target.value })
+                    }
+                    className="w-full border border-[#005FD9]/15 rounded-lg px-3 py-2 text-sm focus:ring-[#044FAF]/20 focus:border-[#044FAF]/40"
+                  >
+                    <option value="">Select</option>
+                    {EB_POSITIONS.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <p className="text-[10px] text-[#134687]/30 font-mono mt-1">
-                  {ebForm.committees.length} selected
-                </p>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-                  Meeting Link
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    Committees *
+                  </label>
+                  <div className="max-h-32 overflow-y-auto border border-[#005FD9]/15 rounded-lg p-2 space-y-1 bg-[#F3F3FD]/50">
+                    {EB_COMMITTEES.map((committee) => (
+                      <label
+                        key={committee.id}
+                        className="flex items-center gap-2 text-sm cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={ebForm.committees.includes(committee.id)}
+                          onChange={(e) => {
+                            const updated = e.target.checked
+                              ? [...ebForm.committees, committee.id]
+                              : ebForm.committees.filter(
+                                  (x) => x !== committee.id,
+                                );
+                            setEbForm({ ...ebForm, committees: updated });
+                          }}
+                          className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
+                        />
+                        <span className="text-[#134687] text-xs">
+                          {committee.title}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-[#134687]/30 font-mono mt-1">
+                    {ebForm.committees.length} selected
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    Meeting Link
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://meet.google.com/..."
+                    value={ebForm.meetingLink}
+                    onChange={(e) =>
+                      setEbForm({ ...ebForm, meetingLink: e.target.value })
+                    }
+                    className="w-full border border-[#005FD9]/15 rounded-lg px-3 py-2 text-sm font-mono focus:ring-[#044FAF]/20 focus:border-[#044FAF]/40"
+                  />
+                </div>
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={ebForm.isActive}
+                    onChange={(e) =>
+                      setEbForm({ ...ebForm, isActive: e.target.checked })
+                    }
+                    className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
+                  />
+                  <span className="text-[#134687] text-xs">active</span>
                 </label>
-                <input
-                  type="url"
-                  placeholder="https://meet.google.com/..."
-                  value={ebForm.meetingLink}
-                  onChange={(e) =>
-                    setEbForm({ ...ebForm, meetingLink: e.target.value })
-                  }
-                  className="w-full border border-[#005FD9]/15 rounded-lg px-3 py-2 text-sm font-mono focus:ring-[#044FAF]/20 focus:border-[#044FAF]/40"
-                />
-              </div>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={ebForm.isActive}
-                  onChange={(e) =>
-                    setEbForm({ ...ebForm, isActive: e.target.checked })
-                  }
-                  className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
-                />
-                <span className="text-[#134687] text-xs">active</span>
-              </label>
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="submit"
-                  disabled={!ebForm.position || ebForm.committees.length === 0}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white [background:linear-gradient(90deg,#2F7EE3_0%,#0349A2_100%)] rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity"
-                >
-                  {selectedUser.ebProfile ? "update" : "create"}
-                </button>
-                <button
-                  type="button"
-                  onClick={closeEbForm}
-                  className="px-4 py-2 text-sm font-medium text-[#134687] border border-[#005FD9]/15 rounded-lg hover:bg-[#F3F3FD] transition-colors"
-                >
-                  cancel
-                </button>
-              </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="submit"
+                    disabled={
+                      !ebForm.position || ebForm.committees.length === 0
+                    }
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white [background:linear-gradient(90deg,#2F7EE3_0%,#0349A2_100%)] rounded-lg hover:opacity-90 disabled:opacity-40 transition-opacity"
+                  >
+                    {selectedUser.ebProfile ? "update" : "create"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeEbForm}
+                    className="px-4 py-2 text-sm font-medium text-[#134687] border border-[#005FD9]/15 rounded-lg hover:bg-[#F3F3FD] transition-colors"
+                  >
+                    cancel
+                  </button>
+                </div>
               </fieldset>
             </form>
           </div>
@@ -1305,6 +1324,7 @@ function SettingsTab({
   settingsSection,
   onSettingsSectionChange,
 }: SettingsTabProps) {
+  const { data: session } = useSession();
   const {
     data: cycleData,
     isLoading,
@@ -1320,6 +1340,7 @@ function SettingsTab({
     applicationStart: "",
     interviewStart: "",
     interviewEnd: "",
+    membershipExpiration: "",
     isActive: true,
   };
   const [form, setForm] = useState<RecruitmentCycleForm>(emptyForm);
@@ -1400,6 +1421,13 @@ function SettingsTab({
     enabled: true,
     url: "",
     label: "",
+  });
+  const [demoIdForm, setDemoIdForm] = useState({
+    name: "JUAN DELA CRUZ",
+    studentNumber: "2023123456",
+    roleTitle: "Official Member",
+    section: "2CSA",
+    memberId: "CSS-2627-0042",
   });
   const [savingCommunity, setSavingCommunity] = useState(false);
   const {
@@ -1719,11 +1747,15 @@ function SettingsTab({
       });
       const preparation = await readApiResponse(prepareResponse);
       if (!prepareResponse.ok) {
-        throw new Error(apiError(preparation, "Failed to prepare EB picture upload"));
+        throw new Error(
+          apiError(preparation, "Failed to prepare EB picture upload"),
+        );
       }
 
-      const imagePath = typeof preparation.imagePath === "string" ? preparation.imagePath : "";
-      const signedUrl = typeof preparation.signedUrl === "string" ? preparation.signedUrl : "";
+      const imagePath =
+        typeof preparation.imagePath === "string" ? preparation.imagePath : "";
+      const signedUrl =
+        typeof preparation.signedUrl === "string" ? preparation.signedUrl : "";
       if (!imagePath || !signedUrl) {
         throw new Error("The upload service returned incomplete credentials");
       }
@@ -1886,9 +1918,10 @@ function SettingsTab({
     setForm({
       id: cycle.id,
       schoolYear: cycle.schoolYear,
-      applicationStart: cycle.applicationStart?.split("T")[0] ?? "",
-      interviewStart: cycle.interviewStart?.split("T")[0] ?? "",
-      interviewEnd: cycle.interviewEnd?.split("T")[0] ?? "",
+      applicationStart: toManilaDateInput(cycle.applicationStart),
+      interviewStart: toManilaDateInput(cycle.interviewStart),
+      interviewEnd: toManilaDateInput(cycle.interviewEnd),
+      membershipExpiration: toManilaDateInput(cycle.membershipExpiration),
       isActive: cycle.isActive,
     });
     setEditingId(cycle.id);
@@ -1997,779 +2030,1041 @@ function SettingsTab({
       </nav>
 
       <div>
-      {settingsSection === "general" && (
-        <div className="space-y-5">
-      <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
-        <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
-          payment qr
-        </h2>
-        <p className="text-xs text-[#134687]/40 font-mono mb-5">
-          upload the QR code shown on accepted applicants&apos; payment
-          instructions
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-5 items-start">
-          <div className="flex min-h-[180px] items-center justify-center overflow-hidden rounded-xl bg-[#F7F9FC]">
-            {isPaymentQrLoading ? (
-              <LoadingSpinner label="Loading configuration" size="sm" />
-            ) : paymentQrData?.url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={paymentQrData.url}
-                alt="Current payment QR"
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <span className="text-xs text-[#134687]/40 font-mono">
-                no qr uploaded
-              </span>
-            )}
-          </div>
-
-          <form onSubmit={handlePaymentQrUpload} className="space-y-3">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setSelectedPaymentQr(e.target.files?.[0] ?? null)
-              }
-              className="block w-full text-sm text-[#134687] file:mr-4 file:rounded-lg file:border-0 file:bg-[#E8F2FF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#134687] hover:file:bg-[#DCECFF]"
-            />
-            {selectedPaymentQr && (
-              <p className="text-xs text-[#134687]/50 font-mono">
-                selected: {selectedPaymentQr.name}
+        {settingsSection === "general" && (
+          <div className="space-y-5">
+            <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
+              <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
+                payment qr
+              </h2>
+              <p className="text-xs text-[#134687]/40 font-mono mb-5">
+                upload the QR code shown on accepted applicants&apos; payment
+                instructions
               </p>
-            )}
-            <button
-              type="submit"
-              disabled={savingPaymentQr || !selectedPaymentQr}
-              className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
-            >
-              {savingPaymentQr ? "uploading..." : "upload qr"}
-            </button>
-          </form>
-        </div>
-      </div>
 
-      <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
-        <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
-          payment acknowledgement receipt
-        </h2>
-        <p className="text-xs text-[#134687]/40 font-mono mb-5">
-          upload the PDF template applicants must fill out and submit as a
-          Google Drive link
-        </p>
-        <form
-          onSubmit={handleReceiptTemplateUpload}
-          className="space-y-3 max-w-xl"
-        >
-          {receiptTemplateData?.url && (
-            <a
-              href={receiptTemplateData.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-sm text-[#044FAF] underline font-mono"
-            >
-              view current receipt template
-            </a>
-          )}
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={(e) =>
-              setSelectedReceiptTemplate(e.target.files?.[0] ?? null)
-            }
-            className="block w-full text-sm text-[#134687] file:mr-4 file:rounded-lg file:border-0 file:bg-[#E8F2FF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#134687] hover:file:bg-[#DCECFF]"
-          />
-          {selectedReceiptTemplate && (
-            <p className="text-xs text-[#134687]/50 font-mono">
-              selected: {selectedReceiptTemplate.name}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={savingReceiptTemplate || !selectedReceiptTemplate}
-            className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
-          >
-            {savingReceiptTemplate ? "uploading..." : "upload receipt pdf"}
-          </button>
-        </form>
-      </div>
-
-      <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
-        <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
-          community link
-        </h2>
-        <p className="text-xs text-[#134687]/40 font-mono mb-5">
-          configure the group link shown to accepted applicants
-        </p>
-        <form onSubmit={handleCommunitySave} className="space-y-3 max-w-xl">
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input
-              type="checkbox"
-              checked={communityForm.enabled}
-              onChange={(e) =>
-                setCommunityForm({
-                  ...communityForm,
-                  enabled: e.target.checked,
-                })
-              }
-              className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
-            />
-            <span className="text-[#134687] text-xs">
-              show community card to accepted applicants
-            </span>
-          </label>
-          <div>
-            <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-              Button Label *
-            </label>
-            <input
-              type="text"
-              required
-              value={communityForm.label}
-              onChange={(e) =>
-                setCommunityForm({ ...communityForm, label: e.target.value })
-              }
-              className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
-              placeholder="Join UST CSS Members 26'-27' Group"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-              Group URL *
-            </label>
-            <input
-              type="url"
-              required
-              value={communityForm.url}
-              onChange={(e) =>
-                setCommunityForm({ ...communityForm, url: e.target.value })
-              }
-              className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
-              placeholder="https://fb.me/g/..."
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={savingCommunity}
-            className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
-          >
-            {savingCommunity ? "saving..." : "save community link"}
-          </button>
-        </form>
-      </div>
-
-      <div
-        className="relative rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6"
-        aria-busy={savingExclusivePerk}
-      >
-        <FormProcessingOverlay
-          active={savingExclusivePerk}
-          label="Adding homepage perk"
-        />
-        <fieldset
-          disabled={savingExclusivePerk}
-          className={`transition ${
-            savingExclusivePerk
-              ? "pointer-events-none opacity-45 grayscale"
-              : ""
-          }`}
-        >
-          <h2 className="mb-1 text-sm font-bold text-[#134687] font-poppins">
-            exclusive perks partners
-          </h2>
-          <p className="mb-5 text-xs text-[#134687]/40 font-mono">
-            manage the partner logos and destination links shown on the homepage
-          </p>
-
-          {areExclusivePerksLoading ? (
-            <div className="flex justify-center py-8">
-              <LoadingSpinner label="Loading exclusive perks" size="md" />
-            </div>
-          ) : exclusivePerksData?.items.length ? (
-            <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {exclusivePerksData.items.map((item) => {
-                const isDeleting = deletingExclusivePerks.has(item.id);
-                return (
-                  <div
-                    key={item.id}
-                    className="relative flex min-w-0 items-center gap-3 rounded-xl border border-[#005FD9]/10 bg-[#F7F9FC] p-3"
-                    aria-busy={isDeleting}
-                  >
-                    <FormProcessingOverlay
-                      active={isDeleting}
-                      label="Removing perk"
+              <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-5 items-start">
+                <div className="flex min-h-[180px] items-center justify-center overflow-hidden rounded-xl bg-[#F7F9FC]">
+                  {isPaymentQrLoading ? (
+                    <LoadingSpinner label="Loading configuration" size="sm" />
+                  ) : paymentQrData?.url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={paymentQrData.url}
+                      alt="Current payment QR"
+                      className="w-full h-full object-contain"
                     />
-                    <div
-                      className={`relative h-16 w-16 shrink-0 overflow-hidden bg-white ${
-                        item.shape === "circle" ? "rounded-full" : "rounded-lg"
-                      }`}
-                    >
-                      <Image
-                        src={item.imageUrl}
-                        alt={`${item.name} logo`}
-                        fill
-                        unoptimized
-                        sizes="64px"
-                        className={
-                          item.fit === "contain" ? "object-contain" : "object-cover"
+                  ) : (
+                    <span className="text-xs text-[#134687]/40 font-mono">
+                      no qr uploaded
+                    </span>
+                  )}
+                </div>
+
+                <form onSubmit={handlePaymentQrUpload} className="space-y-3">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setSelectedPaymentQr(e.target.files?.[0] ?? null)
+                    }
+                    className="block w-full text-sm text-[#134687] file:mr-4 file:rounded-lg file:border-0 file:bg-[#E8F2FF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#134687] hover:file:bg-[#DCECFF]"
+                  />
+                  {selectedPaymentQr && (
+                    <p className="text-xs text-[#134687]/50 font-mono">
+                      selected: {selectedPaymentQr.name}
+                    </p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={savingPaymentQr || !selectedPaymentQr}
+                    className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
+                  >
+                    {savingPaymentQr ? "uploading..." : "upload qr"}
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
+              <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
+                payment acknowledgement receipt
+              </h2>
+              <p className="text-xs text-[#134687]/40 font-mono mb-5">
+                upload the PDF template applicants must fill out and submit as a
+                Google Drive link
+              </p>
+              <form
+                onSubmit={handleReceiptTemplateUpload}
+                className="space-y-3 max-w-xl"
+              >
+                {receiptTemplateData?.url && (
+                  <a
+                    href={receiptTemplateData.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-sm text-[#044FAF] underline font-mono"
+                  >
+                    view current receipt template
+                  </a>
+                )}
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) =>
+                    setSelectedReceiptTemplate(e.target.files?.[0] ?? null)
+                  }
+                  className="block w-full text-sm text-[#134687] file:mr-4 file:rounded-lg file:border-0 file:bg-[#E8F2FF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#134687] hover:file:bg-[#DCECFF]"
+                />
+                {selectedReceiptTemplate && (
+                  <p className="text-xs text-[#134687]/50 font-mono">
+                    selected: {selectedReceiptTemplate.name}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={savingReceiptTemplate || !selectedReceiptTemplate}
+                  className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
+                >
+                  {savingReceiptTemplate
+                    ? "uploading..."
+                    : "upload receipt pdf"}
+                </button>
+              </form>
+            </div>
+
+            <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
+              <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
+                community link
+              </h2>
+              <p className="text-xs text-[#134687]/40 font-mono mb-5">
+                configure the group link shown to accepted applicants
+              </p>
+              <form
+                onSubmit={handleCommunitySave}
+                className="space-y-3 max-w-xl"
+              >
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={communityForm.enabled}
+                    onChange={(e) =>
+                      setCommunityForm({
+                        ...communityForm,
+                        enabled: e.target.checked,
+                      })
+                    }
+                    className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
+                  />
+                  <span className="text-[#134687] text-xs">
+                    show community card to accepted applicants
+                  </span>
+                </label>
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    Button Label *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={communityForm.label}
+                    onChange={(e) =>
+                      setCommunityForm({
+                        ...communityForm,
+                        label: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                    placeholder="Join UST CSS Members 26'-27' Group"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    Group URL *
+                  </label>
+                  <input
+                    type="url"
+                    required
+                    value={communityForm.url}
+                    onChange={(e) =>
+                      setCommunityForm({
+                        ...communityForm,
+                        url: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                    placeholder="https://fb.me/g/..."
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={savingCommunity}
+                  className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
+                >
+                  {savingCommunity ? "saving..." : "save community link"}
+                </button>
+              </form>
+            </div>
+            {/* Digital Member ID Card Demo Preview */}
+            <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-[#005FD9]/15 pb-3">
+                <div>
+                  <h2 className="text-sm font-bold text-[#134687] font-poppins mb-0.5">
+                    digital member id pass (live demo preview)
+                  </h2>
+                  <p className="text-xs text-[#134687]/50 font-mono">
+                    interactive calibration and live preview of the official
+                    vertical photocard pass issued to verified members
+                  </p>
+                </div>
+                <span className="w-fit rounded-full bg-[#044FAF] px-3 py-1 text-[11px] font-bold text-white">
+                  A.Y. {cycleData?.activeCycle?.schoolYear || "2026-2027"}
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-8">
+                {/* Customization controls */}
+                <div className="space-y-4 max-w-xl">
+                  <div className="rounded-xl bg-[#F4F8FE] border border-[#005FD9]/15 p-4 text-xs font-inter text-[#134687]/80 leading-relaxed">
+                    <strong className="text-[#044FAF]">
+                      Super Admin Preview Mode:
+                    </strong>{" "}
+                    The front reflects the digital card issued to approved
+                    applicants. The back is shown only here for physical ID
+                    printing. Customize the sample fields below to test layout,
+                    typography, QR scanning, and photo alignment.
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                        Sample Name
+                      </label>
+                      <input
+                        type="text"
+                        value={demoIdForm.name}
+                        onChange={(e) =>
+                          setDemoIdForm({
+                            ...demoIdForm,
+                            name: e.target.value.toUpperCase(),
+                          })
                         }
+                        className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25 font-mono"
+                        placeholder="e.g. JUAN DELA CRUZ"
                       />
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-semibold text-[#134687] font-poppins">
-                        {item.name}
-                      </p>
-                      <a
-                        href={item.destinationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-0.5 block truncate text-[10px] text-[#044FAF] hover:underline font-mono"
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                        Sample Student No.
+                      </label>
+                      <input
+                        type="text"
+                        value={demoIdForm.studentNumber}
+                        onChange={(e) =>
+                          setDemoIdForm({
+                            ...demoIdForm,
+                            studentNumber: e.target.value,
+                          })
+                        }
+                        className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25 font-mono"
+                        placeholder="e.g. 2023123456"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                        Sample Role
+                      </label>
+                      <select
+                        value={demoIdForm.roleTitle}
+                        onChange={(e) =>
+                          setDemoIdForm({
+                            ...demoIdForm,
+                            roleTitle: e.target.value,
+                          })
+                        }
+                        className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25 font-mono"
                       >
-                        {item.destinationUrl}
-                      </a>
-                      <div className="mt-2 flex items-center gap-2">
-                        {item.isLegacy && (
-                          <span className="rounded bg-[#E8F2FF] px-1.5 py-0.5 text-[9px] font-semibold text-[#134687]">
-                            current default
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          disabled={isDeleting}
-                          onClick={() => handleExclusivePerkDelete(item)}
-                          className="text-[10px] font-medium text-red-600 hover:text-red-700 disabled:opacity-40"
+                        <option value="Official Member">Official Member</option>
+                        <option value="Staff - Technology Development">
+                          Staff - Technology Development
+                        </option>
+                        <option value="Staff - Creatives & Technical">
+                          Staff - Creatives & Technical
+                        </option>
+                        <option value="Staff - Academics">
+                          Staff - Academics
+                        </option>
+                        <option value="Staff - Documentation">
+                          Staff - Documentation
+                        </option>
+                        <option value="Executive Associate (President)">
+                          Executive Associate (President)
+                        </option>
+                        <option value="Executive Associate (Internal VP)">
+                          Executive Associate (Internal VP)
+                        </option>
+                        <option value="Executive Associate (Treasurer)">
+                          Executive Associate (Treasurer)
+                        </option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                        Sample Section
+                      </label>
+                      <input
+                        type="text"
+                        value={demoIdForm.section}
+                        onChange={(e) =>
+                          setDemoIdForm({
+                            ...demoIdForm,
+                            section: e.target.value.toUpperCase(),
+                          })
+                        }
+                        className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25 font-mono"
+                        placeholder="e.g. 2CSA"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                        Sample Member ID
+                      </label>
+                      <input
+                        type="text"
+                        value={demoIdForm.memberId}
+                        onChange={(e) =>
+                          setDemoIdForm({
+                            ...demoIdForm,
+                            memberId: e.target.value.toUpperCase(),
+                          })
+                        }
+                        className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25 font-mono"
+                        placeholder="e.g. CSS-2026-0042"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDemoIdForm({
+                          name: "JUAN DELA CRUZ",
+                          studentNumber: "2023123456",
+                          roleTitle: "Official Member",
+                          section: "2CSA",
+                          memberId: "CSS-2627-0042",
+                        })
+                      }
+                      className="rounded-lg border border-[#134687]/20 bg-white px-4 py-1.5 text-xs font-medium text-[#134687] hover:bg-[#F3F8FF] transition-colors font-mono"
+                    >
+                      Reset Demo Values
+                    </button>
+                  </div>
+                </div>
+
+                {/* Live ID Card Preview */}
+                <div className="w-full flex flex-col items-center justify-center p-4 sm:p-6 bg-gradient-to-b from-slate-50 to-[#F0F5FF] rounded-2xl border border-[#044FAF]/15 shadow-inner">
+                  <span className="mb-3 rounded-full bg-[#044FAF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-xs">
+                    Front &amp; Back Print Preview
+                  </span>
+                  <DigitalIdCard
+                    memberId={demoIdForm.memberId || "CSS-2026-0042"}
+                    schoolYear={
+                      cycleData?.activeCycle?.schoolYear || "2026-2027"
+                    }
+                    expirationDate={
+                      cycleData?.activeCycle?.membershipExpiration || undefined
+                    }
+                    roleTitle={demoIdForm.roleTitle}
+                    user={{
+                      name: demoIdForm.name || "JUAN DELA CRUZ",
+                      studentNumber: demoIdForm.studentNumber || "2023123456",
+                      section: demoIdForm.section || "2CSA",
+                      image: session?.user?.image || null,
+                    }}
+                    isEligible={true}
+                    showBackPreview={true}
+                    photoUploadEnabled={false}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="relative rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6"
+              aria-busy={savingExclusivePerk}
+            >
+              <FormProcessingOverlay
+                active={savingExclusivePerk}
+                label="Adding homepage perk"
+              />
+              <fieldset
+                disabled={savingExclusivePerk}
+                className={`transition ${
+                  savingExclusivePerk
+                    ? "pointer-events-none opacity-45 grayscale"
+                    : ""
+                }`}
+              >
+                <h2 className="mb-1 text-sm font-bold text-[#134687] font-poppins">
+                  exclusive perks partners
+                </h2>
+                <p className="mb-5 text-xs text-[#134687]/40 font-mono">
+                  manage the partner logos and destination links shown on the
+                  homepage
+                </p>
+
+                {areExclusivePerksLoading ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner label="Loading exclusive perks" size="md" />
+                  </div>
+                ) : exclusivePerksData?.items.length ? (
+                  <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {exclusivePerksData.items.map((item) => {
+                      const isDeleting = deletingExclusivePerks.has(item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          className="relative flex min-w-0 items-center gap-3 rounded-xl border border-[#005FD9]/10 bg-[#F7F9FC] p-3"
+                          aria-busy={isDeleting}
                         >
-                          remove
+                          <FormProcessingOverlay
+                            active={isDeleting}
+                            label="Removing perk"
+                          />
+                          <div
+                            className={`relative h-16 w-16 shrink-0 overflow-hidden bg-white ${
+                              item.shape === "circle"
+                                ? "rounded-full"
+                                : "rounded-lg"
+                            }`}
+                          >
+                            <Image
+                              src={item.imageUrl}
+                              alt={`${item.name} logo`}
+                              fill
+                              unoptimized
+                              sizes="64px"
+                              className={
+                                item.fit === "contain"
+                                  ? "object-contain"
+                                  : "object-cover"
+                              }
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs font-semibold text-[#134687] font-poppins">
+                              {item.name}
+                            </p>
+                            <a
+                              href={item.destinationUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-0.5 block truncate text-[10px] text-[#044FAF] hover:underline font-mono"
+                            >
+                              {item.destinationUrl}
+                            </a>
+                            <div className="mt-2 flex items-center gap-2">
+                              {item.isLegacy && (
+                                <span className="rounded bg-[#E8F2FF] px-1.5 py-0.5 text-[9px] font-semibold text-[#134687]">
+                                  current default
+                                </span>
+                              )}
+                              <button
+                                type="button"
+                                disabled={isDeleting}
+                                onClick={() => handleExclusivePerkDelete(item)}
+                                className="text-[10px] font-medium text-red-600 hover:text-red-700 disabled:opacity-40"
+                              >
+                                remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="mb-6 rounded-xl bg-[#F7F9FC] p-4 text-xs text-[#134687]/50">
+                    No exclusive perks are currently shown on the homepage.
+                  </p>
+                )}
+
+                <form
+                  onSubmit={handleExclusivePerkUpload}
+                  className="space-y-4 border-t border-[#005FD9]/10 pt-5"
+                >
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
+                        Partner Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={80}
+                        value={exclusivePerkForm.name}
+                        onChange={(event) =>
+                          setExclusivePerkForm((current) => ({
+                            ...current,
+                            name: event.target.value,
+                          }))
+                        }
+                        className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                        placeholder="Partner or establishment name"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
+                        Destination Link *
+                      </label>
+                      <input
+                        type="url"
+                        required
+                        value={exclusivePerkForm.destinationUrl}
+                        onChange={(event) =>
+                          setExclusivePerkForm((current) => ({
+                            ...current,
+                            destinationUrl: event.target.value,
+                          }))
+                        }
+                        className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                        placeholder="https://facebook.com/partner"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
+                        Logo Shape
+                      </label>
+                      <select
+                        value={exclusivePerkForm.shape}
+                        onChange={(event) =>
+                          setExclusivePerkForm((current) => ({
+                            ...current,
+                            shape: event.target.value as ExclusivePerkShape,
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[#DCE4EE] bg-[#F7F9FC] px-3 py-2 text-sm text-[#134687]"
+                      >
+                        <option value="rounded">Rounded square</option>
+                        <option value="circle">Circle</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
+                        Image Fit
+                      </label>
+                      <select
+                        value={exclusivePerkForm.fit}
+                        onChange={(event) =>
+                          setExclusivePerkForm((current) => ({
+                            ...current,
+                            fit: event.target.value as ExclusivePerkFit,
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[#DCE4EE] bg-[#F7F9FC] px-3 py-2 text-sm text-[#134687]"
+                      >
+                        <option value="contain">Show entire logo</option>
+                        <option value="cover">Fill the frame</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
+                        Display Size
+                      </label>
+                      <select
+                        value={exclusivePerkForm.size}
+                        onChange={(event) =>
+                          setExclusivePerkForm((current) => ({
+                            ...current,
+                            size: event.target.value as ExclusivePerkSize,
+                          }))
+                        }
+                        className="w-full rounded-xl border border-[#DCE4EE] bg-[#F7F9FC] px-3 py-2 text-sm text-[#134687]"
+                      >
+                        <option value="standard">Standard</option>
+                        <option value="large">Featured</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
+                      Partner Image *
+                    </label>
+                    <input
+                      ref={exclusivePerkFileInputRef}
+                      type="file"
+                      required
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleExclusivePerkImageSelect}
+                      className="block w-full text-sm text-[#134687] file:mr-4 file:rounded-lg file:border-0 file:bg-[#E8F2FF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#134687] hover:file:bg-[#DCECFF]"
+                    />
+                    <p className="mt-1 text-[10px] text-[#134687]/45 font-mono">
+                      JPEG, PNG, or WebP · maximum 10MB
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={
+                      savingExclusivePerk || !selectedExclusivePerkImage
+                    }
+                    className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
+                  >
+                    {savingExclusivePerk
+                      ? "adding partner..."
+                      : "add homepage perk"}
+                  </button>
+                </form>
+              </fieldset>
+            </div>
+          </div>
+        )}
+
+        {settingsSection === "executive-board" &&
+          (isEbPicturesLoading || isAvailabilityLoading ? (
+            <div className="flex min-h-[calc(100dvh-380px)] items-center justify-center rounded-2xl bg-white">
+              <AdminContentLoading description="Loading Executive Board configuration..." />
+            </div>
+          ) : (
+            <div className="space-y-5">
+              <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
+                <h2 className="mb-1 text-sm font-bold text-[#134687] font-poppins">
+                  executive board pictures
+                </h2>
+                <p className="mb-5 text-xs text-[#134687]/40 font-mono">
+                  configure the active Executive Board pictures displayed to
+                  Executive Associate applicants
+                  {ebPictureData?.activeCycle?.schoolYear
+                    ? ` for A.Y. ${ebPictureData.activeCycle.schoolYear}`
+                    : ""}
+                </p>
+
+                {isEbPicturesLoading ? (
+                  <div className="flex justify-center py-8">
+                    <LoadingSpinner label="Loading EB pictures" size="sm" />
+                  </div>
+                ) : !ebPictureData?.activeCycle ? (
+                  <div className="rounded-xl bg-[#FFF4DA] p-4 text-xs text-[#5B4515]">
+                    Create and activate a recruitment cycle before configuring
+                    EB pictures.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {ebRoles.map((role) => {
+                      const profile = ebPictureData.profiles.find(
+                        (item) => item.roleId === role.id,
+                      );
+                      const selection = selectedEbPictures[role.id];
+                      const previewUrl =
+                        selection?.previewUrl || profile?.imageUrl;
+                      const isSavingPicture = savingEbPictureRoles.has(role.id);
+
+                      return (
+                        <div
+                          key={role.id}
+                          className="relative overflow-hidden rounded-xl bg-white shadow-sm"
+                          aria-busy={isSavingPicture}
+                        >
+                          <FormProcessingOverlay
+                            active={isSavingPicture}
+                            label="Updating picture"
+                          />
+                          <fieldset
+                            disabled={isSavingPicture}
+                            className={`flex min-w-0 gap-3 p-3 transition ${isSavingPicture ? "pointer-events-none opacity-45 grayscale" : ""}`}
+                          >
+                            <div className="relative h-28 w-22 shrink-0 overflow-hidden rounded-lg bg-[#134687]">
+                              {previewUrl ? (
+                                <Image
+                                  src={previewUrl}
+                                  alt={`${profile?.userName || role.title} picture preview`}
+                                  fill
+                                  unoptimized
+                                  sizes="88px"
+                                  className="object-cover object-top"
+                                />
+                              ) : (
+                                <div className="flex h-full items-center justify-center px-2 text-center text-[10px] font-semibold text-white font-poppins">
+                                  {role.title}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex min-w-0 flex-1 flex-col justify-between gap-2 py-0.5">
+                              <div>
+                                <p className="line-clamp-2 text-xs font-semibold text-[#134687] font-poppins">
+                                  {role.title}
+                                </p>
+                                <p className="truncate text-[10px] text-[#134687]/45 font-mono">
+                                  {profile?.userName || "No active EB assigned"}
+                                </p>
+                              </div>
+
+                              {profile ? (
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <label className="inline-flex cursor-pointer rounded-md bg-[#E8F2FF] px-2.5 py-1.5 text-[10px] font-semibold text-[#044FAF] hover:bg-[#D9E9FF] focus-within:ring-2 focus-within:ring-[#044FAF]/30">
+                                    choose
+                                    <input
+                                      type="file"
+                                      accept="image/jpeg,image/png,image/webp"
+                                      onChange={(event) =>
+                                        handleEbPictureSelect(role.id, event)
+                                      }
+                                      className="sr-only"
+                                    />
+                                  </label>
+                                  {selection && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleEbPictureUpload(profile)
+                                        }
+                                        className="rounded-md bg-[#134687] px-2.5 py-1.5 text-[10px] font-semibold text-white hover:bg-[#0F376B]"
+                                      >
+                                        save
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          URL.revokeObjectURL(
+                                            selection.previewUrl,
+                                          );
+                                          setSelectedEbPictures((current) => {
+                                            const next = { ...current };
+                                            delete next[role.id];
+                                            return next;
+                                          });
+                                        }}
+                                        className="rounded-md bg-[#F1F4F8] px-2.5 py-1.5 text-[10px] font-medium text-[#134687] hover:bg-[#E8EDF3]"
+                                      >
+                                        cancel
+                                      </button>
+                                    </>
+                                  )}
+                                  {!selection && profile.imageUrl && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleEbPictureRemove(profile)
+                                      }
+                                      className="px-1 text-[10px] font-medium text-red-600 hover:text-red-700"
+                                    >
+                                      remove
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <p className="text-[10px] leading-4 text-[#134687]/45">
+                                  Assign this position in User DB first.
+                                </p>
+                              )}
+                            </div>
+                          </fieldset>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div>
+                    <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
+                      executive associate availability
+                    </h2>
+                    <p className="text-xs text-[#134687]/40 font-mono">
+                      choose which EB roles applicants can apply to as Executive
+                      Associate
+                    </p>
+                  </div>
+                  {savingAvailability && (
+                    <span className="text-[11px] text-[#134687]/40 font-mono">
+                      saving...
+                    </span>
+                  )}
+                </div>
+
+                {isAvailabilityLoading ? (
+                  <div className="flex justify-center py-6">
+                    <LoadingSpinner label="Loading configuration" size="sm" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {ebRoles.map((role) => {
+                      const enabled = availability[role.id] !== false;
+
+                      return (
+                        <label
+                          key={role.id}
+                          className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors ${
+                            enabled
+                              ? "bg-[#E8F2FF]"
+                              : "bg-[#F7F9FC] hover:bg-[#EEF2F7]"
+                          }`}
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[#134687] font-poppins">
+                              {role.title}
+                            </p>
+                            <p className="text-[11px] text-[#134687]/40 font-mono">
+                              {enabled
+                                ? "visible to applicants"
+                                : "hidden from applicants"}
+                            </p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={enabled}
+                            disabled={savingAvailability}
+                            onChange={(e) =>
+                              handleToggleAvailability(
+                                role.id,
+                                e.target.checked,
+                              )
+                            }
+                            className="h-5 w-5 rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
+                          />
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+        {settingsSection === "recruitment" && (
+          <div className="space-y-5">
+            {/* Existing Cycles */}
+            {allCycles.length > 0 && (
+              <div className="overflow-hidden rounded-2xl bg-white/90 shadow-sm">
+                <div className="flex items-center justify-between bg-[#F7F9FC] px-5 py-3">
+                  <span className="text-xs font-semibold text-[#134687]/50 uppercase tracking-widest font-mono">
+                    saved_cycles
+                  </span>
+                  <button
+                    onClick={handleNew}
+                    className="text-xs text-[#044FAF] font-medium hover:underline font-mono"
+                  >
+                    + new
+                  </button>
+                </div>
+                <div className="divide-y divide-[#005FD9]/5">
+                  {allCycles.map((cycle) => (
+                    <div
+                      key={cycle.id}
+                      className={`flex items-center justify-between px-5 py-3 transition-colors ${editingId === cycle.id ? "bg-[#E8F2FF]" : "hover:bg-[#F3F3FD]/50"}`}
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-[#134687] font-poppins">
+                            {cycle.schoolYear}
+                          </span>
+                          {cycle.isActive && (
+                            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-[#044FAF]/10 text-[#044FAF] font-mono">
+                              active
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-[#134687]/40 font-mono mt-0.5">
+                          interviews:{" "}
+                          {new Date(cycle.interviewStart).toLocaleDateString()}{" "}
+                          &ndash;{" "}
+                          {new Date(cycle.interviewEnd).toLocaleDateString()}
+                        </p>
+                        <p className="text-[11px] text-[#134687]/55 font-mono mt-0.5">
+                          membership expires:{" "}
+                          {cycle.membershipExpiration
+                            ? new Date(
+                                cycle.membershipExpiration,
+                              ).toLocaleDateString("en-US", { timeZone: "UTC" })
+                            : "not set"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 ml-4">
+                        <button
+                          onClick={() => handleEdit(cycle)}
+                          className="text-xs text-[#044FAF] font-mono hover:underline"
+                        >
+                          edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(cycle.id)}
+                          className="text-xs text-[#134687]/30 font-mono hover:text-red-500 hover:underline"
+                        >
+                          delete
                         </button>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="mb-6 rounded-xl bg-[#F7F9FC] p-4 text-xs text-[#134687]/50">
-              No exclusive perks are currently shown on the homepage.
-            </p>
-          )}
-
-          <form
-            onSubmit={handleExclusivePerkUpload}
-            className="space-y-4 border-t border-[#005FD9]/10 pt-5"
-          >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
-                  Partner Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  maxLength={80}
-                  value={exclusivePerkForm.name}
-                  onChange={(event) =>
-                    setExclusivePerkForm((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                  className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
-                  placeholder="Partner or establishment name"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
-                  Destination Link *
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={exclusivePerkForm.destinationUrl}
-                  onChange={(event) =>
-                    setExclusivePerkForm((current) => ({
-                      ...current,
-                      destinationUrl: event.target.value,
-                    }))
-                  }
-                  className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
-                  placeholder="https://facebook.com/partner"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
-                  Logo Shape
-                </label>
-                <select
-                  value={exclusivePerkForm.shape}
-                  onChange={(event) =>
-                    setExclusivePerkForm((current) => ({
-                      ...current,
-                      shape: event.target.value as ExclusivePerkShape,
-                    }))
-                  }
-                  className="w-full rounded-xl border border-[#DCE4EE] bg-[#F7F9FC] px-3 py-2 text-sm text-[#134687]"
-                >
-                  <option value="rounded">Rounded square</option>
-                  <option value="circle">Circle</option>
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
-                  Image Fit
-                </label>
-                <select
-                  value={exclusivePerkForm.fit}
-                  onChange={(event) =>
-                    setExclusivePerkForm((current) => ({
-                      ...current,
-                      fit: event.target.value as ExclusivePerkFit,
-                    }))
-                  }
-                  className="w-full rounded-xl border border-[#DCE4EE] bg-[#F7F9FC] px-3 py-2 text-sm text-[#134687]"
-                >
-                  <option value="contain">Show entire logo</option>
-                  <option value="cover">Fill the frame</option>
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
-                  Display Size
-                </label>
-                <select
-                  value={exclusivePerkForm.size}
-                  onChange={(event) =>
-                    setExclusivePerkForm((current) => ({
-                      ...current,
-                      size: event.target.value as ExclusivePerkSize,
-                    }))
-                  }
-                  className="w-full rounded-xl border border-[#DCE4EE] bg-[#F7F9FC] px-3 py-2 text-sm text-[#134687]"
-                >
-                  <option value="standard">Standard</option>
-                  <option value="large">Featured</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#134687]/60 font-mono">
-                Partner Image *
-              </label>
-              <input
-                ref={exclusivePerkFileInputRef}
-                type="file"
-                required
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleExclusivePerkImageSelect}
-                className="block w-full text-sm text-[#134687] file:mr-4 file:rounded-lg file:border-0 file:bg-[#E8F2FF] file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#134687] hover:file:bg-[#DCECFF]"
-              />
-              <p className="mt-1 text-[10px] text-[#134687]/45 font-mono">
-                JPEG, PNG, or WebP · maximum 10MB
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              disabled={savingExclusivePerk || !selectedExclusivePerkImage}
-              className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
-            >
-              {savingExclusivePerk ? "adding partner..." : "add homepage perk"}
-            </button>
-          </form>
-        </fieldset>
-      </div>
-        </div>
-      )}
-
-      {settingsSection === "executive-board" &&
-        (isEbPicturesLoading || isAvailabilityLoading ? (
-          <div className="flex min-h-[calc(100dvh-380px)] items-center justify-center rounded-2xl bg-white">
-            <AdminContentLoading description="Loading Executive Board configuration..." />
-          </div>
-        ) : (
-        <div className="space-y-5">
-      <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
-        <h2 className="mb-1 text-sm font-bold text-[#134687] font-poppins">
-          executive board pictures
-        </h2>
-        <p className="mb-5 text-xs text-[#134687]/40 font-mono">
-          configure the active Executive Board pictures displayed to Executive
-          Associate applicants
-          {ebPictureData?.activeCycle?.schoolYear
-            ? ` for A.Y. ${ebPictureData.activeCycle.schoolYear}`
-            : ""}
-        </p>
-
-        {isEbPicturesLoading ? (
-          <div className="flex justify-center py-8">
-            <LoadingSpinner label="Loading EB pictures" size="sm" />
-          </div>
-        ) : !ebPictureData?.activeCycle ? (
-          <div className="rounded-xl bg-[#FFF4DA] p-4 text-xs text-[#5B4515]">
-            Create and activate a recruitment cycle before configuring EB
-            pictures.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {ebRoles.map((role) => {
-              const profile = ebPictureData.profiles.find(
-                (item) => item.roleId === role.id,
-              );
-              const selection = selectedEbPictures[role.id];
-              const previewUrl = selection?.previewUrl || profile?.imageUrl;
-              const isSavingPicture = savingEbPictureRoles.has(role.id);
-
-              return (
-                <div
-                  key={role.id}
-                  className="relative overflow-hidden rounded-xl bg-white shadow-sm"
-                  aria-busy={isSavingPicture}
-                >
-                  <FormProcessingOverlay
-                    active={isSavingPicture}
-                    label="Updating picture"
-                  />
-                  <fieldset
-                    disabled={isSavingPicture}
-                    className={`flex min-w-0 gap-3 p-3 transition ${isSavingPicture ? "pointer-events-none opacity-45 grayscale" : ""}`}
-                  >
-                    <div className="relative h-28 w-22 shrink-0 overflow-hidden rounded-lg bg-[#134687]">
-                      {previewUrl ? (
-                        <Image
-                          src={previewUrl}
-                          alt={`${profile?.userName || role.title} picture preview`}
-                          fill
-                          unoptimized
-                          sizes="88px"
-                          className="object-cover object-top"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center px-2 text-center text-[10px] font-semibold text-white font-poppins">
-                          {role.title}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex min-w-0 flex-1 flex-col justify-between gap-2 py-0.5">
-                      <div>
-                        <p className="line-clamp-2 text-xs font-semibold text-[#134687] font-poppins">
-                          {role.title}
-                        </p>
-                        <p className="truncate text-[10px] text-[#134687]/45 font-mono">
-                          {profile?.userName || "No active EB assigned"}
-                        </p>
-                      </div>
-
-                      {profile ? (
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <label className="inline-flex cursor-pointer rounded-md bg-[#E8F2FF] px-2.5 py-1.5 text-[10px] font-semibold text-[#044FAF] hover:bg-[#D9E9FF] focus-within:ring-2 focus-within:ring-[#044FAF]/30">
-                            choose
-                            <input
-                              type="file"
-                              accept="image/jpeg,image/png,image/webp"
-                              onChange={(event) =>
-                                handleEbPictureSelect(role.id, event)
-                              }
-                              className="sr-only"
-                            />
-                          </label>
-                          {selection && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() => handleEbPictureUpload(profile)}
-                                className="rounded-md bg-[#134687] px-2.5 py-1.5 text-[10px] font-semibold text-white hover:bg-[#0F376B]"
-                              >
-                                save
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  URL.revokeObjectURL(selection.previewUrl);
-                                  setSelectedEbPictures((current) => {
-                                    const next = { ...current };
-                                    delete next[role.id];
-                                    return next;
-                                  });
-                                }}
-                                className="rounded-md bg-[#F1F4F8] px-2.5 py-1.5 text-[10px] font-medium text-[#134687] hover:bg-[#E8EDF3]"
-                              >
-                                cancel
-                              </button>
-                            </>
-                          )}
-                          {!selection && profile.imageUrl && (
-                            <button
-                              type="button"
-                              onClick={() => handleEbPictureRemove(profile)}
-                              className="px-1 text-[10px] font-medium text-red-600 hover:text-red-700"
-                            >
-                              remove
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-[10px] leading-4 text-[#134687]/45">
-                          Assign this position in User DB first.
-                        </p>
-                      )}
-                    </div>
-                  </fieldset>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </div>
+            )}
 
-      <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
-        <div className="flex items-start justify-between gap-4 mb-5">
-          <div>
-            <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
-              executive associate availability
-            </h2>
-            <p className="text-xs text-[#134687]/40 font-mono">
-              choose which EB roles applicants can apply to as Executive
-              Associate
-            </p>
-          </div>
-          {savingAvailability && (
-            <span className="text-[11px] text-[#134687]/40 font-mono">
-              saving...
-            </span>
-          )}
-        </div>
-
-        {isAvailabilityLoading ? (
-          <div className="flex justify-center py-6">
-            <LoadingSpinner label="Loading configuration" size="sm" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {ebRoles.map((role) => {
-              const enabled = availability[role.id] !== false;
-
-              return (
-                <label
-                  key={role.id}
-                  className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl px-4 py-3 transition-colors ${
-                    enabled
-                      ? "bg-[#E8F2FF]"
-                      : "bg-[#F7F9FC] hover:bg-[#EEF2F7]"
-                  }`}
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#134687] font-poppins">
-                      {role.title}
-                    </p>
-                    <p className="text-[11px] text-[#134687]/40 font-mono">
-                      {enabled
-                        ? "visible to applicants"
-                        : "hidden from applicants"}
-                    </p>
-                  </div>
+            {/* Form */}
+            <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
+              <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
+                {isEditing ? "edit cycle" : "new cycle"}
+              </h2>
+              <p className="text-xs text-[#134687]/40 font-mono mb-5">
+                configure recruitment dates and membership validity
+              </p>
+              <form onSubmit={handleSave} className="space-y-4 max-w-lg">
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    School Year *
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={enabled}
-                    disabled={savingAvailability}
+                    type="text"
+                    required
+                    placeholder="e.g. 2025-2026"
+                    value={form.schoolYear}
                     onChange={(e) =>
-                      handleToggleAvailability(role.id, e.target.checked)
+                      setForm({ ...form, schoolYear: e.target.value })
                     }
-                    className="h-5 w-5 rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
+                    className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25 font-mono"
                   />
-                </label>
-              );
-            })}
-          </div>
-        )}
-      </div>
-        </div>
-      ))}
-
-      {settingsSection === "recruitment" && (
-        <div className="space-y-5">
-      {/* Existing Cycles */}
-      {allCycles.length > 0 && (
-        <div className="overflow-hidden rounded-2xl bg-white/90 shadow-sm">
-          <div className="flex items-center justify-between bg-[#F7F9FC] px-5 py-3">
-            <span className="text-xs font-semibold text-[#134687]/50 uppercase tracking-widest font-mono">
-              saved_cycles
-            </span>
-            <button
-              onClick={handleNew}
-              className="text-xs text-[#044FAF] font-medium hover:underline font-mono"
-            >
-              + new
-            </button>
-          </div>
-          <div className="divide-y divide-[#005FD9]/5">
-            {allCycles.map((cycle) => (
-              <div
-                key={cycle.id}
-                className={`flex items-center justify-between px-5 py-3 transition-colors ${editingId === cycle.id ? "bg-[#E8F2FF]" : "hover:bg-[#F3F3FD]/50"}`}
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-[#134687] font-poppins">
-                      {cycle.schoolYear}
-                    </span>
-                    {cycle.isActive && (
-                      <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-[#044FAF]/10 text-[#044FAF] font-mono">
-                        active
-                      </span>
-                    )}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    Application Start *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    min={todayDate}
+                    value={form.applicationStart}
+                    onChange={(e) =>
+                      setForm({ ...form, applicationStart: e.target.value })
+                    }
+                    className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                      Interview Start *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      min={todayDate}
+                      value={form.interviewStart}
+                      onChange={(e) =>
+                        setForm({ ...form, interviewStart: e.target.value })
+                      }
+                      className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                    />
                   </div>
-                  <p className="text-[11px] text-[#134687]/40 font-mono mt-0.5">
-                    {new Date(cycle.interviewStart).toLocaleDateString()}{" "}
-                    &ndash; {new Date(cycle.interviewEnd).toLocaleDateString()}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                      Interview Last Day *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      min={todayDate}
+                      value={form.interviewEnd}
+                      onChange={(e) =>
+                        setForm({ ...form, interviewEnd: e.target.value })
+                      }
+                      className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
+                    Membership Expiration *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    min={form.interviewEnd || todayDate}
+                    value={form.membershipExpiration}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        membershipExpiration: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
+                  />
+                  <p className="mt-1 text-[11px] text-[#134687]/45 font-mono">
+                    The ID remains valid through this date in Philippine time.
                   </p>
                 </div>
-                <div className="flex items-center gap-3 shrink-0 ml-4">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.isActive}
+                    onChange={(e) =>
+                      setForm({ ...form, isActive: e.target.checked })
+                    }
+                    className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
+                  />
+                  <span className="text-[#134687] text-xs">set as active</span>
+                </label>
+                <div className="flex gap-2">
                   <button
-                    onClick={() => handleEdit(cycle)}
-                    className="text-xs text-[#044FAF] font-mono hover:underline"
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
                   >
-                    edit
+                    {saving ? "saving..." : isEditing ? "update" : "create"}
                   </button>
-                  <button
-                    onClick={() => handleDelete(cycle.id)}
-                    className="text-xs text-[#134687]/30 font-mono hover:text-red-500 hover:underline"
-                  >
-                    delete
-                  </button>
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={handleNew}
+                      className="rounded-lg bg-[#F1F4F8] px-6 py-2 text-sm font-medium text-[#134687] transition-colors hover:bg-[#E8EDF3]"
+                    >
+                      cancel
+                    </button>
+                  )}
                 </div>
+              </form>
+            </div>
+
+            {/* Help */}
+            <div className="rounded-2xl bg-[#E8F2FF]/55 p-5">
+              <div className="text-xs font-mono text-[#134687]/60 space-y-1">
+                <p>
+                  <span className="text-[#044FAF]">{"// "}</span>
+                  {"click + new to create a cycle"}
+                </p>
+                <p>
+                  <span className="text-[#044FAF]">{"// "}</span>
+                  {
+                    "active cycle controls interview dates and member IDs across the app"
+                  }
+                </p>
+                <p>
+                  <span className="text-[#044FAF]">{"// "}</span>
+                  {
+                    "digital IDs expire after the configured membership expiration date"
+                  }
+                </p>
+                <p>
+                  <span className="text-[#044FAF]">{"// "}</span>
+                  {"only one cycle can be active at a time"}
+                </p>
+                <p>
+                  <span className="text-[#044FAF]">{"// "}</span>
+                  {"meeting links are set per-eb in user_db"}
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Form */}
-      <div className="rounded-2xl bg-white/90 p-5 shadow-sm sm:p-6">
-        <h2 className="text-sm font-bold text-[#134687] font-poppins mb-1">
-          {isEditing ? "edit cycle" : "new cycle"}
-        </h2>
-        <p className="text-xs text-[#134687]/40 font-mono mb-5">
-          configure recruitment period dates
-        </p>
-        <form onSubmit={handleSave} className="space-y-4 max-w-lg">
-          <div>
-            <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-              School Year *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. 2025-2026"
-              value={form.schoolYear}
-              onChange={(e) => setForm({ ...form, schoolYear: e.target.value })}
-              className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25 font-mono"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-              Application Start *
-            </label>
-            <input
-              type="date"
-              required
-              min={todayDate}
-              value={form.applicationStart}
-              onChange={(e) =>
-                setForm({ ...form, applicationStart: e.target.value })
-              }
-              className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-                Interview Start *
-              </label>
-              <input
-                type="date"
-                required
-                min={todayDate}
-                value={form.interviewStart}
-                onChange={(e) =>
-                  setForm({ ...form, interviewStart: e.target.value })
-                }
-                className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-[#134687]/60 uppercase tracking-wider font-mono mb-1">
-                Interview Last Day *
-              </label>
-              <input
-                type="date"
-                required
-                min={todayDate}
-                value={form.interviewEnd}
-                onChange={(e) =>
-                  setForm({ ...form, interviewEnd: e.target.value })
-                }
-                className="w-full rounded-xl border-0 bg-[#F7F9FC] px-3 py-2 text-sm ring-1 ring-inset ring-[#DCE4EE] outline-none focus:ring-2 focus:ring-[#044FAF]/25"
-              />
             </div>
           </div>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.isActive}
-              onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-              className="rounded border-[#005FD9]/20 text-[#044FAF] focus:ring-[#044FAF]/30"
-            />
-            <span className="text-[#134687] text-xs">set as active</span>
-          </label>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-[#134687] px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0F376B] disabled:opacity-40 font-poppins"
-            >
-              {saving ? "saving..." : isEditing ? "update" : "create"}
-            </button>
-            {isEditing && (
-              <button
-                type="button"
-                onClick={handleNew}
-                className="rounded-lg bg-[#F1F4F8] px-6 py-2 text-sm font-medium text-[#134687] transition-colors hover:bg-[#E8EDF3]"
-              >
-                cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-
-      {/* Help */}
-      <div className="rounded-2xl bg-[#E8F2FF]/55 p-5">
-        <div className="text-xs font-mono text-[#134687]/60 space-y-1">
-          <p>
-            <span className="text-[#044FAF]">{"// "}</span>
-            {"click + new to create a cycle"}
-          </p>
-          <p>
-            <span className="text-[#044FAF]">{"// "}</span>
-            {"active cycle controls interview dates across the app"}
-          </p>
-          <p>
-            <span className="text-[#044FAF]">{"// "}</span>
-            {"only one cycle can be active at a time"}
-          </p>
-          <p>
-            <span className="text-[#044FAF]">{"// "}</span>
-            {"meeting links are set per-eb in user_db"}
-          </p>
-        </div>
-      </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react";
 import { usePaymentQr } from "@/lib/usePaymentQr";
 import { useCommunityLink } from "@/lib/useCommunityLink";
 import { usePaymentReceiptTemplate } from "@/lib/usePaymentReceiptTemplate";
+import DigitalIdCard from "@/components/DigitalIdCard";
 
 export default function CommitteeProgressPageContent() {
   const { communityEnabled, communityUrl, communityLabel } = useCommunityLink();
@@ -53,7 +54,14 @@ export default function CommitteeProgressPageContent() {
       studentNumber: string;
       name: string;
       section: string;
-      memberships?: Array<{ memberId: string }>;
+      memberships?: Array<{
+        memberId: string;
+        photoPath: string | null;
+        recruitmentCycle: {
+          schoolYear: string;
+          membershipExpiration: string | null;
+        };
+      }>;
     };
     ebRole: string;
     meetingLink?: string;
@@ -560,6 +568,45 @@ export default function CommitteeProgressPageContent() {
               </div>
             </div>
           </div>
+          {isPaymentApproved &&
+            applicationData.user.memberships?.[0]?.memberId && (
+              <div className="rounded-2xl sm:rounded-[20px] lg:rounded-3xl bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.15)] sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-4 sm:p-6 lg:p-10 w-full max-w-4xl">
+                <div className="text-center mb-6">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-poppins font-bold text-[#134687] mb-1">
+                    Official Digital Member ID
+                  </h3>
+                  <p className="text-xs sm:text-sm font-inter text-[#134687]/70">
+                    Your payment receipt has been approved! Below is your
+                    official CSS membership pass with scannable QR code.
+                  </p>
+                </div>
+                <DigitalIdCard
+                  memberId={applicationData.user.memberships[0].memberId}
+                  schoolYear={
+                    applicationData.user.memberships[0].recruitmentCycle
+                      .schoolYear
+                  }
+                  expirationDate={
+                    applicationData.user.memberships[0].recruitmentCycle
+                      .membershipExpiration || undefined
+                  }
+                  roleTitle={
+                    firstCommittee?.title
+                      ? `Staff - ${firstCommittee.title}`
+                      : "Committee Staff"
+                  }
+                  user={{
+                    name: applicationData.user.name,
+                    studentNumber: applicationData.user.studentNumber,
+                    section: applicationData.user.section,
+                    image: applicationData.user.memberships[0].photoPath
+                      ? `/api/user/digital-id/photo?v=${encodeURIComponent(applicationData.user.memberships[0].photoPath)}`
+                      : session?.user?.image,
+                  }}
+                  isEligible={true}
+                />
+              </div>
+            )}
 
           {/* Application Status and Results */}
           {(application.status === "evaluating" ||
@@ -591,8 +638,7 @@ export default function CommitteeProgressPageContent() {
                     </div>
                     <div className="text-gray-600">
                       <p>
-                        <strong>Member ID:</strong>{" "}
-                        {memberIdStatus}
+                        <strong>Member ID:</strong> {memberIdStatus}
                       </p>
                       {application.redirection ? (
                         <p>
@@ -601,8 +647,7 @@ export default function CommitteeProgressPageContent() {
                         </p>
                       ) : (
                         <p>
-                          <strong>Accepted at:</strong> {firstCommittee?.title}{" "}
-                          Committee
+                          <strong>Accepted at:</strong> {firstCommittee?.title}
                         </p>
                       )}
                     </div>
@@ -696,7 +741,7 @@ export default function CommitteeProgressPageContent() {
                           className="max-w-62.5 sm:max-w-75 w-full h-auto border-3 border-[#134687] rounded-xl shadow-lg mx-auto"
                         />
                       ) : (
-                        <div className="mx-auto max-w-md rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+                        <div className="mx-auto max-w-md rounded-xl border border-[#B77900] bg-white p-4 text-sm text-[#8A5A00]">
                           Payment QR code is currently unavailable. Please
                           contact css.cics@ust.edu.ph for payment instructions.
                         </div>
@@ -740,38 +785,43 @@ export default function CommitteeProgressPageContent() {
                         disabled={submittingPaymentProof}
                         className={`space-y-3 border-0 p-0 transition duration-200 ${submittingPaymentProof ? "opacity-45 grayscale" : "opacity-100"}`}
                       >
-                      <input
-                        type="url"
-                        value={paymentProof}
-                        onChange={(e) => setPaymentProof(e.target.value)}
-                        required
-                        placeholder="Paste Google Drive receipt link"
-                        className="w-full rounded-lg border border-[#005FD9]/20 px-4 py-3 text-sm focus:outline-none focus:border-[#044FAF]"
-                      />
-                      {paymentProofError && (
-                        <p className="text-red-600 text-xs text-center">
-                          {paymentProofError}
-                        </p>
-                      )}
-                      <button
-                        type="submit"
-                        disabled={submittingPaymentProof}
-                        className="w-full bg-[#134687] text-white px-4 py-3 rounded-lg font-semibold disabled:opacity-50"
-                      >
-                        {submittingPaymentProof ? (
-                          <span className="inline-flex items-center justify-center gap-2">
-                            <LoadingSpinner label="Submitting acknowledgement receipt" size="sm" className="border-white border-t-transparent" />
-                            Submitting...
-                          </span>
-                        ) : (
-                          "Submit Acknowledgement Receipt"
+                        <input
+                          type="url"
+                          value={paymentProof}
+                          onChange={(e) => setPaymentProof(e.target.value)}
+                          required
+                          placeholder="Paste Google Drive receipt link"
+                          className="w-full rounded-lg border border-[#005FD9]/20 px-4 py-3 text-sm focus:outline-none focus:border-[#044FAF]"
+                        />
+                        {paymentProofError && (
+                          <p className="text-red-600 text-xs text-center">
+                            {paymentProofError}
+                          </p>
                         )}
-                      </button>
+                        <button
+                          type="submit"
+                          disabled={submittingPaymentProof}
+                          className="w-full bg-[#134687] text-white px-4 py-3 rounded-lg font-semibold disabled:opacity-50"
+                        >
+                          {submittingPaymentProof ? (
+                            <span className="inline-flex items-center justify-center gap-2">
+                              <LoadingSpinner
+                                label="Submitting acknowledgement receipt"
+                                size="sm"
+                                className="border-white border-t-transparent"
+                              />
+                              Submitting...
+                            </span>
+                          ) : (
+                            "Submit Acknowledgement Receipt"
+                          )}
+                        </button>
                       </fieldset>
                     </form>
                   ) : paymentStatus === "pending" ? (
-                    <p className="rounded-lg bg-amber-50 p-3 text-center text-sm font-semibold text-amber-800 mb-4 sm:mb-6">
-                      Your acknowledgement receipt is awaiting Executive Board review.
+                    <p className="rounded-lg border border-[#B77900] bg-white p-3 text-center text-sm font-semibold text-[#8A5A00] mb-4 sm:mb-6">
+                      Your acknowledgement receipt is awaiting Executive Board
+                      review.
                     </p>
                   ) : (
                     <p className="rounded-lg bg-green-50 p-3 text-center text-sm font-semibold text-green-700 mb-4 sm:mb-6">
@@ -781,12 +831,15 @@ export default function CommitteeProgressPageContent() {
                   )}
                   {paymentStatus === "rejected" && (
                     <p className="mb-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-700">
-                      Receipt rejected: {application.paymentRejectionReason || "Please submit a valid acknowledgement receipt."}
+                      Receipt rejected:{" "}
+                      {application.paymentRejectionReason ||
+                        "Please submit a valid acknowledgement receipt."}
                     </p>
                   )}
                   <p className="text-[#134687]/80 text-center text-xs sm:text-sm mt-2">
-                    Your Member ID will be shown only after an authorized Executive
-                    Board reviewer approves your acknowledgement receipt.
+                    Your Member ID will be shown only after an authorized
+                    Executive Board reviewer approves your acknowledgement
+                    receipt.
                   </p>
                 </div>
 

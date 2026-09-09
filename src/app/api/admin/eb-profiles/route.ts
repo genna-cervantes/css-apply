@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -5,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { committeeRoles } from "@/data/committeeRoles";
 import { supabase } from "@/lib/supabase";
 import { getRoleId } from "@/lib/eb-mapping";
+import { PUBLIC_EB_ROLES_CACHE_TAG } from "@/lib/cache-tags";
 
 const EB_IMAGE_BUCKET = "eb-profile-images";
 
@@ -75,8 +77,8 @@ export async function GET() {
           roleId: getRoleId(profile.position),
           userName: profile.user.name,
           imageUrl: profile.imagePath
-            ? signedImageUrls.get(profile.imagePath) ??
-              `/api/admin/eb-profiles/image?userId=${encodeURIComponent(profile.userId)}&v=${encodeURIComponent(profile.imagePath)}`
+            ? (signedImageUrls.get(profile.imagePath) ??
+              `/api/admin/eb-profiles/image?userId=${encodeURIComponent(profile.userId)}&v=${encodeURIComponent(profile.imagePath)}`)
             : null,
         })),
         activeCycle,
@@ -92,7 +94,10 @@ export async function GET() {
       "Get active EB profiles failed",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -170,6 +175,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidateTag(PUBLIC_EB_ROLES_CACHE_TAG);
     return NextResponse.json({
       success: true,
       ebProfile,
@@ -217,6 +223,7 @@ export async function DELETE(request: NextRequest) {
       if (error) console.error("Removed EB profile image cleanup failed");
     }
 
+    revalidateTag(PUBLIC_EB_ROLES_CACHE_TAG);
     return NextResponse.json({
       success: true,
       message: "EB profile removed successfully",

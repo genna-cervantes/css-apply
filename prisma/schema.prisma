@@ -66,6 +66,7 @@ model Membership {
   recruitmentCycle   RecruitmentCycle @relation(fields: [recruitmentCycleId], references: [id], onDelete: Cascade)
   memberId           String           @unique
   memberSequence     Int
+  photoPath          String?
   createdAt          DateTime         @default(now())
 
   @@unique([userId, recruitmentCycleId])
@@ -204,6 +205,7 @@ model RecruitmentCycle {
   applicationStart               DateTime
   interviewStart                 DateTime
   interviewEnd                   DateTime
+  membershipExpiration           DateTime?                       @db.Date
   isActive                       Boolean                         @default(false)
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt

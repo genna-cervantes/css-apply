@@ -60,9 +60,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
+          // Avoid stale forced-consent/reauthentication URLs and let users
+          // explicitly select their UST Google account on each sign-in.
+          prompt: "select_account",
         },
       },
     }),

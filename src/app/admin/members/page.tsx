@@ -166,10 +166,7 @@ const Members = () => {
                 onChange={(e) =>
                   setSelectedStatus(
                     e.target.value as
-                      | "all"
-                      | "accepted"
-                      | "pending"
-                      | "rejected",
+                      "all" | "accepted" | "pending" | "rejected",
                   )
                 }
                 className="w-full rounded-lg border border-[#005FD9]/15 px-3 py-2 text-sm text-[#134687] focus:outline-none focus:ring-2 focus:ring-[#044FAF]/20 sm:w-auto"
@@ -234,7 +231,7 @@ const Members = () => {
                           <div className="text-[#044FAF]/70">
                             ID:{" "}
                             {member.user.memberships?.[0]?.memberId ??
-                              member.user.id.slice(-7).toUpperCase()}
+                              "Not issued"}
                           </div>
                         )}
                         <div>

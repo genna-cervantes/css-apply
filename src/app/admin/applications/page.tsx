@@ -95,8 +95,7 @@ const getEARedirectionMessage = (redirection: string): string => {
   return "EA Applicant Redirected";
 };
 const getApplicationMemberId = (application: Application) =>
-  application.user.memberships?.[0]?.memberId ??
-  application.user.id.slice(-7).toUpperCase();
+  application.user.memberships?.[0]?.memberId ?? "Not issued";
 
 // Helper function to get EB role full name
 const getEBRoleFullName = (roleId: string): string => {
@@ -654,31 +653,31 @@ const Applications = () => {
             Search Applications
           </label>
           <div className="relative max-w-md">
-              <input
-                id="application-search"
-                type="text"
-                placeholder="Search by name, student number, or email..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#044FAF] focus:border-transparent"
+            <input
+              id="application-search"
+              type="text"
+              placeholder="Search by name, student number, or email..."
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="w-full px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#044FAF] focus:border-transparent"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div
+                className="h-4 w-4 text-gray-400 bg-current"
+                style={{
+                  maskImage: "url(/icons/search.svg)",
+                  WebkitMaskImage: "url(/icons/search.svg)",
+                  maskSize: "contain",
+                  maskRepeat: "no-repeat",
+                  maskPosition: "center",
+                }}
               />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <div
-                  className="h-4 w-4 text-gray-400 bg-current"
-                  style={{
-                    maskImage: "url(/icons/search.svg)",
-                    WebkitMaskImage: "url(/icons/search.svg)",
-                    maskSize: "contain",
-                    maskRepeat: "no-repeat",
-                    maskPosition: "center",
-                  }}
-                />
+            </div>
+            {isSearching && (
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#044FAF]"></div>
               </div>
-              {isSearching && (
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#044FAF]"></div>
-                </div>
-              )}
+            )}
           </div>
           {searchQuery.trim() && (
             <p className="mt-2 text-sm text-[#134687]/60">

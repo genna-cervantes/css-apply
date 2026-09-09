@@ -1,9 +1,12 @@
 import { randomUUID } from "crypto";
+import { revalidateTag } from "next/cache";
 import { after, NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { supabase } from "@/lib/supabase";
+import { EXCLUSIVE_PERKS_CACHE_TAG } from "@/lib/cache-tags";
+import { optimizeImageToWebp } from "@/lib/image-optimization";
 import {
   EXCLUSIVE_PERK_IMAGE_TYPES,
   EXCLUSIVE_PERKS_BUCKET,
@@ -57,7 +60,10 @@ async function authorizeSuperAdmin() {
     : NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
 
-function hasValidImageSignature(bytes: Uint8Array, type: ExclusivePerkImageType) {
+function hasValidImageSignature(
+  bytes: Uint8Array,
+  type: ExclusivePerkImageType,
+) {
   if (type === "image/jpeg") {
     return (
       bytes.length >= 3 &&
@@ -178,7 +184,10 @@ export async function GET() {
       "Get exclusive perks failed",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -191,16 +200,23 @@ export async function POST(request: NextRequest) {
 
     const body: unknown = await request.json();
     if (!body || typeof body !== "object") {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 },
+      );
     }
 
     const payload = body as Record<string, unknown>;
     const action = payload.action;
 
     if (action === "prepare") {
-      const fileType = typeof payload.fileType === "string" ? payload.fileType : "";
-      const fileSize = typeof payload.fileSize === "number" ? payload.fileSize : 0;
-      if (!EXCLUSIVE_PERK_IMAGE_TYPES.includes(fileType as ExclusivePerkImageType)) {
+      const fileType =
+        typeof payload.fileType === "string" ? payload.fileType : "";
+      const fileSize =
+        typeof payload.fileSize === "number" ? payload.fileSize : 0;
+      if (
+        !EXCLUSIVE_PERK_IMAGE_TYPES.includes(fileType as ExclusivePerkImageType)
+      ) {
         return NextResponse.json(
           { error: "Only JPEG, PNG, and WebP images are allowed" },
           { status: 400 },
@@ -234,7 +250,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (action !== "complete") {
-      return NextResponse.json({ error: "Invalid upload action" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid upload action" },
+        { status: 400 },
+      );
     }
 
     const name = typeof payload.name === "string" ? payload.name.trim() : "";
@@ -244,7 +263,8 @@ export async function POST(request: NextRequest) {
         : "";
     const imagePath =
       typeof payload.imagePath === "string" ? payload.imagePath.trim() : "";
-    const fileType = typeof payload.fileType === "string" ? payload.fileType : "";
+    const fileType =
+      typeof payload.fileType === "string" ? payload.fileType : "";
     const shape = readPresentationValue<ExclusivePerkShape>(
       payload.shape,
       ["circle", "rounded"],
@@ -263,7 +283,9 @@ export async function POST(request: NextRequest) {
 
     if (!name || name.length > 80) {
       return NextResponse.json(
-        { error: "Partner name is required and must be 80 characters or fewer" },
+        {
+          error: "Partner name is required and must be 80 characters or fewer",
+        },
         { status: 400 },
       );
     }
@@ -276,10 +298,17 @@ export async function POST(request: NextRequest) {
     if (
       !imagePath.startsWith("partners/") ||
       imagePath.includes("..") ||
-      !EXCLUSIVE_PERK_IMAGE_TYPES.includes(fileType as ExclusivePerkImageType) ||
-      !imagePath.endsWith(`.${EXTENSION_BY_TYPE[fileType as ExclusivePerkImageType]}`)
+      !EXCLUSIVE_PERK_IMAGE_TYPES.includes(
+        fileType as ExclusivePerkImageType,
+      ) ||
+      !imagePath.endsWith(
+        `.${EXTENSION_BY_TYPE[fileType as ExclusivePerkImageType]}`,
+      )
     ) {
-      return NextResponse.json({ error: "Invalid uploaded image" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid uploaded image" },
+        { status: 400 },
+      );
     }
     stagedImagePath = imagePath;
 
@@ -287,7 +316,10 @@ export async function POST(request: NextRequest) {
     const { data: uploadedImage, error: downloadError } =
       await storage.download(imagePath);
     if (downloadError || !uploadedImage) {
-      return NextResponse.json({ error: "Uploaded image was not found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Uploaded image was not found" },
+        { status: 400 },
+      );
     }
 
     const bytes = new Uint8Array(await uploadedImage.arrayBuffer());
@@ -304,11 +336,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let optimizedImage: Buffer;
+    try {
+      optimizedImage = await optimizeImageToWebp(bytes, {
+        maxWidth: 512,
+        maxHeight: 512,
+        quality: 85,
+      });
+    } catch {
+      await storage.remove([imagePath]);
+      stagedImagePath = "";
+      return NextResponse.json(
+        { error: "The uploaded image could not be optimized" },
+        { status: 400 },
+      );
+    }
+
+    const optimizedImagePath = `partners/${randomUUID()}.webp`;
+    const { error: optimizedUploadError } = await storage.upload(
+      optimizedImagePath,
+      optimizedImage,
+      {
+        cacheControl: "31536000",
+        contentType: "image/webp",
+        upsert: false,
+      },
+    );
+    if (optimizedUploadError) {
+      throw new Error("Unable to store optimized partner image");
+    }
+
+    const { error: stagedCleanupError } = await storage.remove([imagePath]);
+    if (stagedCleanupError)
+      console.error("Staged partner image cleanup failed");
+    stagedImagePath = optimizedImagePath;
+
     const item: StoredExclusivePerk = {
       id: randomUUID(),
       name,
       destinationUrl,
-      imagePath,
+      imagePath: optimizedImagePath,
       shape,
       fit,
       size,
@@ -322,7 +389,9 @@ export async function POST(request: NextRequest) {
       });
       const current = parseExclusivePerks(config?.value);
       if (current.length >= MAX_EXCLUSIVE_PERKS) {
-        throw new Error(`Only ${MAX_EXCLUSIVE_PERKS} exclusive perks are allowed`);
+        throw new Error(
+          `Only ${MAX_EXCLUSIVE_PERKS} exclusive perks are allowed`,
+        );
       }
       const next = [...current, item];
       await tx.systemConfig.upsert({
@@ -336,8 +405,12 @@ export async function POST(request: NextRequest) {
       });
     });
     stagedImagePath = "";
+    revalidateTag(EXCLUSIVE_PERKS_CACHE_TAG);
 
-    const { data: signedImage } = await storage.createSignedUrl(imagePath, 60 * 60);
+    const { data: signedImage } = await storage.createSignedUrl(
+      optimizedImagePath,
+      60 * 60,
+    );
     return NextResponse.json({
       item: {
         ...item,
@@ -375,11 +448,16 @@ export async function DELETE(request: NextRequest) {
 
     const body: unknown = await request.json();
     const id =
-      body && typeof body === "object" && typeof (body as Record<string, unknown>).id === "string"
+      body &&
+      typeof body === "object" &&
+      typeof (body as Record<string, unknown>).id === "string"
         ? ((body as Record<string, unknown>).id as string)
         : "";
     if (!id) {
-      return NextResponse.json({ error: "Missing exclusive perk ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing exclusive perk ID" },
+        { status: 400 },
+      );
     }
 
     const removed = await prisma.$transaction(async (tx) => {
@@ -405,7 +483,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!removed) {
-      return NextResponse.json({ error: "Exclusive perk not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Exclusive perk not found" },
+        { status: 404 },
+      );
     }
     if (!isLocalPerkImagePath(removed.imagePath)) {
       after(async () => {
@@ -416,12 +497,16 @@ export async function DELETE(request: NextRequest) {
       });
     }
 
+    revalidateTag(EXCLUSIVE_PERKS_CACHE_TAG);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(
       "Delete exclusive perk failed",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

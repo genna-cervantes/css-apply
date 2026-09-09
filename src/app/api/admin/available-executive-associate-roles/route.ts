@@ -1,8 +1,10 @@
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { roles } from "@/data/ebRoles";
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_EB_ROLES_CACHE_TAG } from "@/lib/cache-tags";
 
 const CONFIG_KEY = "available_executive_associate_roles";
 
@@ -80,6 +82,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidateTag(PUBLIC_EB_ROLES_CACHE_TAG);
     return NextResponse.json({ availability: sanitizedAvailability });
   } catch (error) {
     console.error("Update available executive associate roles error:", error);

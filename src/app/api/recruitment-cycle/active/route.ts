@@ -12,6 +12,7 @@ export async function GET() {
         applicationStart: true,
         interviewStart: true,
         interviewEnd: true,
+        membershipExpiration: true,
       },
     });
 
