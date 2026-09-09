@@ -310,7 +310,7 @@ export default function DigitalIdCard({
               <div className="flex min-w-0 items-center gap-2.5">
                 <div className="flex shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow-xs">
                   <Image
-                    src="/assets/css-apply-static-images/assets/logos/Logo_CSS_Blue.png"
+                    src="/assets/css-apply-static-images/assets/logos/Logo_CSS_Blue.webp"
                     alt="CSS Logo"
                     width={36}
                     height={36}
@@ -466,7 +466,7 @@ export default function DigitalIdCard({
             className="relative flex min-h-[588px] w-full max-w-[370px] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-[#082B59] via-[#0757B8] to-[#2F8EFF] shadow-[0_12px_36px_rgba(4,79,175,0.18)]"
           >
             <Image
-              src="/assets/css-apply-static-images/assets/logos/Logo_CSS_Blue.png"
+              src="/assets/css-apply-static-images/assets/logos/Logo_CSS_Blue.webp"
               alt="Computer Science Society logo"
               width={300}
               height={300}
