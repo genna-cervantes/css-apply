@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
 import useSWR from "swr";
+import { ScanLine } from "lucide-react";
 
 const swrFetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -314,6 +315,29 @@ const SidebarContent = ({ activePage }: SidebarContentProps) => {
                   {counts.ea > 9 ? "9+" : counts.ea}
                 </span>
               )}
+            </Link>
+          )}
+
+          {/* event attendance */}
+          {activePage === "attendance" ? (
+            <div
+              className="flex items-center px-4 py-3 text-gray-600 border border-gray-300 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
+              style={{ backgroundColor: "#fefefe" }}
+            >
+              <ScanLine className="mr-3 h-5 w-5 text-[#164e96]" />
+              <span className="text-sm text-gray-700 transition-colors duration-300">
+                Event Attendance
+              </span>
+            </div>
+          ) : (
+            <Link
+              href="/admin/attendance"
+              className="group flex items-center px-4 py-3 text-gray-600 hover:bg-blue-50 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-md"
+            >
+              <ScanLine className="mr-3 h-5 w-5 text-gray-500 transition-colors group-hover:text-[#164e96]" />
+              <span className="text-sm text-gray-700 transition-colors duration-300">
+                Event Attendance
+              </span>
             </Link>
           )}
 
