@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
 
       const application = user.executiveAssociateApplications[0];
       if (!application) throw new Error("EA_APPLICATION_NOT_FOUND");
-      if (application.hasAccepted) throw new Error("APPLICATION_ALREADY_ACCEPTED");
+      if (application.hasAccepted)
+        throw new Error("APPLICATION_ALREADY_ACCEPTED");
+      if (application.interviewSlotDay) {
+        throw new Error("INTERVIEW_ALREADY_SCHEDULED");
+      }
       if (
         slot.ebRole !== application.ebRole ||
         application.firstOptionEb !== application.ebRole
@@ -59,16 +63,15 @@ export async function POST(request: NextRequest) {
         expectedEbRole: application.ebRole,
       });
 
-      const updatedApplication =
-        await tx.executiveAssociateApplication.update({
-          where: { id: application.id },
-          data: {
-            interviewBy: profile.position,
-            interviewSlotDay: slot.interviewSlotDay,
-            interviewSlotTimeStart: slot.interviewSlotTimeStart,
-            interviewSlotTimeEnd: slot.interviewSlotTimeEnd,
-          },
-        });
+      const updatedApplication = await tx.executiveAssociateApplication.update({
+        where: { id: application.id },
+        data: {
+          interviewBy: profile.position,
+          interviewSlotDay: slot.interviewSlotDay,
+          interviewSlotTimeStart: slot.interviewSlotTimeStart,
+          interviewSlotTimeEnd: slot.interviewSlotTimeEnd,
+        },
+      });
 
       return { user, application, updatedApplication, profile };
     });
@@ -141,6 +144,10 @@ export async function POST(request: NextRequest) {
         error: "Accepted applications cannot be rescheduled",
         status: 409,
       },
+      INTERVIEW_ALREADY_SCHEDULED: {
+        error: "Your interview schedule has already been confirmed",
+        status: 409,
+      },
       EA_ROLE_MISMATCH: {
         error: "Interview role does not match the submitted application",
         status: 400,
@@ -158,6 +165,9 @@ export async function POST(request: NextRequest) {
       "Executive Associate schedule update error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

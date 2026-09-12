@@ -41,7 +41,11 @@ export async function POST(request: NextRequest) {
 
       const application = user.committeeApplications[0];
       if (!application) throw new Error("COMMITTEE_APPLICATION_NOT_FOUND");
-      if (application.hasAccepted) throw new Error("APPLICATION_ALREADY_ACCEPTED");
+      if (application.hasAccepted)
+        throw new Error("APPLICATION_ALREADY_ACCEPTED");
+      if (application.interviewSlotDay) {
+        throw new Error("INTERVIEW_ALREADY_SCHEDULED");
+      }
 
       const profile = await validateAndLockInterviewSlot(tx, cycle, {
         day: slot.interviewSlotDay,
@@ -133,6 +137,10 @@ export async function POST(request: NextRequest) {
         error: "Accepted applications cannot be rescheduled",
         status: 409,
       },
+      INTERVIEW_ALREADY_SCHEDULED: {
+        error: "Your interview schedule has already been confirmed",
+        status: 409,
+      },
     };
     if (error instanceof Error && knownErrors[error.message]) {
       const response = knownErrors[error.message];
@@ -146,6 +154,9 @@ export async function POST(request: NextRequest) {
       "Committee schedule update error",
       error instanceof Error ? error.name : "UnknownError",
     );
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

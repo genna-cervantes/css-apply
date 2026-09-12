@@ -440,12 +440,7 @@ const Schedule = () => {
   // SWR automatically loads data, no need for manual fetch
   // The useEffect above updates slots when SWR data changes
 
-  const handleCreateSlot = async () => {
-    if (unavailableTimeSlots.length === 0) {
-      toast.error("Please select time slots to mark as unavailable");
-      return;
-    }
-
+  const handleCreateSlot = () => {
     setShowConfirmModal(true);
   };
 
@@ -456,22 +451,19 @@ const Schedule = () => {
       setIsSaving(true);
 
       const unavailableSlots = unavailableTimeSlots.map((slot) => ({
-        id: `${slot.date}-${slot.startTime}-${slot.endTime}`,
-        eb: ebProfile.position,
         day: slot.date,
         timeStart: slot.startTime,
         timeEnd: slot.endTime,
       }));
       const response = await fetch("/api/admin/unavailable-slots", {
         method: "POST",
-        body: JSON.stringify(unavailableSlots),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slots: unavailableSlots }),
       });
 
       const res = await response.json();
-      if (!res.success) {
-        console.error("Error creating unavailable slots:", res.error);
-        toast.error(res.message);
-        throw new Error(res.message);
+      if (!response.ok || !res.success) {
+        throw new Error(res.error || "Failed to save unavailable times");
       }
 
       // Reset form and close calendar
@@ -480,10 +472,14 @@ const Schedule = () => {
       // Trigger refresh to reload data via SWR mutate
       mutateUnavailable();
       mutateInterviews();
-      toast.success("Unavailable time slots saved successfully!");
+      toast.success(res.message || "Unavailable times saved successfully!");
     } catch (error) {
       console.error("Error creating unavailable slots:", error);
-      toast.error("Failed to save unavailable time slots");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to save unavailable time slots",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -521,7 +517,9 @@ const Schedule = () => {
                 className="border-white border-t-transparent"
               />
             ) : (
-              <span>{ebData?.ebProfile?.position ?? ebProfile?.position ?? "Admin"}</span>
+              <span>
+                {ebData?.ebProfile?.position ?? ebProfile?.position ?? "Admin"}
+              </span>
             )}
             <span aria-hidden="true">👋</span>
           </div>
@@ -588,6 +586,14 @@ const Schedule = () => {
                   select single time blocks or drag across multiple days to
                   create continuous unavailable periods.
                 </p>
+
+                {!isSlotsLoading && unavailableTimeSlots.length === 0 && (
+                  <div className="mb-6 max-w-md rounded-xl border border-[#B77900] bg-white px-4 py-3 text-center text-xs leading-relaxed text-[#8A5A00]">
+                    No unavailable times are saved. Applicants currently see you
+                    as available from 7:00 AM to 9:00 PM throughout the
+                    interview period.
+                  </div>
+                )}
 
                 <button
                   onClick={() => setShowCalendar(true)}
@@ -857,8 +863,7 @@ const Schedule = () => {
                   </button>
                   <button
                     onClick={handleCreateSlot}
-                    disabled={unavailableTimeSlots.length === 0}
-                    className="px-4 sm:px-6 py-2 bg-[#134687] text-white rounded-lg hover:bg-[#0f3a6b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="px-4 sm:px-6 py-2 bg-[#134687] text-white rounded-lg hover:bg-[#0f3a6b] transition-colors text-sm"
                   >
                     Save Unavailable Times
                   </button>
@@ -895,8 +900,9 @@ const Schedule = () => {
                     Confirm Schedule Setup
                   </h3>
                   <div className="font-inter text-xs sm:text-sm text-black">
-                    Please review your chosen time slots carefully. Once
-                    confirmed, these will be saved to the system.
+                    {unavailableTimeSlots.length > 0
+                      ? "Please review your chosen time slots carefully. Once confirmed, these will be saved to the system."
+                      : "No unavailable blocks are selected. Confirming means you are available for the full interview period."}
                   </div>
                 </div>
               </div>

@@ -46,7 +46,9 @@ function getBusinessDateKey(date = new Date()) {
     month: "2-digit",
     day: "2-digit",
   }).formatToParts(date);
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  const values = Object.fromEntries(
+    parts.map(({ type, value }) => [type, value]),
+  );
   return `${values.year}-${values.month}-${values.day}`;
 }
 
@@ -54,7 +56,9 @@ function getStoredDateKey(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 
-export async function getActiveCycle(db: DbClient = prisma): Promise<ActiveCycle> {
+export async function getActiveCycle(
+  db: DbClient = prisma,
+): Promise<ActiveCycle> {
   const cycle = await db.recruitmentCycle.findFirst({
     where: { isActive: true },
     orderBy: { createdAt: "desc" },
@@ -275,7 +279,10 @@ function assertValidInterviewTime(
   }
 
   const selectedDate = new Date(`${day}T00:00:00+08:00`);
-  if (Number.isNaN(selectedDate.getTime()) || getBusinessDateKey(selectedDate) !== day) {
+  if (
+    Number.isNaN(selectedDate.getTime()) ||
+    getBusinessDateKey(selectedDate) !== day
+  ) {
     throw new ApplicationRuleError(
       "Select a valid interview date",
       400,
@@ -401,7 +408,15 @@ export async function validateAndLockInterviewSlot(
 
   const unavailableBlocks = await tx.availableEBInterviewTime.findMany({
     where: {
-      eb: { equals: profile.position, mode: "insensitive" },
+      OR: Array.from(
+        new Set([
+          profile.position,
+          getRoleId(profile.position),
+          input.interviewBy,
+        ]),
+      ).map((value) => ({
+        eb: { equals: value, mode: Prisma.QueryMode.insensitive },
+      })),
       day: input.day,
       maxSlots: 0,
     },

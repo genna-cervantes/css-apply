@@ -24,7 +24,13 @@ export const EB_ROLE_TO_POSITION_MAP: Record<string, string> = {
  * @returns The position title (e.g., "President", "Internal Vice President") or the original roleId if not found
  */
 export function getPositionTitle(roleId: string): string {
-  return EB_ROLE_TO_POSITION_MAP[roleId] || roleId;
+  const normalizedValue = roleId.trim().toLowerCase();
+  const entry = Object.entries(EB_ROLE_TO_POSITION_MAP).find(
+    ([id, title]) =>
+      id.toLowerCase() === normalizedValue ||
+      title.toLowerCase() === normalizedValue,
+  );
+  return entry?.[1] ?? roleId.trim();
 }
 
 /**
@@ -33,10 +39,13 @@ export function getPositionTitle(roleId: string): string {
  * @returns The EB role ID (e.g., "president", "internal-vice-president") or the original title if not found
  */
 export function getRoleId(positionTitle: string): string {
+  const normalizedValue = positionTitle.trim().toLowerCase();
   const entry = Object.entries(EB_ROLE_TO_POSITION_MAP).find(
-    ([, title]) => title === positionTitle,
+    ([id, title]) =>
+      id.toLowerCase() === normalizedValue ||
+      title.toLowerCase() === normalizedValue,
   );
-  return entry ? entry[0] : positionTitle;
+  return entry?.[0] ?? positionTitle.trim();
 }
 
 /**
@@ -45,8 +54,5 @@ export function getRoleId(positionTitle: string): string {
  * @returns The position title (e.g., "President", "Internal Vice President") or the original roleId if not found
  */
 export function getPositionFromRoleId(roleId: string): string {
-  const entry = Object.entries(EB_ROLE_TO_POSITION_MAP).find(
-    ([id]) => id === roleId,
-  );
-  return entry ? entry[1] : roleId;
+  return getPositionTitle(roleId);
 }
