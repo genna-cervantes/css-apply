@@ -1,6 +1,12 @@
 "use client";
 
-import { CalendarDays, QrCode, Upload, UsersRound } from "lucide-react";
+import {
+  CalendarDays,
+  ClipboardCheck,
+  QrCode,
+  Upload,
+  UsersRound,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
 import AdminContentLoading from "@/components/AdminContentLoading";
@@ -8,10 +14,11 @@ import MobileSidebar from "@/components/AdminMobileSB";
 import SidebarContent from "@/components/AdminSidebar";
 import AttendanceEventsPanel from "@/components/attendance/AttendanceEventsPanel";
 import AttendanceImportPanel from "@/components/attendance/AttendanceImportPanel";
+import AttendanceQrTestPanel from "@/components/attendance/AttendanceQrTestPanel";
 import AttendanceScannerPanel from "@/components/attendance/AttendanceScannerPanel";
 import type { AttendanceCycle, AttendanceEvent } from "@/types/attendance";
 
-type Tab = "events" | "check-in" | "import";
+type Tab = "events" | "check-in" | "qr-test" | "import";
 
 export default function AttendanceAdminPage() {
   const { status } = useSession();
@@ -73,6 +80,12 @@ export default function AttendanceAdminPage() {
   }> = [
     { id: "events", label: "Events", icon: CalendarDays, visible: true },
     { id: "check-in", label: "Check-in", icon: QrCode, visible: true },
+    {
+      id: "qr-test",
+      label: "QR test",
+      icon: ClipboardCheck,
+      visible: true,
+    },
     {
       id: "import",
       label: "Import students",
@@ -155,6 +168,7 @@ export default function AttendanceAdminPage() {
             onAttendanceChange={loadEvents}
           />
         )}
+        {tab === "qr-test" && <AttendanceQrTestPanel events={events} />}
         {tab === "import" && canManage && (
           <AttendanceImportPanel cycles={cycles} />
         )}

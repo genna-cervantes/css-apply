@@ -24,7 +24,7 @@ CSSApply is a comprehensive recruitment management system designed specifically 
 - **Multi-Position Applications**: Support for Members, Committee Staff, and Executive Assistant positions
 - **Smart Interview Scheduling**: Automated conflict detection and prevention
 - **Admin Dashboard**: Comprehensive management tools for recruitment staff
-- **Event Attendance**: Snapshot-based event rosters, CSS digital ID and UST QR check-in, CSV guest import, and audited exports
+- **Event Attendance**: Snapshot-based rosters, CSS digital ID and UST QR check-in/testing, CSV guest import, and themed CSV/PDF exports
 - **Email Notifications**: Automated communication system using Brevo with test email feature
 - **Personality Assessment**: Integrated personality test for candidate evaluation
 - **Secure Authentication**: NextAuth.js integration with role-based access control

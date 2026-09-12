@@ -54,6 +54,7 @@ export default function DigitalIdCard({
   const [photo, setPhoto] = useState<string | null>(user.image || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isQrZoomed, setIsQrZoomed] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -114,6 +115,13 @@ export default function DigitalIdCard({
     setCopied(true);
     toast.success("Member ID copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCardPress = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (showBackPreview) return;
+    const target = event.target as HTMLElement;
+    if (target.closest("button, a, input, label")) return;
+    setIsFlipped((value) => !value);
   };
 
   const handlePhotoSelect = useCallback(
@@ -268,6 +276,14 @@ export default function DigitalIdCard({
             visibility: visible;
           }
 
+          #digital-id-flip-inner {
+            transform: none !important;
+          }
+
+          #printable-digital-id-back:not(.print-back-preview) {
+            display: none !important;
+          }
+
           #printable-digital-id,
           #printable-digital-id-back {
             position: fixed;
@@ -297,180 +313,202 @@ export default function DigitalIdCard({
         }
       `}</style>
 
-      <div className="flex w-full flex-wrap items-start justify-center gap-6">
+      <div className="flex w-full flex-wrap items-start justify-center gap-6 [perspective:1400px]">
         <div
-          id="printable-digital-id"
-          ref={cardRef}
-          className={`relative w-full max-w-[370px] overflow-hidden rounded-3xl bg-white font-poppins shadow-[0_12px_36px_rgba(4,79,175,0.14),0_2px_8px_rgba(19,70,135,0.06)] ${
-            showBackPreview ? "print-with-back" : ""
-          }`}
+          id="digital-id-flip-inner"
+          onClick={handleCardPress}
+          title={showBackPreview ? undefined : "Tap to flip the digital ID"}
+          className={
+            showBackPreview
+              ? "contents"
+              : `relative min-h-[588px] w-full max-w-[370px] cursor-pointer transition-transform duration-700 motion-reduce:transition-none [transform-style:preserve-3d] ${
+                  isFlipped
+                    ? "[transform:rotateY(180deg)]"
+                    : "[transform:rotateY(0deg)]"
+                }`
+          }
         >
-          <header className="bg-gradient-to-r from-[#134687] via-[#044FAF] to-[#005FD9] px-4 py-3.5 text-white">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-2.5">
-                <div className="flex shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow-xs">
-                  <Image
-                    src="/assets/css-apply-static-images/assets/logos/Logo_CSS_Blue.webp"
-                    alt="CSS Logo"
-                    width={36}
-                    height={36}
-                    className="h-8 w-8 object-contain"
-                    priority
-                  />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[8.5px] font-bold uppercase leading-tight tracking-[0.08em] text-white">
-                    <span>Computer Science Society</span>
-                    <span className="h-3 w-px shrink-0 bg-blue-200/60" />
-                    <span className="text-blue-100">UST-CSS</span>
+          <div
+            id="printable-digital-id"
+            ref={cardRef}
+            aria-hidden={!showBackPreview && isFlipped}
+            inert={!showBackPreview && isFlipped ? true : undefined}
+            className={`w-full max-w-[370px] overflow-hidden rounded-3xl bg-white font-poppins shadow-[0_12px_36px_rgba(4,79,175,0.14),0_2px_8px_rgba(19,70,135,0.06)] ${
+              showBackPreview
+                ? "relative print-with-back"
+                : "absolute inset-0 [backface-visibility:hidden]"
+            }`}
+          >
+            <header className="bg-gradient-to-r from-[#134687] via-[#044FAF] to-[#005FD9] px-4 py-3.5 text-white">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <div className="flex shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow-xs">
+                    <Image
+                      src="/assets/css-apply-static-images/assets/logos/Logo_CSS_Blue.webp"
+                      alt="CSS Logo"
+                      width={36}
+                      height={36}
+                      className="h-8 w-8 object-contain"
+                      priority
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[8.5px] font-bold uppercase leading-tight tracking-[0.08em] text-white">
+                      <span>Computer Science Society</span>
+                      <span className="h-3 w-px shrink-0 bg-blue-200/60" />
+                      <span className="text-blue-100">UST-CSS</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[9px] font-bold text-[#134687]">
-                A.Y. {schoolYear}
-              </span>
-            </div>
-          </header>
-
-          <div className="flex bg-white">
-            <main className="flex min-h-[516px] min-w-0 flex-1 flex-col p-4">
-              <div className="mb-3.5 border-b border-[#005FD9]/15 pb-2">
-                <span className="font-poppins text-xs font-bold uppercase tracking-wider text-[#134687]">
-                  Official Member Pass
+                <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[9px] font-bold text-[#134687]">
+                  A.Y. {schoolYear}
                 </span>
               </div>
+            </header>
 
-              <section className="mb-3.5 flex items-center justify-center">
-                <button
-                  type="button"
-                  onClick={() =>
-                    photoUploadEnabled && fileInputRef.current?.click()
-                  }
-                  disabled={!photoUploadEnabled || isUploading}
-                  className="group relative flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden border-2 border-[#005FD9] bg-[#F3F8FF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#134687] disabled:cursor-default"
-                  aria-label={
-                    photo ? "Change member photo" : "Upload member photo"
-                  }
-                >
-                  {photo ? (
-                    <Image
-                      src={photo}
-                      alt={`${user.name} profile photo`}
-                      fill
-                      sizes="112px"
-                      className="object-cover object-center"
-                      unoptimized
+            <div className="flex bg-white">
+              <main className="flex min-h-[516px] min-w-0 flex-1 flex-col p-4">
+                <div className="mb-3.5 border-b border-[#005FD9]/15 pb-2">
+                  <span className="font-poppins text-xs font-bold uppercase tracking-wider text-[#134687]">
+                    Official Member Pass
+                  </span>
+                </div>
+
+                <section className="mb-3.5 flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      photoUploadEnabled && fileInputRef.current?.click()
+                    }
+                    disabled={!photoUploadEnabled || isUploading}
+                    className="group relative flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden border-2 border-[#005FD9] bg-[#F3F8FF] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#134687] disabled:cursor-default"
+                    aria-label={
+                      photo ? "Change member photo" : "Upload member photo"
+                    }
+                  >
+                    {photo ? (
+                      <Image
+                        src={photo}
+                        alt={`${user.name} profile photo`}
+                        fill
+                        sizes="112px"
+                        className="object-cover object-center"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="flex flex-col items-center justify-center p-2 text-center">
+                        <Camera className="mb-1 h-6 w-6 text-[#005FD9]" />
+                        <span className="font-poppins text-[9px] font-bold leading-tight text-[#134687]">
+                          1x1 PHOTO
+                        </span>
+                        <span className="mt-0.5 text-[7.5px] text-[#005FD9]">
+                          Click to Upload
+                        </span>
+                      </span>
+                    )}
+
+                    {photoUploadEnabled && (
+                      <span className="screen-only absolute inset-0 flex flex-col items-center justify-center bg-[#134687]/80 p-1 text-center text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                        <Upload className="mb-1 h-5 w-5" />
+                        <span className="font-poppins text-[8px] font-semibold uppercase tracking-tight">
+                          Change Photo
+                        </span>
+                      </span>
+                    )}
+                  </button>
+                </section>
+
+                <section className="my-1.5 overflow-hidden rounded-xl bg-[#F8FAFF] px-4 text-center divide-y divide-[#005FD9]/10">
+                  <div className="flex min-h-9 items-center justify-center py-2">
+                    <span className="text-[14px] font-bold uppercase leading-snug tracking-wide text-[#134687] [overflow-wrap:anywhere]">
+                      {user.name}
+                    </span>
+                  </div>
+                  <div className="flex min-h-7 items-center justify-center py-1.5">
+                    <span className="text-[10px] font-semibold leading-snug tracking-wide text-[#134687] [overflow-wrap:anywhere]">
+                      {user.studentNumber || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex min-h-7 items-center justify-center py-1.5">
+                    <span className="text-[10px] font-bold uppercase leading-snug tracking-normal text-[#005FD9] [overflow-wrap:anywhere]">
+                      {roleTitle}
+                    </span>
+                  </div>
+                  <div className="flex min-h-7 items-center justify-center py-1.5">
+                    <span className="text-[10px] font-semibold leading-snug tracking-wide text-[#134687] [overflow-wrap:anywhere]">
+                      {user.section || "N/A"}
+                    </span>
+                  </div>
+                  <div className="flex min-h-7 items-center justify-center py-1.5">
+                    <span className="text-[10px] font-bold leading-snug tracking-wide text-[#005FD9] [overflow-wrap:anywhere]">
+                      {memberId}
+                    </span>
+                  </div>
+                </section>
+
+                <section className="mt-3 flex items-center gap-3 rounded-xl bg-[#F3F8FF] p-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsQrZoomed(true)}
+                    className="group relative flex h-[106px] w-[106px] shrink-0 items-center justify-center rounded-[10px] bg-white p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005FD9]"
+                    aria-label="Expand verification QR code"
+                  >
+                    <span
+                      className="h-full w-full"
+                      dangerouslySetInnerHTML={{ __html: qrSvg }}
                     />
-                  ) : (
-                    <span className="flex flex-col items-center justify-center p-2 text-center">
-                      <Camera className="mb-1 h-6 w-6 text-[#005FD9]" />
-                      <span className="font-poppins text-[9px] font-bold leading-tight text-[#134687]">
-                        1x1 PHOTO
-                      </span>
-                      <span className="mt-0.5 text-[7.5px] text-[#005FD9]">
-                        Click to Upload
-                      </span>
+                    <span className="screen-only absolute bottom-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#134687] text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                      <Maximize2 className="h-2.5 w-2.5" />
                     </span>
-                  )}
+                  </button>
 
-                  {photoUploadEnabled && (
-                    <span className="screen-only absolute inset-0 flex flex-col items-center justify-center bg-[#134687]/80 p-1 text-center text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                      <Upload className="mb-1 h-5 w-5" />
-                      <span className="font-poppins text-[8px] font-semibold uppercase tracking-tight">
-                        Change Photo
-                      </span>
-                    </span>
-                  )}
-                </button>
-              </section>
-
-              <section className="my-1.5 overflow-hidden rounded-xl bg-[#F8FAFF] px-4 text-center divide-y divide-[#005FD9]/10">
-                <div className="flex min-h-9 items-center justify-center py-2">
-                  <span className="text-[14px] font-bold uppercase leading-snug tracking-wide text-[#134687] [overflow-wrap:anywhere]">
-                    {user.name}
-                  </span>
-                </div>
-                <div className="flex min-h-7 items-center justify-center py-1.5">
-                  <span className="text-[10px] font-semibold leading-snug tracking-wide text-[#134687] [overflow-wrap:anywhere]">
-                    {user.studentNumber || "N/A"}
-                  </span>
-                </div>
-                <div className="flex min-h-7 items-center justify-center py-1.5">
-                  <span className="text-[10px] font-bold uppercase leading-snug tracking-normal text-[#005FD9] [overflow-wrap:anywhere]">
-                    {roleTitle}
-                  </span>
-                </div>
-                <div className="flex min-h-7 items-center justify-center py-1.5">
-                  <span className="text-[10px] font-semibold leading-snug tracking-wide text-[#134687] [overflow-wrap:anywhere]">
-                    {user.section || "N/A"}
-                  </span>
-                </div>
-                <div className="flex min-h-7 items-center justify-center py-1.5">
-                  <span className="text-[10px] font-bold leading-snug tracking-wide text-[#005FD9] [overflow-wrap:anywhere]">
-                    {memberId}
-                  </span>
-                </div>
-              </section>
-
-              <section className="mt-3 flex items-center gap-3 rounded-xl bg-[#F3F8FF] p-2.5">
-                <button
-                  type="button"
-                  onClick={() => setIsQrZoomed(true)}
-                  className="group relative flex h-[106px] w-[106px] shrink-0 items-center justify-center rounded-[10px] bg-white p-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005FD9]"
-                  aria-label="Expand verification QR code"
-                >
-                  <span
-                    className="h-full w-full"
-                    dangerouslySetInnerHTML={{ __html: qrSvg }}
-                  />
-                  <span className="screen-only absolute bottom-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#134687] text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                    <Maximize2 className="h-2.5 w-2.5" />
-                  </span>
-                </button>
-
-                <div className="min-w-0 flex-1">
-                  <p className="font-poppins text-[12px] font-bold text-[#134687]">
-                    Scan to verify
-                  </p>
-                  <p className="mt-1 text-[8.5px] leading-relaxed text-[#134687]/65">
-                    Confirm active CSS membership.
-                  </p>
-                  <p className="mt-2 text-[7px] uppercase tracking-wide text-[#134687]/55">
-                    Issued {effectiveIssueDate}
-                  </p>
-                  {effectiveExpirationDate && (
-                    <p className="mt-1 text-[7px] font-bold uppercase tracking-wide text-[#005FD9]">
-                      Valid through {effectiveExpirationDate}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-poppins text-[12px] font-bold text-[#134687]">
+                      Scan to verify
                     </p>
-                  )}
+                    <p className="mt-1 text-[8.5px] leading-relaxed text-[#134687]/65">
+                      Confirm active CSS membership.
+                    </p>
+                    <p className="mt-2 text-[7px] uppercase tracking-wide text-[#134687]/55">
+                      Issued {effectiveIssueDate}
+                    </p>
+                    {effectiveExpirationDate && (
+                      <p className="mt-1 text-[7px] font-bold uppercase tracking-wide text-[#005FD9]">
+                        Valid through {effectiveExpirationDate}
+                      </p>
+                    )}
+                  </div>
+                </section>
+              </main>
+
+              <aside className="flex w-7 shrink-0 items-center justify-center bg-gradient-to-b from-[#134687] via-[#044FAF] to-[#003875] py-5 text-white sm:w-8">
+                <div className="flex flex-col items-center gap-5 text-blue-100">
+                  <Code2 className="h-3.5 w-3.5" strokeWidth={1.8} />
+                  <Braces className="h-3.5 w-3.5" strokeWidth={1.8} />
+                  <Cpu className="h-3.5 w-3.5" strokeWidth={1.8} />
+                  <Binary className="h-3.5 w-3.5" strokeWidth={1.8} />
                 </div>
-              </section>
-            </main>
-
-            <aside className="flex w-7 shrink-0 items-center justify-center bg-gradient-to-b from-[#134687] via-[#044FAF] to-[#003875] py-5 text-white sm:w-8">
-              <div className="flex flex-col items-center gap-5 text-blue-100">
-                <Code2 className="h-3.5 w-3.5" strokeWidth={1.8} />
-                <Braces className="h-3.5 w-3.5" strokeWidth={1.8} />
-                <Cpu className="h-3.5 w-3.5" strokeWidth={1.8} />
-                <Binary className="h-3.5 w-3.5" strokeWidth={1.8} />
-              </div>
-            </aside>
+              </aside>
+            </div>
           </div>
-        </div>
 
-        {showBackPreview && (
           <div
             id="printable-digital-id-back"
-            aria-label="Digital member ID back preview"
-            className="relative flex min-h-[588px] w-full max-w-[370px] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-[#082B59] via-[#0757B8] to-[#2F8EFF] shadow-[0_12px_36px_rgba(4,79,175,0.18)]"
+            aria-label="Digital member ID back"
+            aria-hidden={!showBackPreview && !isFlipped}
+            className={`flex min-h-[588px] w-full max-w-[370px] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-[#082B59] via-[#0757B8] to-[#2F8EFF] shadow-[0_12px_36px_rgba(4,79,175,0.18)] ${
+              showBackPreview
+                ? "relative print-back-preview"
+                : "absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]"
+            }`}
           >
             <Image
               src="/assets/css-apply-static-images/assets/logos/Logo_CSS_Blue.webp"
               alt="Computer Science Society logo"
               width={300}
               height={300}
-              className="relative z-10 w-[300px] -translate-y-8 object-contain brightness-0 invert drop-shadow-[0_14px_30px_rgba(4,25,65,0.22)]"
+              className="relative z-10 w-[78%] max-w-[300px] -translate-y-8 object-contain brightness-0 invert drop-shadow-[0_14px_30px_rgba(4,25,65,0.22)]"
             />
             <Image
               src="/assets/css-apply-static-images/assets/logos/csar.webp"
@@ -484,8 +522,14 @@ export default function DigitalIdCard({
               dangerouslySetInnerHTML={{ __html: backBarcodeSvg }}
             />
           </div>
-        )}
+        </div>
       </div>
+
+      {!showBackPreview && (
+        <p className="-mt-2 text-center text-[11px] font-medium text-[#134687]/60 print:hidden">
+          Tap the ID card or use the button below to view the other side.
+        </p>
+      )}
 
       {isQrZoomed && (
         <div
@@ -560,6 +604,22 @@ export default function DigitalIdCard({
       )}
 
       <div className="flex w-full flex-wrap items-center justify-center gap-3">
+        {!showBackPreview && (
+          <button
+            type="button"
+            aria-pressed={isFlipped}
+            onClick={() => setIsFlipped((value) => !value)}
+            className="flex items-center gap-2 rounded-xl bg-[#E7F0FC] px-4 py-2.5 font-poppins text-xs font-semibold text-[#134687] transition-colors hover:bg-[#D9E9FF]"
+          >
+            <RotateCw
+              className={`h-4 w-4 text-[#005FD9] transition-transform duration-500 ${
+                isFlipped ? "rotate-180" : ""
+              }`}
+            />
+            <span>{isFlipped ? "Show Front" : "Show Back"}</span>
+          </button>
+        )}
+
         {photoUploadEnabled && (
           <button
             type="button"

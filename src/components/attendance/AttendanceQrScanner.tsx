@@ -25,6 +25,7 @@ export default function AttendanceQrScanner({
 
   useEffect(() => {
     disabledRef.current = disabled;
+    lastScanRef.current = null;
   }, [disabled]);
 
   useEffect(() => {

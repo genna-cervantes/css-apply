@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CalendarPlus,
   Download,
+  FileText,
   LoaderCircle,
   MapPin,
   Pencil,
@@ -61,6 +62,7 @@ export default function AttendanceEventsPanel({
   );
   const [submitting, setSubmitting] = useState(false);
   const [changingId, setChangingId] = useState<string | null>(null);
+  const [exportingKey, setExportingKey] = useState<string | null>(null);
   const now = new Date();
   const defaultStart = new Date(now.getTime() + 60 * 60_000);
 
@@ -183,10 +185,15 @@ export default function AttendanceEventsPanel({
     }
   }
 
-  async function exportAttendance(event: AttendanceEvent) {
+  async function exportAttendance(
+    event: AttendanceEvent,
+    format: "csv" | "pdf",
+  ) {
+    const exportKey = `${event.id}:${format}`;
+    setExportingKey(exportKey);
     try {
       const response = await fetch(
-        `/api/admin/attendance/events/${event.id}/export`,
+        `/api/admin/attendance/events/${event.id}/export?format=${format}`,
         { method: "POST" },
       );
       if (!response.ok) {
@@ -201,11 +208,16 @@ export default function AttendanceEventsPanel({
       link.download =
         response.headers
           .get("Content-Disposition")
-          ?.match(/filename="([^"]+)"/)?.[1] || "attendance.csv";
+          ?.match(/filename="([^"]+)"/)?.[1] || `attendance.${format}`;
+      document.body.appendChild(link);
       link.click();
-      URL.revokeObjectURL(url);
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+      toast.success(`${format.toUpperCase()} attendance report downloaded`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Export failed");
+    } finally {
+      setExportingKey(null);
     }
   }
 
@@ -473,10 +485,29 @@ export default function AttendanceEventsPanel({
                 )}
                 <button
                   type="button"
-                  onClick={() => void exportAttendance(event)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#005FD9]/15 px-3 py-2 text-xs font-semibold text-[#134687] hover:bg-[#F3F8FF]"
+                  disabled={exportingKey !== null}
+                  onClick={() => void exportAttendance(event, "csv")}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#005FD9]/15 px-3 py-2 text-xs font-semibold text-[#134687] hover:bg-[#F3F8FF] disabled:opacity-50"
                 >
-                  <Download className="h-3.5 w-3.5" /> Export
+                  {exportingKey === `${event.id}:csv` ? (
+                    <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Download className="h-3.5 w-3.5" />
+                  )}
+                  CSV
+                </button>
+                <button
+                  type="button"
+                  disabled={exportingKey !== null}
+                  onClick={() => void exportAttendance(event, "pdf")}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#E8F2FF] px-3 py-2 text-xs font-semibold text-[#044FAF] hover:bg-[#D8E9FF] disabled:opacity-50"
+                >
+                  {exportingKey === `${event.id}:pdf` ? (
+                    <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <FileText className="h-3.5 w-3.5" />
+                  )}
+                  PDF
                 </button>
                 {canManage && event.status === "DRAFT" && (
                   <>
