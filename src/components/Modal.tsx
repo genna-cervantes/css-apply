@@ -1,7 +1,11 @@
 // components/modals/ConfirmationModal.tsx
 "use client";
 
+import LoadingSpinner from "@/components/LoadingSpinner";
+import FormProcessingOverlay from "@/components/FormProcessingOverlay";
+
 import { useEffect } from "react";
+import Image from "next/image";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -21,7 +25,7 @@ export default function ConfirmationModal({
   // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === "Escape" && isOpen && !isLoading) {
         onClose();
       }
     };
@@ -35,7 +39,7 @@ export default function ConfirmationModal({
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "unset";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, isLoading, onClose]);
 
   if (!isOpen) return null;
 
@@ -47,27 +51,32 @@ export default function ConfirmationModal({
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
       }}
-      onClick={onClose}
+      onClick={() => {
+        if (!isLoading) onClose();
+      }}
     >
       <div
-        className="bg-white rounded-2xl p-4 sm:p-6 lg:p-10 max-w-xl w-full shadow-2xl border-[#FFBC2B] border-2 sm:border-4 max-h-[90vh] overflow-y-auto"
+        aria-busy={isLoading}
+        className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border-2 border-[#FFBC2B] bg-white p-4 shadow-2xl sm:border-4 sm:p-6 lg:p-10"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-center">
+        <FormProcessingOverlay
+          active={isLoading}
+          label="Submitting interview schedule..."
+        />
+        <div
+          className={`text-center transition duration-200 ${isLoading ? "opacity-45 grayscale" : "opacity-100"}`}
+        >
           {/* Header section with icon and title */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-4 sm:mb-6">
-            <div className="p-2 sm:p-3 flex items-center justify-center h-12 w-12 sm:h-15 sm:w-15 rounded-full bg-[#FFE7B4] flex-shrink-0">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
+            <div className="p-2 sm:p-3 flex items-center justify-center h-12 w-12 sm:h-15 sm:w-15 rounded-full bg-[#FFE7B4] shrink-0">
+              <Image
+                src="/icons/warning.svg"
+                alt="Warning"
+                width={34}
+                height={35}
                 className="w-6 h-6 sm:w-8 sm:h-8"
-                viewBox="0 0 34 35"
-                fill="none"
-              >
-                <path
-                  d="M1.57861 30.0413L16.8044 3.74219L32.0303 30.0413H1.57861ZM16.8044 25.8888C17.1966 25.8888 17.5256 25.756 17.7914 25.4902C18.0571 25.2244 18.1895 24.8959 18.1886 24.5047C18.1877 24.1134 18.0548 23.7849 17.79 23.5192C17.5251 23.2534 17.1966 23.1205 16.8044 23.1205C16.4123 23.1205 16.0838 23.2534 15.8189 23.5192C15.5541 23.7849 15.4212 24.1134 15.4203 24.5047C15.4194 24.8959 15.5522 25.2249 15.8189 25.4916C16.0856 25.7583 16.4141 25.8907 16.8044 25.8888ZM15.4203 21.7364H18.1886V14.8155H15.4203V21.7364Z"
-                  fill="#CE9823"
-                />
-              </svg>
+              />
             </div>
             <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
               <h3 className="text-lg sm:text-xl font-inter font-bold text-[#CE9823] mb-2">
@@ -80,7 +89,7 @@ export default function ConfirmationModal({
           </div>
 
           {/* Note section */}
-          <div className="bg-[#ECECEC] border-[#C8C5C5] border-1 rounded-lg px-4 sm:px-8 lg:px-14 py-4 sm:py-6 lg:py-9 mb-4 sm:mb-6 text-left">
+          <div className="bg-[#ECECEC] border-[#C8C5C5] border rounded-lg px-4 sm:px-8 lg:px-14 py-4 sm:py-6 lg:py-9 mb-4 sm:mb-6 text-left">
             <p className="font-inter text-xs sm:text-sm text-[#CE9823] font-bold mb-2">
               Note:
             </p>
@@ -113,7 +122,7 @@ export default function ConfirmationModal({
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
+                  <LoadingSpinner label="Submitting interview schedule" size="sm" className="border-[#5B4515] border-t-transparent" />
                   <span>Submitting...</span>
                 </>
               ) : (

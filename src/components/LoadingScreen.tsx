@@ -3,50 +3,58 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-export default function LoadingScreen() {
-  const [progress, setProgress] = useState(0);
+interface LoadingScreenProps {
+  message?: string;
+}
+
+const COMMITTEE_IMAGES = [
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_ACADEMICS.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_COMMDEV.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_CREATIVES.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_DOCU.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_EXTERNALS.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_FINANCE.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_LOGISTICS.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_PUBLICITY.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_SPOTA.webp",
+  "/assets/css-apply-static-images/assets/committee_test/CSAR_TECHDEV.webp",
+] as const;
+
+export default function LoadingScreen({
+  message = "Loading your journey...",
+}: LoadingScreenProps) {
+  const [progress, setProgress] = useState(18);
   const [showText, setShowText] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const committeeImages = [
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_ACADEMICS.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_COMMDEV.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_CREATIVES.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_DOCU.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_EXTERNALS.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_FINANCE.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_LOGISTICS.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_PUBLICITY.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_SPOTA.png",
-    "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_TECHDEV.png",
-  ];
-
   useEffect(() => {
+    // Move quickly at first, then settle below 100 while real work finishes.
+    // The component unmounts immediately when the page is ready—there is no
+    // artificial minimum loading duration.
     const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 10;
+      setProgress((previous) => {
+        if (previous >= 97) return previous;
+        const increment =
+          previous < 65 ? 14 : previous < 85 ? 6 : previous < 93 ? 2 : 1;
+        return Math.min(97, previous + increment);
       });
-    }, 200);
+    }, 90);
 
     const textTimer = setTimeout(() => {
       setShowText(true);
-    }, 500);
+    }, 120);
 
     // Cycle through committee images
     const imageInterval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % committeeImages.length);
-    }, 800);
+      setCurrentImageIndex((prev) => (prev + 1) % COMMITTEE_IMAGES.length);
+    }, 700);
 
     return () => {
       clearInterval(interval);
       clearTimeout(textTimer);
       clearInterval(imageInterval);
     };
-  }, [committeeImages.length]);
+  }, []);
 
   return (
     <>
@@ -66,16 +74,18 @@ export default function LoadingScreen() {
           }
         }
       `}</style>
-      <div className="fixed inset-0 bg-[#F6F6FE] bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/loadingscreen_background.png')] bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center z-50">
+      <div className="fixed inset-0 bg-[#F6F6FE] bg-[url('/assets/css-apply-static-images/assets/pictures/loadingscreen_background.webp')] bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center z-50">
         {/* Committee Image Animation */}
         <div className="mb-8 flex items-center justify-center transition-all duration-500 ease-in-out">
-          <div className="relative w-[150px] h-[150px] flex items-center justify-center group">
+          <div className="relative w-37.5 h-37.5 flex items-center justify-center group">
             <Image
               key={currentImageIndex}
-              src={committeeImages[currentImageIndex]}
+              src={COMMITTEE_IMAGES[currentImageIndex]}
               alt={`Committee ${currentImageIndex + 1}`}
               width={150}
               height={150}
+              priority={currentImageIndex === 0}
+              unoptimized
               className="transform transition-all duration-500 ease-in-out hover:scale-110 drop-shadow-lg group-hover:drop-shadow-xl"
               style={{
                 animation: "popOut 0.6s ease-in-out",
@@ -98,11 +108,11 @@ export default function LoadingScreen() {
           </div>
           <div className="bg-white/20 backdrop-blur-sm rounded-full h-4 border border-white/30 shadow-inner">
             <div
-              className="bg-[#134687]  h-4 rounded-full transition-all duration-500 ease-out shadow-lg relative overflow-hidden"
+              className="relative h-4 overflow-hidden rounded-full bg-[#134687] shadow-lg transition-all duration-200 ease-out"
               style={{ width: `${progress}%` }}
             >
               {/* Shimmer effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-600/60 to-transparent animate-pulse"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-blue-600/60 to-transparent animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -114,10 +124,10 @@ export default function LoadingScreen() {
           }`}
         >
           <p className="text-[#134687] text-lg font-semibold mb-1 drop-shadow-lg">
-            Compiling your journey...
+            {message}
           </p>
           <p className="text-[#134687]/80 text-sm drop-shadow-md">
-            Initializing CSS Apply system
+            Preparing your page
           </p>
         </div>
 

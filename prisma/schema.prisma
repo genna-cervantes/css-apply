@@ -10,78 +10,191 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum AttendanceEventStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  ARCHIVED
+}
+
+enum AttendanceGroup {
+  MEMBER
+  COMMITTEE_STAFF
+  EXECUTIVE_ASSOCIATE
+  IMPORTED_STUDENT
+}
+
+enum AttendanceRosterSource {
+  CSSAPPLY
+  IMPORTED
+}
+
+enum AttendanceMethod {
+  QR
+  CSS_ID_QR
+  UST_QR
+  MANUAL
+}
+
+enum AttendanceScanOutcome {
+  ACCEPTED
+  DUPLICATE
+  UNKNOWN
+  INACTIVE
+  INELIGIBLE
+  OUTSIDE_WINDOW
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  name          String
-  studentNumber String?  @unique @db.VarChar(10)
-  section       String?
-  role          String   @default("user") // user, admin, super_admin
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String
+  image          String?
+  studentNumber  String?   @unique @db.VarChar(10)
+  section        String?
+  age            Int?
+  sex            String?   @db.VarChar(1)
+  dateOfBirth    DateTime?
+  isOldCssMember Boolean?
+  role           String    @default("user") // user, admin, super_admin
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relationships
-  memberApplication    MemberApplication?
-  eaApplication        EAApplication?
-  committeeApplication CommitteeApplication?
-  ebProfile            EBProfile?
+  memberApplications             MemberApplication[]
+  executiveAssociateApplications ExecutiveAssociateApplication[]
+  committeeApplications          CommitteeApplication[]
+  ebProfile                      EBProfile?
+  memberships                    Membership[]
+  attendanceEventsCreated        AttendanceEvent[]               @relation("AttendanceEventCreator")
+  attendanceRosterEntries        AttendanceEventRoster[]
+  attendanceCheckIns             EventAttendance[]               @relation("AttendanceCheckInOperator")
+  attendanceScanAttempts         AttendanceScanAttempt[]
+  attendanceGuestsImported       AttendanceGuest[]               @relation("AttendanceGuestImporter")
+  attendanceAuditLogs            AttendanceAuditLog[]            @relation("AttendanceAuditActor")
+
+  @@index([role])
 }
 
 model MemberApplication {
-  id            String   @id @default(cuid())
-  studentNumber String   @unique
-  user          User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
-  paymentProof  String
-  hasAccepted   Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                     String            @id @default(cuid())
+  studentNumber          String
+  user                   User              @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  recruitmentCycleId     String?
+  recruitmentCycle       RecruitmentCycle? @relation(fields: [recruitmentCycleId], references: [id], onDelete: SetNull)
+  paymentProof           String
+  paymentStatus          String            @default("not_submitted")
+  paymentReviewedAt      DateTime?
+  paymentReviewedBy      String?
+  paymentRejectionReason String?
+  hasAccepted            Boolean           @default(false)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  @@unique([studentNumber, recruitmentCycleId])
+  @@index([hasAccepted])
+  @@index([recruitmentCycleId])
+  @@index([recruitmentCycleId, paymentStatus])
 }
 
-model EAApplication {
-  id                     String   @id @default(cuid())
-  studentNumber          String   @unique
-  user                   User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
-  ebRole                 String   
+model Membership {
+  id                 String           @id @default(cuid())
+  userId             String
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recruitmentCycleId String
+  recruitmentCycle   RecruitmentCycle @relation(fields: [recruitmentCycleId], references: [id], onDelete: Cascade)
+  memberId           String           @unique
+  memberSequence     Int
+  photoPath          String?
+  createdAt          DateTime         @default(now())
+
+  @@unique([userId, recruitmentCycleId])
+  @@unique([recruitmentCycleId, memberSequence])
+  @@index([recruitmentCycleId])
+  @@index([userId])
+}
+
+model MembershipCounter {
+  id                 String           @id @default(cuid())
+  recruitmentCycleId String           @unique
+  recruitmentCycle   RecruitmentCycle @relation(fields: [recruitmentCycleId], references: [id], onDelete: Cascade)
+  nextSequence       Int              @default(0)
+  updatedAt          DateTime         @updatedAt
+}
+
+model ExecutiveAssociateApplication {
+  id                     String            @id @default(cuid())
+  studentNumber          String
+  user                   User              @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  recruitmentCycleId     String?
+  recruitmentCycle       RecruitmentCycle? @relation(fields: [recruitmentCycleId], references: [id], onDelete: SetNull)
+  ebRole                 String
   firstOptionEb          String
   secondOptionEb         String
   cv                     String
+  paymentProof           String?
+  paymentStatus          String            @default("not_submitted")
+  paymentReviewedAt      DateTime?
+  paymentReviewedBy      String?
+  paymentRejectionReason String?
   supabaseFilePath       String?
   interviewSlotDay       String?
   interviewSlotTimeStart String?
   interviewSlotTimeEnd   String?
   interviewBy            String?
-  hasFinishedInterview   Boolean  @default(false)
-  status                 String?  // passed, failed, redirected
+  hasFinishedInterview   Boolean           @default(false)
+  status                 String? // passed, failed, redirected
   redirection            String?
-  hasAccepted            Boolean  @default(false)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  hasAccepted            Boolean           @default(false)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
 
+  @@unique([studentNumber, recruitmentCycleId])
+  @@index([status])
+  @@index([interviewBy])
+  @@index([hasAccepted])
+  @@index([hasFinishedInterview])
+  @@index([recruitmentCycleId])
+  @@index([recruitmentCycleId, paymentStatus])
+  @@map("EAApplication")
 }
 
 model CommitteeApplication {
-  id                     String   @id @default(cuid())
-  studentNumber          String   @unique
-  user                   User     @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  id                     String            @id @default(cuid())
+  studentNumber          String
+  user                   User              @relation(fields: [studentNumber], references: [studentNumber], onDelete: Cascade)
+  recruitmentCycleId     String?
+  recruitmentCycle       RecruitmentCycle? @relation(fields: [recruitmentCycleId], references: [id], onDelete: SetNull)
   firstOptionCommittee   String
   secondOptionCommittee  String
   portfolioLink          String?
   cv                     String
+  paymentProof           String?
+  paymentStatus          String            @default("not_submitted")
+  paymentReviewedAt      DateTime?
+  paymentReviewedBy      String?
+  paymentRejectionReason String?
   supabaseFilePath       String?
   interviewSlotDay       String?
   interviewSlotTimeStart String?
   interviewSlotTimeEnd   String?
-  hasFinishedInterview   Boolean  @default(false)
+  hasFinishedInterview   Boolean           @default(false)
   interviewBy            String?
-  status                 String?  // passed, failed, redirected
+  status                 String? // passed, failed, redirected
   redirection            String?
-  hasAccepted            Boolean  @default(false)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  hasAccepted            Boolean           @default(false)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
 
+  @@unique([studentNumber, recruitmentCycleId])
+  @@index([status])
+  @@index([interviewBy])
+  @@index([hasAccepted])
+  @@index([hasFinishedInterview])
+  @@index([recruitmentCycleId])
+  @@index([recruitmentCycleId, paymentStatus])
 }
 
 model AvailableEBInterviewTime {
@@ -94,16 +207,179 @@ model AvailableEBInterviewTime {
   currentSlots Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([eb])
+  @@index([day])
 }
 
 model EBProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  position    String
-  committees  String[] 
-  meetingLink String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  id                 String            @id @default(cuid())
+  userId             String            @unique
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recruitmentCycleId String?
+  recruitmentCycle   RecruitmentCycle? @relation(fields: [recruitmentCycleId], references: [id], onDelete: SetNull)
+  position           String
+  committees         String[]
+  meetingLink        String?
+  imagePath          String?
+  isActive           Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([position])
+  @@index([recruitmentCycleId])
+  @@index([isActive])
+}
+
+model SystemConfig {
+  key         String   @unique
+  value       String
+  description String?
   updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+
+model RecruitmentCycle {
+  id                             String                          @id @default(cuid())
+  schoolYear                     String                          @unique // e.g. "2025-2026"
+  applicationStart               DateTime
+  interviewStart                 DateTime
+  interviewEnd                   DateTime
+  membershipExpiration           DateTime?                       @db.Date
+  isActive                       Boolean                         @default(false)
+  createdAt                      DateTime                        @default(now())
+  updatedAt                      DateTime                        @updatedAt
+  ebProfiles                     EBProfile[]
+  memberApplications             MemberApplication[]
+  executiveAssociateApplications ExecutiveAssociateApplication[]
+  committeeApplications          CommitteeApplication[]
+  memberships                    Membership[]
+  membershipCounters             MembershipCounter[]
+  attendanceEvents               AttendanceEvent[]
+  attendanceGuests               AttendanceGuest[]
+
+  @@index([isActive])
+}
+
+model AttendanceGuest {
+  id                 String                  @id @default(cuid())
+  recruitmentCycleId String
+  recruitmentCycle   RecruitmentCycle        @relation(fields: [recruitmentCycleId], references: [id], onDelete: Cascade)
+  studentNumber      String                  @db.VarChar(10)
+  fullName           String                  @db.VarChar(200)
+  section            String?                 @db.VarChar(100)
+  isActive           Boolean                 @default(true)
+  importedById       String
+  importedBy         User                    @relation("AttendanceGuestImporter", fields: [importedById], references: [id], onDelete: Restrict)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  rosterEntries      AttendanceEventRoster[]
+
+  @@unique([recruitmentCycleId, studentNumber])
+  @@index([recruitmentCycleId, isActive])
+  @@index([studentNumber])
+}
+
+model AttendanceEvent {
+  id                 String                  @id @default(cuid())
+  recruitmentCycleId String
+  recruitmentCycle   RecruitmentCycle        @relation(fields: [recruitmentCycleId], references: [id], onDelete: Restrict)
+  title              String                  @db.VarChar(160)
+  venue              String                  @db.VarChar(160)
+  startsAt           DateTime
+  endsAt             DateTime
+  checkInOpensAt     DateTime
+  checkInClosesAt    DateTime
+  status             AttendanceEventStatus   @default(DRAFT)
+  eligibleGroups     AttendanceGroup[]
+  createdById        String
+  createdBy          User                    @relation("AttendanceEventCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  rosterEntries      AttendanceEventRoster[]
+  attendances        EventAttendance[]
+  scanAttempts       AttendanceScanAttempt[]
+
+  @@index([recruitmentCycleId])
+  @@index([status, checkInOpensAt, checkInClosesAt])
+  @@index([startsAt])
+}
+
+model AttendanceEventRoster {
+  id                String                  @id @default(cuid())
+  eventId           String
+  event             AttendanceEvent         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestId           String?
+  guest             AttendanceGuest?        @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  studentNumber     String                  @db.VarChar(10)
+  memberId          String?                 @db.VarChar(32)
+  fullName          String                  @db.VarChar(200)
+  section           String?                 @db.VarChar(100)
+  source            AttendanceRosterSource
+  affiliationGroups AttendanceGroup[]
+  isActive          Boolean                 @default(true)
+  materializedAt    DateTime                @default(now())
+  attendance        EventAttendance?
+  scanAttempts      AttendanceScanAttempt[]
+
+  @@unique([eventId, studentNumber])
+  @@unique([eventId, memberId])
+  @@index([eventId, isActive])
+  @@index([memberId])
+}
+
+model EventAttendance {
+  id            String                  @id @default(cuid())
+  eventId       String
+  event         AttendanceEvent         @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  rosterEntryId String                  @unique
+  rosterEntry   AttendanceEventRoster   @relation(fields: [rosterEntryId], references: [id], onDelete: Restrict)
+  checkedInAt   DateTime                @default(now())
+  checkedInById String
+  checkedInBy   User                    @relation("AttendanceCheckInOperator", fields: [checkedInById], references: [id], onDelete: Restrict)
+  method        AttendanceMethod
+  scanAttempts  AttendanceScanAttempt[]
+
+  @@unique([eventId, rosterEntryId])
+  @@index([eventId, checkedInAt])
+  @@index([checkedInById])
+}
+
+model AttendanceScanAttempt {
+  id            String                 @id @default(cuid())
+  eventId       String
+  event         AttendanceEvent        @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  clientScanId  String                 @db.Uuid
+  operatorId    String
+  operator      User                   @relation(fields: [operatorId], references: [id], onDelete: Restrict)
+  method        AttendanceMethod
+  outcome       AttendanceScanOutcome
+  rosterEntryId String?
+  rosterEntry   AttendanceEventRoster? @relation(fields: [rosterEntryId], references: [id], onDelete: Restrict)
+  attendanceId  String?
+  attendance    EventAttendance?       @relation(fields: [attendanceId], references: [id], onDelete: Restrict)
+  attemptedAt   DateTime               @default(now())
+
+  @@unique([eventId, clientScanId])
+  @@index([eventId, attemptedAt])
+  @@index([operatorId])
+  @@index([outcome])
+}
+
+model AttendanceAuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation("AttendanceAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String   @db.VarChar(100)
+  entityType String   @db.VarChar(80)
+  entityId   String?  @db.VarChar(128)
+  details    Json
+  occurredAt DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([occurredAt])
 }

@@ -8,6 +8,7 @@ declare module "next-auth" {
       dbId: string;
       email: string;
       name: string;
+      image?: string | null;
       role: string;
       studentNumber?: string;
       section?: string;
@@ -15,13 +16,27 @@ declare module "next-auth" {
       updatedAt: Date;
       hasCompletedProfile: boolean;
       hasMemberApplication: boolean;
-      memberApplication?: {id: string; hasAccepted: boolean; paymentProof?: string; createdAt: Date};
-      hasEAApplication: boolean;
-      eaApplication?: {id: string; hasAccepted: boolean; status: string};
+      memberApplication?: {
+        id: string;
+        hasAccepted: boolean;
+        paymentProof?: string;
+        createdAt: Date;
+      };
+      hasExecutiveAssociateApplication: boolean;
+      executiveAssociateApplication?: { id: string; hasAccepted: boolean; status: string };
       hasCommitteeApplication: boolean;
-      committeeApplication?: {id: string; hasAccepted: boolean; status: string};
+      committeeApplication?: {
+        id: string;
+        hasAccepted: boolean;
+        status: string;
+      };
       ebRole?: string;
       committeeId?: string;
+      ebProfile?: {
+        position: string;
+        committees: string[];
+        isActive: boolean;
+      } | null;
       applicationStatus: {
         member: {
           hasApplication: boolean;

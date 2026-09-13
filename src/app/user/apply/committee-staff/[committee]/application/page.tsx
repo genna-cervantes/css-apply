@@ -7,9 +7,14 @@ import Image from "next/image";
 import { committeeRoles } from "@/data/committeeRoles";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import LoadingScreen from "@/components/LoadingScreen";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import FormProcessingOverlay from "@/components/FormProcessingOverlay";
+import DateOfBirthInput from "@/components/DateOfBirthInput";
 import { parseFullName } from "@/lib/name-parsing";
 import { useFormPersistence } from "@/lib/useFormPersistence";
-import { usePageReload } from "@/lib/usePageReload";
+import { useApplicationStatus } from "@/lib/useApplicationStatus";
+import { useApplicationsOpen } from "@/lib/useApplicationsOpen";
 
 export default function CommitteeApplication() {
   const router = useRouter();
@@ -17,14 +22,23 @@ export default function CommitteeApplication() {
   const { data: session, status } = useSession();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Disable auto-reload on application pages to prevent data loss
-  usePageReload({ disableReload: true });
+  // SWR hook — shared cache with user dashboard, no duplicate fetch
+  const {
+    data: appStatus,
+    isLoading: isAppLoading,
+  } = useApplicationStatus(status !== "unauthenticated");
+
+  // Gate: redirect to /user when applications are closed
+  const applicationsOpen = useApplicationsOpen("/user");
 
   const [isChecked, setIsChecked] = useState(false);
-  const [hasCheckedApplications, setHasCheckedApplications] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [hasFetchedData, setHasFetchedData] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<{
+    cv: File | null;
+    portfolio: File | null;
+  }>({ cv: null, portfolio: null });
 
   const [uploading, setUploading] = useState({ cv: false, portfolio: false });
   const [uploadError, setUploadError] = useState({ cv: "", portfolio: "" });
@@ -34,6 +48,10 @@ export default function CommitteeApplication() {
     firstName: "",
     lastName: "",
     section: "",
+    age: "",
+    dateOfBirth: "",
+    sex: "",
+    isOldCssMember: false,
     secondChoice: "",
     cv: "",
     portfolioLink: "",
@@ -82,13 +100,21 @@ export default function CommitteeApplication() {
           if (!formData.section && data.user?.section) {
             updates.section = data.user.section;
           }
-          
-          if (!formData.cv && data.application?.cv) {
-            updates.cv = data.application.cv;
+
+          if (!formData.age && data.user?.age) {
+            updates.age = String(data.user.age);
           }
-          
-          if (!formData.portfolioLink && data.application?.portfolioLink) {
-            updates.portfolioLink = data.application.portfolioLink;
+
+          if (!formData.dateOfBirth && data.user?.dateOfBirth) {
+            updates.dateOfBirth = data.user.dateOfBirth.slice(0, 10);
+          }
+
+          if (!formData.sex && data.user?.sex) {
+            updates.sex = data.user.sex;
+          }
+
+          if (data.user?.isOldCssMember !== null && data.user?.isOldCssMember !== undefined) {
+            updates.isOldCssMember = data.user.isOldCssMember;
           }
           
           if (!formData.secondChoice && data.application?.secondOptionCommittee) {
@@ -108,43 +134,36 @@ export default function CommitteeApplication() {
     };
 
     fetchApplicationData();
-  }, [session, status, isLoaded, updateFormData, hasFetchedData, formData.studentNumber, formData.section, formData.cv, formData.portfolioLink, formData.secondChoice]);
+  }, [
+    session,
+    status,
+    isLoaded,
+    updateFormData,
+    hasFetchedData,
+    formData.studentNumber,
+    formData.section,
+    formData.age,
+    formData.dateOfBirth,
+    formData.sex,
+    formData.cv,
+    formData.portfolioLink,
+    formData.secondChoice,
+  ]);
 
-  // Check for if there are applications present
-  if (status === "authenticated" && !hasCheckedApplications) {
-    const checkApplications = async () => {
-      try {
-        const response = await fetch("/api/applications/check-existing");
-        if (response.ok) {
-          const data = await response.json();
-
-          // Redirect based on existing applications
-          if (data.hasMemberApplication) {
-            router.push("/user/apply/member/progress");
-          } else if (data.hasCommitteeApplication) {
-            const committeeId =
-              data.applications.committee?.firstOptionCommittee;
-            if (committeeId) {
-              router.push(
-                `/user/apply/committee-staff/${committeeId}/progress`
-              );
-            }
-          } else if (data.hasEAApplication) {
-            const ebRole = data.applications.ea?.firstOptionEb;
-            if (ebRole) {
-              router.push(`/user/apply/executive-assistant/${ebRole}/progress`);
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error checking applications:", error);
-      } finally {
-        setHasCheckedApplications(true);
-      }
-    };
-
-    checkApplications();
-  }
+  // Redirect if user already has an application
+  useEffect(() => {
+    if (!appStatus || status !== "authenticated") return;
+    if (appStatus.hasMemberApplication)
+      router.push("/user/apply/member/progress");
+    else if (appStatus.hasCommitteeApplication && appStatus.committeeId)
+      router.push(
+        `/user/apply/committee-staff/${appStatus.committeeId}/progress`,
+      );
+    else if (appStatus.hasExecutiveAssociateApplication && appStatus.ebRole)
+      router.push(
+        `/user/apply/executive-associate/${appStatus.ebRole}/progress`,
+      );
+  }, [appStatus, status, router]);
 
   const selectedCommittee = committeeRoles.find(
     (role) => role.id === committeeId
@@ -152,18 +171,18 @@ export default function CommitteeApplication() {
 
   const getCommitteeImage = (committeeId: string) => {
     const imageMap: { [key: string]: string } = {
-      academics: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_ACADEMICS.png",
-      community: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_COMMDEV.png",
-      creatives: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_CREATIVES.png",
-      documentation: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_DOCU.png",
-      external: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_EXTERNALS.png",
-      finance: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_FINANCE.png",
-      logistics: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_LOGISTICS.png",
-      publicity: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_PUBLICITY.png",
-      sports: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_SPOTA.png",
-      technology: "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/CSAR_TECHDEV.png",
+      academics: "/assets/css-apply-static-images/assets/committee_test/CSAR_ACADEMICS.webp",
+      community: "/assets/css-apply-static-images/assets/committee_test/CSAR_COMMDEV.webp",
+      creatives: "/assets/css-apply-static-images/assets/committee_test/CSAR_CREATIVES.webp",
+      documentation: "/assets/css-apply-static-images/assets/committee_test/CSAR_DOCU.webp",
+      external: "/assets/css-apply-static-images/assets/committee_test/CSAR_EXTERNALS.webp",
+      finance: "/assets/css-apply-static-images/assets/committee_test/CSAR_FINANCE.webp",
+      logistics: "/assets/css-apply-static-images/assets/committee_test/CSAR_LOGISTICS.webp",
+      publicity: "/assets/css-apply-static-images/assets/committee_test/CSAR_PUBLICITY.webp",
+      sports: "/assets/css-apply-static-images/assets/committee_test/CSAR_SPOTA.webp",
+      technology: "/assets/css-apply-static-images/assets/committee_test/CSAR_TECHDEV.webp",
     };
-    return imageMap[committeeId] || "https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/committee_test/Questions CSAR.png";
+    return imageMap[committeeId] || "/assets/css-apply-static-images/assets/committee_test/Questions%20CSAR.webp";
   };
 
   useEffect(() => {
@@ -183,25 +202,27 @@ export default function CommitteeApplication() {
     };
   }, [uiState.isOpen, updateUIState]);
 
+  // Early returns AFTER all hooks
+  if (status === "loading" || isAppLoading) return <LoadingScreen />;
+  if (
+    appStatus &&
+    (appStatus.hasMemberApplication ||
+      appStatus.hasCommitteeApplication ||
+      appStatus.hasExecutiveAssociateApplication)
+  )
+    return <LoadingScreen />;
+  if (!applicationsOpen) return <LoadingScreen />;
+
   const requiresPortfolio = (committeeKey?: string) =>
     ["creatives", "technology", "documentation"].includes(committeeKey || "");
-
-  // Helper function to check if a string is a valid Supabase URL
-  const isValidSupabaseUrl = (url: string) => {
-    if (!url) return false;
-    // Check if it's a valid URL and contains supabase.co
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname.includes('supabase.co') || urlObj.hostname.includes('supabase.com');
-    } catch {
-      return false;
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "studentNumber") {
       const numericValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+      updateFormData({ [name]: numericValue });
+    } else if (name === "age") {
+      const numericValue = value.replace(/[^0-9]/g, "").slice(0, 3);
       updateFormData({ [name]: numericValue });
     } else {
       updateFormData({ [name]: value });
@@ -237,21 +258,20 @@ export default function CommitteeApplication() {
       return;
     }
 
+    if (!formData.age || !formData.dateOfBirth || !formData.sex) {
+      setError("Please enter your age, date of birth, and sex");
+      setLoading(false);
+      return;
+    }
+
     if (!formData.secondChoice) {
       setError("Please select a second choice committee");
       setLoading(false);
       return;
     }
 
-    if (!formData.cv) {
-      setError("Please upload or wait for your CV to finish uploading");
-      setLoading(false);
-      return;
-    }
-
-    // Validate that CV is a valid Supabase URL (not a filename)
-    if (!isValidSupabaseUrl(formData.cv)) {
-      setError("CV upload failed. Please re-upload your CV file.");
+    if (!selectedFiles.cv) {
+      setError("Please attach your CV file before submitting");
       setLoading(false);
       return;
     }
@@ -259,25 +279,77 @@ export default function CommitteeApplication() {
     if (
       (requiresPortfolio(selectedCommittee?.id) ||
         requiresPortfolio(formData.secondChoice)) &&
-      !formData.portfolioLink
+      !selectedFiles.portfolio
     ) {
-      setError("Please upload or wait for your Portfolio to finish uploading");
-      setLoading(false);
-      return;
-    }
-
-    // Validate that portfolio is a valid Supabase URL (not a filename)
-    if (
-      (requiresPortfolio(selectedCommittee?.id) ||
-        requiresPortfolio(formData.secondChoice)) &&
-      !isValidSupabaseUrl(formData.portfolioLink)
-    ) {
-      setError("Portfolio upload failed. Please re-upload your Portfolio file.");
+      setError("Please attach your Portfolio file before submitting");
       setLoading(false);
       return;
     }
 
     try {
+      const shouldUploadPortfolio =
+        requiresPortfolio(selectedCommittee?.id) ||
+        requiresPortfolio(formData.secondChoice);
+
+      setUploading({ cv: true, portfolio: shouldUploadPortfolio });
+
+      const cvUploadFormData = new FormData();
+      cvUploadFormData.append("file", selectedFiles.cv);
+      cvUploadFormData.append("studentNumber", formData.studentNumber);
+      cvUploadFormData.append("section", formData.section);
+      cvUploadFormData.append("fileType", "cv");
+      cvUploadFormData.append("applicationType", "committee");
+
+      const uploadCvPromise = fetch("/api/files/upload", {
+        method: "POST",
+        body: cvUploadFormData,
+      });
+
+      const uploadPortfolioPromise = shouldUploadPortfolio
+        ? (() => {
+            const portfolioUploadFormData = new FormData();
+            portfolioUploadFormData.append("file", selectedFiles.portfolio!);
+            portfolioUploadFormData.append(
+              "studentNumber",
+              formData.studentNumber,
+            );
+            portfolioUploadFormData.append("section", formData.section);
+            portfolioUploadFormData.append("fileType", "portfolio");
+            portfolioUploadFormData.append("applicationType", "committee");
+
+            return fetch("/api/files/upload", {
+              method: "POST",
+              body: portfolioUploadFormData,
+            });
+          })()
+        : null;
+
+      const [cvUploadResponse, portfolioUploadResponse] =
+        await Promise.all([uploadCvPromise, uploadPortfolioPromise]);
+
+      const cvUploadResult = await cvUploadResponse.json();
+      if (!cvUploadResponse.ok) {
+        setError(cvUploadResult.error || "Failed to upload CV");
+        setLoading(false);
+        setUploading({ cv: false, portfolio: false });
+        return;
+      }
+
+      let portfolioPath = "";
+      if (portfolioUploadResponse) {
+        const portfolioUploadResult = await portfolioUploadResponse.json();
+        if (!portfolioUploadResponse.ok) {
+          setError(portfolioUploadResult.error || "Failed to upload Portfolio");
+          setLoading(false);
+          setUploading({ cv: false, portfolio: false });
+          return;
+        }
+
+        portfolioPath = portfolioUploadResult.filePath;
+      }
+
+      setUploading({ cv: false, portfolio: false });
+
       const response = await fetch("/api/applications/committee-staff", {
         method: "POST",
         headers: {
@@ -288,10 +360,14 @@ export default function CommitteeApplication() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           section: formData.section,
+          age: Number(formData.age),
+          dateOfBirth: formData.dateOfBirth,
+          sex: formData.sex,
+          isOldCssMember: formData.isOldCssMember,
           firstOptionCommittee: committeeId,
           secondOptionCommittee: formData.secondChoice,
-          cv: formData.cv,
-          portfolio: formData.portfolioLink,
+          cv: cvUploadResult.filePath,
+          portfolio: portfolioPath || undefined,
         }),
       });
 
@@ -315,14 +391,8 @@ export default function CommitteeApplication() {
     }
   };
 
-  const handleFileUpload = async (file: File, type: "cv" | "portfolio") => {
-    if (!file || !formData.studentNumber || !formData.section) {
-      setUploadError((prev) => ({
-        ...prev,
-        [type]: "Student number and section are required",
-      }));
-      return;
-    }
+  const handleFileUpload = (file: File, type: "cv" | "portfolio") => {
+    if (!file) return;
 
     if (file.type !== "application/pdf") {
       setUploadError((prev) => ({
@@ -341,53 +411,9 @@ export default function CommitteeApplication() {
       }));
       return;
     }
-
-    setUploading((prev) => ({ ...prev, [type]: true }));
     setUploadError((prev) => ({ ...prev, [type]: "" }));
 
-    try {
-      const uploadFormData = new FormData();
-      uploadFormData.append("file", file);
-      uploadFormData.append("studentNumber", formData.studentNumber);
-      uploadFormData.append("section", formData.section);
-      uploadFormData.append("fileType", type);
-      uploadFormData.append("applicationType", "committee");
-
-      const response = await fetch("/api/files/upload", {
-        method: "POST",
-        body: uploadFormData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        // Update form data with the new file URL
-        if (type === "cv") {
-          updateFormData({ cv: result.url });
-        } else {
-          updateFormData({ portfolioLink: result.url });
-        }
-      } else {
-        setUploadError((prev) => ({
-          ...prev,
-          [type]: result.error || "Upload failed",
-        }));
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      setUploadError((prev) => ({
-        ...prev,
-        [type]: "Upload failed. Please try again.",
-      }));
-      // Don't store filename - leave the field empty so user must retry upload
-      if (type === "cv") {
-        updateFormData({ cv: "" });
-      } else {
-        updateFormData({ portfolioLink: "" });
-      }
-    } finally {
-      setUploading((prev) => ({ ...prev, [type]: false }));
-    }
+    setSelectedFiles((prev) => ({ ...prev, [type]: file }));
   };
 
   if (!selectedCommittee) {
@@ -412,16 +438,30 @@ export default function CommitteeApplication() {
     );
   }
 
+  const isProcessing = loading || uploading.cv || uploading.portfolio;
+  const processingLabel = uploading.cv || uploading.portfolio
+    ? "Uploading application files..."
+    : "Submitting committee application...";
+
   return (
-    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('https://odjmlznlgvuslhceobtz.supabase.co/storage/v1/object/public/css-apply-static-images/assets/pictures/background.png')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
+    <div className="min-h-screen bg-white sm:bg-[rgb(243,243,253)] sm:bg-[url('/assets/css-apply-static-images/assets/pictures/background.webp')] sm:bg-cover  sm:bg-no-repeat flex flex-col justify-between">
       <Header />
 
       <section className="flex flex-col items-center justify-center sm:my-12 lg:my-28">
         <div className="w-[80%] flex flex-col justify-center items-center">
           <form
             onSubmit={handleSubmit}
-            className="rounded-[24px] sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] p-10 md:p-16 lg:py-20 lg:px-24"
+            aria-busy={isProcessing}
+            className="relative rounded-3xl p-10 sm:bg-white sm:shadow-[0_4px_4px_0_rgba(0,0,0,0.31)] md:p-16 lg:px-24 lg:py-20"
           >
+            <FormProcessingOverlay
+              active={isProcessing}
+              label={processingLabel}
+            />
+            <fieldset
+              disabled={isProcessing}
+              className={`min-w-0 border-0 p-0 transition duration-200 ${isProcessing ? "opacity-45 grayscale" : "opacity-100"}`}
+            >
             <div className="text-3xl lg:text-4xl font-raleway font-semibold mb-2 lg:mb-4">
               <span className="text-black">Apply for </span>
               <span className="text-[#134687]">
@@ -433,7 +473,7 @@ export default function CommitteeApplication() {
               {selectedCommittee.description}
             </div>
 
-            <hr className="my-5 lg:my-8 border-t-1 border-[#717171]" />
+            <hr className="my-5 lg:my-8 border-t border-[#717171]" />
 
             {/* Stepper */}
             <div className="w-full flex flex-col items-center justify-center">
@@ -446,13 +486,13 @@ export default function CommitteeApplication() {
                     1
                   </span>
                 </div>
-                <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
+                <div className="w-20 lg:w-24 h-0.5 lg:h-0.75 bg-[#D9D9D9]" />
                 <div className="flex items-center justify-center rounded-full bg-[#2F7EE3] w-5 h-5 lg:w-10 lg:h-10">
                   <span className="text-white text-[9px] lg:text-xs lg:font-bold font-inter">
                     2
                   </span>
                 </div>
-                <div className="w-20 lg:w-24 h-[2px] lg:h-[3px] bg-[#D9D9D9]" />
+                <div className="w-20 lg:w-24 h-0.5 lg:h-0.75 bg-[#D9D9D9]" />
                 <div className="flex items-center justify-center rounded-full bg-[#D9D9D9] w-5 h-5 lg:w-10 lg:h-10">
                   <span className="text-[#696767] text-[9px] lg:text-xs lg:font-bold font-inter">
                     3
@@ -480,13 +520,13 @@ export default function CommitteeApplication() {
             )}
 
             {/* Application Form */}
-            <div className="flex flex-col lg:flex-row justify-center lg:gap-8 mt-5 lg:mt-8">
-              <div className="flex flex-col gap-4 lg:gap-6">
+            <div className="mx-auto mt-5 flex w-full flex-col lg:mt-8 lg:w-fit lg:flex-row lg:items-start lg:gap-12">
+              <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1 lg:gap-2">
                   <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                     Student Number *
                   </div>
-                  <div className="text-black text-xs lg:text-sm font-Inter w-full lg:w-[400px]">
+                  <div className="text-black text-xs lg:text-sm font-Inter w-full lg:w-100">
                     <input
                       type="text"
                       name="studentNumber"
@@ -502,7 +542,7 @@ export default function CommitteeApplication() {
                   <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                     First Name *
                   </div>
-                  <div className="text-black text-sm font-Inter w-full lg:w-[400px]">
+                  <div className="text-black text-sm font-Inter w-full lg:w-100">
                     <input
                       type="text"
                       name="firstName"
@@ -521,7 +561,7 @@ export default function CommitteeApplication() {
                   <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                     Last Name *
                   </div>
-                  <div className="text-black lg:text-sm font-Inter lg:w-[400px]">
+                  <div className="text-black lg:text-sm font-Inter lg:w-100">
                     <input
                       type="text"
                       name="lastName"
@@ -541,7 +581,7 @@ export default function CommitteeApplication() {
                     <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                       Section *
                     </div>
-                    <div className="text-black lg:text-sm font-Inter w-28 lg:w-[150px]">
+                    <div className="text-black lg:text-sm font-Inter w-28 lg:w-37.5">
                       <input
                         type="text"
                         name="section"
@@ -562,13 +602,13 @@ export default function CommitteeApplication() {
                       Second Choice *
                     </div>
                     <div
-                      className="relative w-44 lg:w-[240px]"
+                      className="relative w-44 lg:w-60"
                       ref={dropdownRef}
                     >
                       <button
                         type="button"
                         onClick={() => updateUIState({ isOpen: !uiState.isOpen })}
-                        className={`w-full h-9 lg:h-12 rounded-md border-2 focus:outline-none bg-white px-2 lg:px-4 lg:py-3 text-sm lg:text-base text-left appearance-none bg-no-repeat bg-right bg-[length:16px] lg:pr-10 truncate ${
+                        className={`w-full h-9 lg:h-12 rounded-md border-2 focus:outline-none bg-white px-2 lg:px-4 lg:py-3 text-sm lg:text-base text-left appearance-none bg-no-repeat bg-right bg-size-[16px] lg:pr-10 truncate ${
                           uiState.isOpen ? "border-[#044FAF]" : "border-[#CDCECF]"
                         } ${
                           formData.secondChoice
@@ -576,7 +616,7 @@ export default function CommitteeApplication() {
                             : "text-[#888888]"
                         }`}
                         style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+                          backgroundImage: "url('/icons/chevron-down-dropdown.svg')",
                         }}
                       >
                         {formData.secondChoice
@@ -612,21 +652,60 @@ export default function CommitteeApplication() {
                     </div>
                   </div>
                 </div>
+
+                <div className="flex gap-2">
+                  <div className="flex flex-col gap-1 lg:gap-2">
+                    <div className="text-black text-xs lg:text-sm font-Inter font-normal">Age *</div>
+                    <input type="text" name="age" value={formData.age} onChange={handleInputChange} required inputMode="numeric" className="w-24 h-9 lg:h-12 rounded-md border-2 border-[#CDCECF] focus:border-[#044FAF] focus:outline-none bg-white px-4 py-3 text-sm lg:text-base" placeholder="Age" />
+                  </div>
+                  <div className="flex flex-col gap-1 lg:gap-2">
+                    <div className="text-black text-xs lg:text-sm font-Inter font-normal">Date of Birth *</div>
+                    <DateOfBirthInput value={formData.dateOfBirth} onChange={handleInputChange} className="h-10 w-48 rounded-md border-2 border-[#CDCECF] bg-white px-4 py-2 text-sm focus:border-[#044FAF] focus:outline-none lg:h-12 lg:w-60 lg:text-base" />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 lg:gap-2">
+                  <div className="text-black text-xs font-normal font-Inter lg:text-sm">Sex *</div>
+                  <div className="flex gap-6 text-sm text-black font-Inter">
+                    {(["M", "F"] as const).map((sex) => (
+                      <label key={sex} className="flex cursor-pointer items-center gap-2">
+                        <input
+                          type="radio"
+                          name="sex"
+                          value={sex}
+                          checked={formData.sex === sex}
+                          onChange={handleInputChange}
+                          required
+                          className="h-4 w-4 accent-[#134687]"
+                        />
+                        {sex}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 lg:gap-2">
+                  <div className="text-black text-xs lg:text-sm font-Inter font-normal">Were you an old member/staff/executive associate of CSS before? *</div>
+                  <div className="flex gap-6 text-black text-sm font-Inter">
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={formData.isOldCssMember} onChange={() => updateFormData({ isOldCssMember: true })} className="w-4 h-4 accent-[#134687]" />Yes</label>
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!formData.isOldCssMember} onChange={() => updateFormData({ isOldCssMember: false })} className="w-4 h-4 accent-[#134687]" />No</label>
+                  </div>
+                </div>
                 <div className="flex gap-4 lg:gap-2 items-center">
                   <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                     Curriculum Vitae (in pdf):
                   </div>
-                  <div className="text-black lg:text-xs font-Inter lg:w-[200px]">
-                    {formData.cv ? (
+                  <div className="text-black lg:text-xs font-Inter lg:w-50">
+                    {selectedFiles.cv ? (
                       <div className="flex items-center justify-between bg-gray-100 p-2 lg:px-3 lg:py-2 rounded-md">
                         <span className="lg:text-sm text-black truncate">
-                          {formData.cv.includes("http")
-                            ? "CV Uploaded ✓"
-                            : formData.cv}
+                          {selectedFiles.cv.name}
                         </span>
                         <button
                           type="button"
-                          onClick={() => updateFormData({ cv: "" })}
+                          onClick={() =>
+                            setSelectedFiles((prev) => ({ ...prev, cv: null }))
+                          }
                           className="text-black hover:text-[#044FAF] lg:ml-2 lg:text-lg"
                         >
                           ×
@@ -672,18 +751,19 @@ export default function CommitteeApplication() {
                     <div className="text-black text-xs lg:text-sm font-Inter font-normal">
                       Portfolio (in pdf):
                     </div>
-                    <div className="text-black lg:text-xs font-Inter lg:w-[200px]">
-                      {formData.portfolioLink ? (
+                    <div className="text-black lg:text-xs font-Inter lg:w-50">
+                      {selectedFiles.portfolio ? (
                         <div className="flex items-center justify-between bg-gray-100 p-2 lg:px-3 lg:py-2 rounded-md">
                           <span className="lg:text-sm text-black truncate">
-                            {formData.portfolioLink.includes("http")
-                              ? "Portfolio Uploaded ✓"
-                              : formData.portfolioLink}
+                            {selectedFiles.portfolio.name}
                           </span>
                           <button
                             type="button"
                             onClick={() =>
-                              updateFormData({ portfolioLink: "" })
+                              setSelectedFiles((prev) => ({
+                                ...prev,
+                                portfolio: null,
+                              }))
                             }
                             className="text-black hover:text-[#044FAF] lg:ml-2 lg:text-lg"
                           >
@@ -731,31 +811,28 @@ export default function CommitteeApplication() {
                 )}
 
                 <div className="flex items-start gap-3">
-                  <div className="relative flex-shrink-0">
+                  <div className="relative shrink-0 h-4 w-4 lg:h-6 lg:w-6">
                     <input
                       type="checkbox"
                       id="agreement-checkbox"
                       checked={isChecked}
                       onChange={(e) => setIsChecked(e.target.checked)}
-                      className="w-4 h-4 lg:w-6 lg:h-6 appearance-none rounded-full border-2 border-gray-400 transition-all duration-200 focus:outline-none hover:border-[#134687] checked:bg-blue-500 shadow-inner cursor-pointer"
+                      className="absolute inset-0 block h-full w-full appearance-none rounded-full border-2 border-gray-400 transition-all duration-200 focus:outline-none hover:border-[#134687] checked:bg-blue-500 shadow-inner cursor-pointer"
                       required
                     />
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                      <svg
-                        className={`w-2 h-2 lg:w-4 lg:h-4 text-white transition-opacity duration-20 ${
+                      <div
+                        className={`w-2 h-2 lg:w-4 lg:h-4 text-white transition-opacity duration-20 bg-current ${
                           isChecked ? "opacity-100" : "opacity-0"
                         }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 26 26"
-                        strokeWidth="3"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                        style={{
+                          maskImage: "url(/icons/check.svg)",
+                          WebkitMaskImage: "url(/icons/check.svg)",
+                          maskSize: "contain",
+                          maskRepeat: "no-repeat",
+                          maskPosition: "center",
+                        }}
+                      />
                     </div>
                   </div>
                   <label
@@ -771,18 +848,18 @@ export default function CommitteeApplication() {
               </div>
 
               <div className="hidden lg:flex justify-center">
-                <div className="w-80 h-96 rounded-lg overflow-hidden border border-gray-200 bg-gradient-to-b from-blue-900 via-blue-90 to-[#2F7EE3] relative">
+                <div className="relative h-96 w-80 overflow-hidden rounded-lg border border-[#134687]/20 bg-[#134687]">
                   <Image
                     src={getCommitteeImage(committeeId || "")}
                     alt={selectedCommittee?.title || "Committee"}
                     fill
-                    className="object-cover"
+                    className="object-contain p-5"
                     sizes="(min-width: 1024px) 320px, 0px"
                   />
                 </div>
               </div>
             </div>
-            <hr className="my-8 border-t-1 border-[#717171]" />
+            <hr className="my-8 border-t border-[#717171]" />
             <div className="flex justify-center gap-4">
               <button
                 type="button"
@@ -796,9 +873,22 @@ export default function CommitteeApplication() {
                 disabled={loading}
                 className="cursor-pointer whitespace-nowrap font-inter text-sm font-semibold text-[#134687] px-15 py-3 rounded-lg border-2 border-[#134687] bg-white hover:bg-[#B1CDF0] transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Submitting..." : "Next"}
+                {loading ? (
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <LoadingSpinner
+                      label={uploading.cv || uploading.portfolio ? "Uploading files" : "Submitting application"}
+                      size="sm"
+                    />
+                    {uploading.cv || uploading.portfolio
+                      ? "Uploading files..."
+                      : "Submitting..."}
+                  </span>
+                ) : (
+                  "Next"
+                )}
               </button>
             </div>
+            </fieldset>
           </form>
         </div>
       </section>

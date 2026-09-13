@@ -1,25 +1,44 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Keep development hot-reload artifacts separate from production builds.
+  // Running `next build` must not invalidate an active `next dev` server.
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
+  poweredByHeader: false,
+  // Keep recently visited routes compiled during local development so moving
+  // between admin/application pages does not repeatedly trigger cold rebuilds.
+  onDemandEntries: {
+    maxInactiveAge: 25 * 60 * 1000,
+    pagesBufferLength: 12,
+  },
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb',
+      bodySizeLimit: "10mb",
     },
   },
   images: {
-    // Increase the limit for image optimization
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Add domains if you're loading external images
-    domains: ["odjmlznlgvuslhceobtz.supabase.co"],
-    // Increase memory limit for image optimization
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "odjmlznlgvuslhceobtz.supabase.co",
+        pathname: "/storage/v1/object/**",
+      },
+      {
+        protocol: "https",
+        hostname: "itvimtcxzsubgcbnknvq.supabase.co",
+        pathname: "/storage/v1/object/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
+      },
+    ],
     minimumCacheTTL: 60,
-    // Handle large images better
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Disable optimization for deployment issues
-    unoptimized: true,
   },
 };
 

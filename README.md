@@ -8,8 +8,8 @@
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.4.6-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.1.12-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![Prisma](https://img.shields.io/badge/Prisma-6.16.1-2D3748?style=for-the-badge&logo=prisma)](https://prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.2.2-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-7.7.0-2D3748?style=for-the-badge&logo=prisma)](https://prisma.io/)
 
 </div>
 
@@ -24,10 +24,12 @@ CSSApply is a comprehensive recruitment management system designed specifically 
 - **Multi-Position Applications**: Support for Members, Committee Staff, and Executive Assistant positions
 - **Smart Interview Scheduling**: Automated conflict detection and prevention
 - **Admin Dashboard**: Comprehensive management tools for recruitment staff
-- **Email Notifications**: Automated communication system using Brevo
+- **Event Attendance**: Snapshot-based rosters, CSS digital ID and UST QR check-in/testing, CSV guest import, and themed CSV/PDF exports
+- **Email Notifications**: Automated communication system using Brevo with test email feature
 - **Personality Assessment**: Integrated personality test for candidate evaluation
 - **Secure Authentication**: NextAuth.js integration with role-based access control
 - **Responsive Design**: Mobile-first approach with modern UI/UX
+- **Performance Optimized**: SWR caching for fast data fetching and instant page loads
 
 ---
 
@@ -43,12 +45,14 @@ CSSApply is a comprehensive recruitment management system designed specifically 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-org/css-apply.git
    cd css-apply
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -58,35 +62,42 @@ CSSApply is a comprehensive recruitment management system designed specifically 
    ```
 
 3. **Environment Setup**
+
    ```bash
    cp .env.example .env.local
    ```
-   
+
    Configure the following environment variables:
+
    ```env
    # Database
    DATABASE_URL="postgresql://username:password@localhost:5432/css_apply"
-   
+
    # NextAuth
    NEXTAUTH_URL="http://localhost:3000"
    NEXTAUTH_SECRET="your-secret-key"
-   
+
    # Supabase
    NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
    NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
    SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
-   
+
+   # Auth
+   ALLOWED_SIGNIN_EMAIL_DOMAIN="ust.edu.ph"
+
    # Email (Brevo)
    BREVO_API_KEY="your-brevo-api-key"
    ```
 
 4. **Database Setup**
+
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
 5. **Start Development Server**
+
    ```bash
    npm run dev
    # or
@@ -125,31 +136,58 @@ css-apply/
 
 ## Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server with Turbopack |
-| `npm run build` | Build the application for production |
-| `npm run start` | Start the production server |
-| `npm run lint` | Run ESLint for code quality |
+| Command         | Description                             |
+| --------------- | --------------------------------------- |
+| `npm run dev`   | Start development server with Turbopack |
+| `npm run build` | Build the application for production    |
+| `npm run start` | Start the production server             |
+| `npm run lint`  | Run ESLint for code quality             |
+| `npm run lint:fix` | Run ESLint with auto-fix             |
+| `npx prisma generate` | Regenerate Prisma client         |
+| `npx prisma db push` | Push schema changes to database   |
+| `npx prisma studio` | Open Prisma Studio GUI             |
 
 ---
 
 ## Application Types
 
 ### Member Application
+
 - Basic membership application
 - Simple form with personal information
 - Automatic approval process
 
 ### Committee Staff Application
+
 - Apply for specific committee positions
 - Portfolio submission required
 - Interview scheduling with committee heads
 
 ### Executive Assistant Application
+
 - Apply to assist Executive Board members
 - CV submission required
 - Interview scheduling with EB members
+
+---
+
+## Admin Features
+
+### Super Admin Dashboard
+
+The Super Admin dashboard provides comprehensive system management:
+
+- **User Database (user_db)**: View, search, and manage all users. Assign EB (Executive Board) profiles, change roles (user/admin/super_admin), and view member statistics.
+- **Configuration (config)**: Manage recruitment cycles with start/end dates and active status.
+- **Test Email (email_test)**: Send test emails for all email templates to verify delivery and design.
+
+### EB Profile Management
+
+Super Admins can assign and manage Executive Board profiles including:
+- Position (President, Secretary, Treasurer, etc.)
+- Committees assigned
+- Meeting links for interviews
+- Active/inactive status
 
 ---
 
@@ -172,10 +210,13 @@ CSSApply uses **Brevo** (formerly Sendinblue) for email communications:
 - **Application Confirmations**: Successful submissions
 - **Interview Notifications**: Schedule confirmations
 - **Admin Alerts**: System notifications
+- **Test Emails**: Super Admins can send test emails to verify templates
 
 ### Email Templates
+
 - Responsive HTML templates
-- Brand-consistent styling
+- Brand-consistent styling with blue theme colors
+- Clean design with logo instead of text
 - Multi-language support ready
 
 ---
@@ -183,6 +224,7 @@ CSSApply uses **Brevo** (formerly Sendinblue) for email communications:
 ## Database Schema
 
 ### Core Models
+
 - **User**: User accounts and profiles
 - **EAApplication**: Executive Assistant applications
 - **CommitteeApplication**: Committee Staff applications
@@ -190,6 +232,7 @@ CSSApply uses **Brevo** (formerly Sendinblue) for email communications:
 - **AvailableEBInterviewTime**: Interview slot management
 
 ### Key Features
+
 - **Prisma ORM**: Type-safe database operations
 - **Migrations**: Version-controlled schema changes
 - **Relationships**: Proper foreign key constraints
@@ -197,20 +240,48 @@ CSSApply uses **Brevo** (formerly Sendinblue) for email communications:
 
 ---
 
+## Performance Optimization
+
+CSSApply uses several techniques to ensure fast performance:
+
+### SWR Caching
+
+- Client-side data caching with SWR (Stale-While-Revalidate)
+- EB profiles and schedule data are cached for 5 minutes
+- Eliminates loading spinners on return visits
+- Automatic revalidation disabled to reduce server load
+
+### Loading States
+
+- All admin and user pages show loading spinners during data fetches
+- Prevents "flash" of empty content when loading
+- Consistent UX across all pages
+
+### Database Optimization
+
+- Prisma queries optimized with proper `select` statements
+- Pagination implemented for large datasets
+- Indexes on frequently queried columns
+
+---
+
 ## Deployment
 
 ### Vercel (Recommended)
+
 1. Connect your GitHub repository to Vercel
 2. Configure environment variables
 3. Deploy automatically on push to main branch
 
 ### Manual Deployment
+
 1. Build the application: `npm run build`
 2. Start the production server: `npm run start`
 3. Configure reverse proxy (nginx/Apache)
 4. Set up SSL certificates
 
 ### Environment Variables for Production
+
 ```env
 NEXTAUTH_URL="https://your-domain.com"
 DATABASE_URL="your-production-database-url"
@@ -224,6 +295,7 @@ NEXTAUTH_SECRET="your-production-secret"
 We welcome contributions to CSSApply! Here's how you can help:
 
 ### Development Workflow
+
 1. **Fork** the repository
 2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
 3. **Commit** your changes: `git commit -m 'Add amazing feature'`
@@ -231,6 +303,7 @@ We welcome contributions to CSSApply! Here's how you can help:
 5. **Open** a Pull Request
 
 ### Code Standards
+
 - **TypeScript**: Strict type checking enabled
 - **ESLint**: Follow the configured rules
 - **Prettier**: Consistent code formatting
@@ -241,7 +314,8 @@ We welcome contributions to CSSApply! Here's how you can help:
 ## Support
 
 ### Getting Help
-- **Email**: css.cics@ust.edu.ph
+
+- **Email**: <css.cics@ust.edu.ph>
 - **Facebook**: [CSS Facebook Page](https://facebook.com/USTCSS)
 
 ---
